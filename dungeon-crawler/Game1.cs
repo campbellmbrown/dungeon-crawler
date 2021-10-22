@@ -1,25 +1,42 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 namespace dungeon_crawler
 {
     public class Game1 : Game
     {
+        public enum GameState
+        {
+            Playing,
+        }
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private Color _backgroundColor;
+
+        public static Dictionary<string, Texture2D> textures { get; set; }
+        public static Random random;
+
+        private GameState _gameState;
+
+        public const string VERSION_STR = "v0.1.1";
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            random = new Random();
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
+            IsMouseVisible = true;
+            IsFixedTimeStep = true;
+            _backgroundColor = new Color(10, 10, 12);
+            _gameState = GameState.Playing;
             base.Initialize();
         }
 
@@ -27,26 +44,45 @@ namespace dungeon_crawler
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            textures = new Dictionary<string, Texture2D>();
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 Exit();
+            }
 
-            // TODO: Add your update logic here
+            switch (_gameState)
+            {
+                case GameState.Playing:
+                    // TODO: add playing state update here
+                    break;
+                default:
+                    // TODO: add logging warning here
+                    break;
+            }
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
-
+            // TODO: _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, transformMatrix: _viewManager.camera.GetViewMatrix());
+            _spriteBatch.Begin();
+            GraphicsDevice.Clear(_backgroundColor);
+            switch (_gameState)
+            {
+                case GameState.Playing:
+                    // TODO: add playing state draw here
+                    break;
+                default:
+                    // TODO: add logging warning here
+                    break;
+            }
             base.Draw(gameTime);
+            _spriteBatch.End();
         }
     }
 }
