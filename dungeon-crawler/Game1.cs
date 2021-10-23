@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeoncrawler.Management;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 
@@ -20,6 +22,7 @@ namespace dungeon_crawler
         public static Dictionary<string, Texture2D> textures { get; set; }
         public static Random random;
 
+        private ViewManager _viewManager;
         private GameState _gameState;
 
         public const string VERSION_STR = "v0.1.1";
@@ -45,6 +48,8 @@ namespace dungeon_crawler
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             textures = new Dictionary<string, Texture2D>();
+
+            _viewManager = new ViewManager(GraphicsDevice, _graphics, Window);
         }
 
         protected override void Update(GameTime gameTime)
@@ -69,8 +74,15 @@ namespace dungeon_crawler
 
         protected override void Draw(GameTime gameTime)
         {
-            // TODO: _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, transformMatrix: _viewManager.camera.GetViewMatrix());
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(
+                SpriteSortMode.Deferred,
+                BlendState.AlphaBlend,
+                SamplerState.PointClamp,
+                DepthStencilState.None,
+                RasterizerState.CullCounterClockwise,
+                null,
+                transformMatrix: _viewManager.camera.GetViewMatrix()
+            );
             GraphicsDevice.Clear(_backgroundColor);
             switch (_gameState)
             {
@@ -81,6 +93,8 @@ namespace dungeon_crawler
                     // TODO: add logging warning here
                     break;
             }
+            _spriteBatch.DrawRectangle(new RectangleF(-5, -5, 10, 10), Color.White);
+            _viewManager.UpdateCameraPosition(Vector2.Zero); // TODO: move out of here to the player class
             base.Draw(gameTime);
             _spriteBatch.End();
         }
