@@ -1,4 +1,5 @@
-﻿using dungeoncrawler.Management;
+﻿using dungeoncrawler.GameStates.PlayingState;
+using dungeoncrawler.Management;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -24,8 +25,9 @@ namespace dungeon_crawler
 
         private ViewManager _viewManager;
         private GameState _gameState;
+        private PlayingState _playingState;
 
-        public const string VERSION_STR = "v0.1.1";
+        public const string VERSION_STR = "v0.1.2";
 
         public Game1()
         {
@@ -50,6 +52,7 @@ namespace dungeon_crawler
             textures = new Dictionary<string, Texture2D>();
 
             _viewManager = new ViewManager(GraphicsDevice, _graphics, Window);
+            _playingState = new PlayingState();
         }
 
         protected override void Update(GameTime gameTime)
@@ -62,7 +65,7 @@ namespace dungeon_crawler
             switch (_gameState)
             {
                 case GameState.Playing:
-                    // TODO: add playing state update here
+                    _playingState.FrameTick(gameTime);
                     break;
                 default:
                     // TODO: add logging warning here
@@ -87,13 +90,12 @@ namespace dungeon_crawler
             switch (_gameState)
             {
                 case GameState.Playing:
-                    // TODO: add playing state draw here
+                    _playingState.Draw(_spriteBatch);
                     break;
                 default:
                     // TODO: add logging warning here
                     break;
             }
-            _spriteBatch.DrawRectangle(new RectangleF(-5, -5, 10, 10), Color.White);
             _viewManager.UpdateCameraPosition(Vector2.Zero); // TODO: move out of here to the player class
             base.Draw(gameTime);
             _spriteBatch.End();

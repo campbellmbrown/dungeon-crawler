@@ -1,0 +1,18 @@
+@startuml
+
+title Game Class Diagram
+
+class Game1
+
+interface IGameState
+class PlayingState
+class GridManager
+class GridSquare
+
+Game1 -- "1..*" IGameState
+
+IGameState <|-- PlayingState
+PlayingState -- "1" GridManager
+GridManager -- "0..*" GridSquare
+
+@enduml
