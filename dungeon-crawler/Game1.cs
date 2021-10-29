@@ -27,7 +27,7 @@ namespace dungeoncrawler
         private GameState _gameState;
         private PlayingState _playingState;
 
-        public const string VERSION_STR = "v0.1.2";
+        public const string VERSION_STR = "v0.1.3";
 
         public Game1()
         {
