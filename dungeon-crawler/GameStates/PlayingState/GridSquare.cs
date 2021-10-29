@@ -14,6 +14,24 @@ namespace dungeoncrawler.GameStates.PlayingState
         public int xIdx { get; }
         public int yIdx { get; }
 
+        private Entity _entity;
+        public Entity entity
+        {
+            get
+            {
+                return _entity;
+            }
+            set
+            {
+                _entity = value;
+                if (_entity != null)
+                {
+                    _entity.ChangeGridSquare(this);
+                }
+            }
+        }
+        public bool hasEntity { get { return entity != null; } }
+
         public GridSquare(int xIdx, int yIdx)
         {
             this.xIdx = xIdx;
@@ -22,12 +40,19 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public void FrameTick(GameTime gameTime)
         {
-
+            if (hasEntity)
+            {
+                entity.FrameTick(gameTime);
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.DrawRectangle(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), Color.Red);
+            if (hasEntity)
+            {
+                entity.Draw(spriteBatch);
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 
-namespace dungeon_crawler
+namespace dungeoncrawler
 {
     public class Game1 : Game
     {
@@ -27,7 +27,7 @@ namespace dungeon_crawler
         private GameState _gameState;
         private PlayingState _playingState;
 
-        public const string VERSION_STR = "v0.1.2";
+        public const string VERSION_STR = "v0.1.3";
 
         public Game1()
         {
@@ -52,7 +52,7 @@ namespace dungeon_crawler
             textures = new Dictionary<string, Texture2D>();
 
             _viewManager = new ViewManager(GraphicsDevice, _graphics, Window);
-            _playingState = new PlayingState();
+            _playingState = new PlayingState(_viewManager);
         }
 
         protected override void Update(GameTime gameTime)
