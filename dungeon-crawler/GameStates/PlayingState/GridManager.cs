@@ -13,6 +13,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public GridManager()
         {
             _gridSquares = new List<GridSquare>();
+            // TODO: remove
             _gridSquares.Add(new GridSquare(0, 0));
             _gridSquares.Add(new GridSquare(0, 1));
             _gridSquares.Add(new GridSquare(0, 2));
@@ -24,10 +25,14 @@ namespace dungeoncrawler.GameStates.PlayingState
             _gridSquares.Add(new GridSquare(2, 2));
         }
 
+
         /// <summary>
         /// Moves an entity to a random spot in the grid.
         /// Main use would be on creation of the entity where a random position needs to be assigned.
         /// </summary>
+        /// <remarks>
+        /// Maybe the move entity should be a function in the PlayingState instead of the GridManager.
+        /// </remarks>
         /// <param name="entity">The entity to move to a random spot.</param>
         public void MoveToRandom(Entity entity)
         {
@@ -43,38 +48,63 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
         }
 
-        public void MoveEntity(Entity entity, int deltaX, int deltaY)
+        /// <summary>
+        /// Moves an entity by a certain (indexed) difference.
+        /// </summary>
+        /// <param name="entity">The entity to move.</param>
+        /// <param name="deltaX">The desired change in position in the X axis.</param>
+        /// <param name="deltaY">The desired change in position in the Y axis.</param>
+        public void MoveEntityByDifference(Entity entity, int deltaX, int deltaY)
         {
-            GridSquare containingEntity = _gridSquares.Find(sq => sq.entity == entity);
-
+            // Move in the X direction first.
             for (int xIdx = 0; xIdx < Math.Abs(deltaX); xIdx++)
             {
-                GridSquare inXDirection = _gridSquares.Find(sq => sq.xIdx == (containingEntity.xIdx + Math.Sign(deltaX)) && sq.yIdx == containingEntity.yIdx);
-                if (inXDirection != null)
-                {
-                    inXDirection.entity = containingEntity.entity;
-                    containingEntity.entity = null;
-                    containingEntity = inXDirection;
-                }
-                else
+                GridSquare containingEntity = _gridSquares.Find(sq => sq.entity == entity);
+                int desiredX = containingEntity.xIdx + Math.Sign(deltaX);
+                int desiredY = containingEntity.yIdx;
+
+                if (!MoveEntityFromTo(containingEntity, desiredX, desiredY))
                 {
                     break;
                 }
             }
 
+            // Then move in the Y direction.
             for (int yIdx = 0; yIdx < Math.Abs(deltaY); yIdx++)
             {
-                GridSquare inYDirection = _gridSquares.Find(sq => sq.yIdx == (containingEntity.yIdx + Math.Sign(deltaY)) && sq.xIdx == containingEntity.xIdx);
-                if (inYDirection != null)
-                {
-                    inYDirection.entity = containingEntity.entity;
-                    containingEntity.entity = null;
-                    containingEntity = inYDirection;
-                }
-                else
+                GridSquare containingEntity = _gridSquares.Find(sq => sq.entity == entity);
+                int desiredX = containingEntity.xIdx;
+                int desiredY = containingEntity.yIdx + Math.Sign(deltaY);
+
+                if (!MoveEntityFromTo(containingEntity, desiredX, desiredY))
                 {
                     break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Try to move an entity from a GridSquare to a new GridSquare at a certain index.
+        /// </summary>
+        /// <param name="containingEntity">The GridSquare containing the entity to move.</param>
+        /// <param name="xIdx">The desired x index of the new location.</param>
+        /// <param name="yIdx">The desired y index of the new location.</param>
+        /// <returns>True if the GridSquare exists at the index, false otherwise.</returns>
+        public bool MoveEntityFromTo(GridSquare containingEntity, int xIdx, int yIdx)
+        {
+            // TODO: should also check if there is an entity in the square.
+            // Or maybe there can be 'swappable' entities, that swap position with the player.
+            // In that case, we should call gridSquare.swapEntity(gridSquareContainingEntity) instead of the logic below.
+            GridSquare gridSquare = _gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
+            if (gridSquare != null)
+            {
+                gridSquare.entity = containingEntity.entity;
+                containingEntity.entity = null;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

@@ -66,7 +66,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public override void ActionTick()
         {
-            _gridManager.MoveEntity(this, _desiredXMovement, _desiredYMovement);
+            _gridManager.MoveEntityByDifference(this, _desiredXMovement, _desiredYMovement);
 
             _desiredXMovement = 0;
             _desiredYMovement = 0;
