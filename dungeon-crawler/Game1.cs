@@ -3,7 +3,6 @@ using dungeoncrawler.Management;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 
@@ -27,7 +26,7 @@ namespace dungeoncrawler
         private GameState _gameState;
         private PlayingState _playingState;
 
-        public const string VERSION_STR = "v0.1.3";
+        public const string VERSION_STR = "v0.1.4";
 
         public Game1()
         {

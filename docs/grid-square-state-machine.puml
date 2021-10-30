@@ -1,0 +1,27 @@
+@startuml GridSquare State Machine
+
+title GridSquare State Machine
+
+state NotVisible
+state FadingIn
+state FadingOut
+state Visible
+
+[*] --> NotVisible
+
+NotVisible -[#Blue]r-> FadingIn : [Player within 4 tiles]\n/ Add to drawables
+
+FadingOut -[#Red]-> NotVisible : [0 opacity]\n/ Remove from drawables
+FadingOut -[#Blue]-> FadingIn : [Player within 4 tiles]
+
+FadingIn -[#Red]r-> Visible : [Full opacity]
+FadingIn -[#Blue]-> FadingOut : [Player not within 4 tiles]
+
+Visible -[#Blue]l-> FadingOut : [Player not within 4 tiles]
+
+note as N1
+    Red arrows are on FrameTick
+    Blue arrows are on ActionTick
+end note
+
+@enduml

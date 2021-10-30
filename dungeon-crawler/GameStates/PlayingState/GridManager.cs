@@ -10,19 +10,23 @@ namespace dungeoncrawler.GameStates.PlayingState
     {
         private List<GridSquare> _gridSquares;
 
+        private List<GridSquare> _drawableGridSquares;
+
         public GridManager()
         {
             _gridSquares = new List<GridSquare>();
+            _drawableGridSquares = new List<GridSquare>();
             // TODO: remove
-            _gridSquares.Add(new GridSquare(0, 0));
-            _gridSquares.Add(new GridSquare(0, 1));
-            _gridSquares.Add(new GridSquare(0, 2));
-            _gridSquares.Add(new GridSquare(1, 0));
-            _gridSquares.Add(new GridSquare(1, 1));
-            _gridSquares.Add(new GridSquare(1, 2));
-            _gridSquares.Add(new GridSquare(2, 0));
-            _gridSquares.Add(new GridSquare(2, 1));
-            _gridSquares.Add(new GridSquare(2, 2));
+            for (int xIdx = 0; xIdx < 30; xIdx++)
+            {
+                for (int yIdx = 0; yIdx < 30; yIdx++)
+                {
+                    if (Game1.random.Next(0, 101) > 30)
+                    {
+                        _gridSquares.Add(new GridSquare(this, xIdx, yIdx));
+                    }
+                }
+            }
         }
 
 
@@ -116,12 +120,37 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
         }
 
+        public void ActionTick()
+        {
+            UpdateVisibilityStates();
+        }
+
+        public void UpdateVisibilityStates()
+        {
+            // Any gridSquare within the range of the player is visible.
+            GridSquare containingPlayer = _gridSquares.Find(sq => sq.entity is Player);
+            foreach (var gridSquare in _gridSquares)
+            {
+                gridSquare.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
+            }
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var gridSquare in _gridSquares)
+            foreach (var gridSquare in _drawableGridSquares)
             {
                 gridSquare.Draw(spriteBatch);
             }
+        }
+
+        public void AddToDrawables(GridSquare gridSquare)
+        {
+            _drawableGridSquares.Add(gridSquare);
+        }
+
+        public void RemoveFromDrawables(GridSquare gridSquare)
+        {
+            _drawableGridSquares.Remove(gridSquare);
         }
     }
 }

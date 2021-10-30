@@ -14,6 +14,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             _gridManager = new GridManager();
             _player = new Player(viewManager, _gridManager, this);
             _gridManager.MoveToRandom(_player);
+            _gridManager.UpdateVisibilityStates();
         }
 
         public void FrameTick(GameTime gameTime)
@@ -30,6 +31,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public void ActionTick()
         {
             _player.ActionTick();
+            _gridManager.ActionTick();
         }
     }
 }

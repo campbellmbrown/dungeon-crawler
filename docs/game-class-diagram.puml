@@ -18,7 +18,7 @@ IGameState <|-- PlayingState
 PlayingState -- "1" GridManager
 PlayingState -- "1" Player
 Player --|> Entity
-GridManager -- "0..*" GridSquare
+GridManager "1" -- "0..*" GridSquare
 GridSquare "1" -- "0..1" Entity
 
 @enduml
