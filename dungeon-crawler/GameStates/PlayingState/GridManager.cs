@@ -56,35 +56,64 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// Moves an entity by a certain (indexed) difference.
         /// </summary>
         /// <param name="entity">The entity to move.</param>
-        /// <param name="deltaX">The desired change in position in the X axis.</param>
-        /// <param name="deltaY">The desired change in position in the Y axis.</param>
-        public void MoveEntityByDifference(Entity entity, int deltaX, int deltaY)
+        /// <param name="deltaX">The desired change in index in the X axis.</param>
+        /// <param name="deltaY">The desired change in index in the Y axis.</param>
+        public MovementStatus MoveEntityDiagonally(Entity entity, int deltaX, int deltaY)
         {
-            // Move in the X direction first.
-            for (int xIdx = 0; xIdx < Math.Abs(deltaX); xIdx++)
-            {
-                GridSquare containingEntity = _gridSquares.Find(sq => sq.entity == entity);
-                int desiredX = containingEntity.xIdx + Math.Sign(deltaX);
-                int desiredY = containingEntity.yIdx;
+            bool finished = false;
+            int leftToMoveInX = Math.Abs(deltaX);
+            int leftToMoveInY = Math.Abs(deltaY);
 
-                if (!MoveEntityFromTo(containingEntity, desiredX, desiredY))
+            // Result of this function.
+            MovementStatus ret = MovementStatus.Success;
+            // Result of the individual movements.
+            MovementStatus xStatus = MovementStatus.Blocked;
+            MovementStatus yStatus = MovementStatus.Blocked;
+
+            while (!finished)
+            {
+                if (leftToMoveInX > 0)
+                {
+                    int moveInXBy = (deltaX > 0) ? 1 : -1;
+                    xStatus = MoveEntityInStraightLine(entity, moveInXBy, 0);
+                    if (xStatus == MovementStatus.Success) { leftToMoveInX--; }
+                }
+
+                if (leftToMoveInY > 0)
+                {
+                    int moveInYBy = (deltaY > 0) ? 1 : -1;
+                    yStatus = MoveEntityInStraightLine(entity, 0, moveInYBy);
+                    if (yStatus == MovementStatus.Success) { leftToMoveInY--; }
+                }
+
+                if (xStatus == MovementStatus.Blocked && yStatus == MovementStatus.Blocked)
+                {
+                    ret = MovementStatus.Blocked;
+                    break;
+                }
+
+                if (leftToMoveInX == 0 && leftToMoveInY == 0)
                 {
                     break;
                 }
             }
 
-            // Then move in the Y direction.
-            for (int yIdx = 0; yIdx < Math.Abs(deltaY); yIdx++)
-            {
-                GridSquare containingEntity = _gridSquares.Find(sq => sq.entity == entity);
-                int desiredX = containingEntity.xIdx;
-                int desiredY = containingEntity.yIdx + Math.Sign(deltaY);
+            return ret;
+        }
 
-                if (!MoveEntityFromTo(containingEntity, desiredX, desiredY))
-                {
-                    break;
-                }
-            }
+        public enum MovementStatus
+        {
+            Success,
+            Blocked,
+            DestinationNonExistant,
+        }
+
+        private MovementStatus MoveEntityInStraightLine(Entity entity, int deltaX, int deltaY)
+        {
+            GridSquare containingEntity = _gridSquares.Find(sq => sq.entity == entity);
+            int desiredX = containingEntity.xIdx + deltaX;
+            int desiredY = containingEntity.yIdx + deltaY;
+            return MoveEntityFromTo(containingEntity, desiredX, desiredY);
         }
 
         /// <summary>
@@ -94,9 +123,9 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <param name="xIdx">The desired x index of the new location.</param>
         /// <param name="yIdx">The desired y index of the new location.</param>
         /// <returns>True if the GridSquare exists at the index, false otherwise.</returns>
-        public bool MoveEntityFromTo(GridSquare containingEntity, int xIdx, int yIdx)
+        public MovementStatus MoveEntityFromTo(GridSquare containingEntity, int xIdx, int yIdx)
         {
-            // TODO: should also check if there is an entity in the square.
+            // TODO: should also check if there is something that can block the entity, such as another entity or a wall.
             // Or maybe there can be 'swappable' entities, that swap position with the player.
             // In that case, we should call gridSquare.swapEntity(gridSquareContainingEntity) instead of the logic below.
             GridSquare gridSquare = _gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
@@ -104,11 +133,12 @@ namespace dungeoncrawler.GameStates.PlayingState
             {
                 gridSquare.entity = containingEntity.entity;
                 containingEntity.entity = null;
-                return true;
+                return MovementStatus.Success;
             }
             else
             {
-                return false;
+                // TODO: this should actually be MovementStatus.DestinationNonExistant, but we don't have walls yet.
+                return MovementStatus.Blocked;
             }
         }
 

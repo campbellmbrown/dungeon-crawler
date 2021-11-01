@@ -6,7 +6,6 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class Player : Entity
     {
-        private readonly ViewManager _viewManager;
         private readonly GridManager _gridManager;
         private readonly PlayingState _playingState;
 
@@ -14,10 +13,9 @@ namespace dungeoncrawler.GameStates.PlayingState
         private int _desiredXMovement = 0;
         private int _desiredYMovement = 0;
 
-        public Player(ViewManager viewManager, GridManager gridManager, PlayingState playingState) :
+        public Player(GridManager gridManager, PlayingState playingState) :
             base()
         {
-            _viewManager = viewManager;
             _gridManager = gridManager;
             _playingState = playingState;
 
@@ -31,7 +29,6 @@ namespace dungeoncrawler.GameStates.PlayingState
         public override void FrameTick(GameTime gameTime)
         {
             _inputManager.FrameTick();
-            _viewManager.UpdateCameraPosition(gridSquare.position);
             base.FrameTick(gameTime);
         }
 
@@ -66,7 +63,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public override void ActionTick()
         {
-            _gridManager.MoveEntityByDifference(this, _desiredXMovement, _desiredYMovement);
+            _gridManager.MoveEntityDiagonally(this, _desiredXMovement, _desiredYMovement);
 
             _desiredXMovement = 0;
             _desiredYMovement = 0;
