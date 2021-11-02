@@ -24,32 +24,27 @@ namespace dungeoncrawler.GameStates.PlayingState
         private Queue<Vector2> _destinations;
         public Vector2 position { get; private set; }
         private GridSquare _gridSquare;
-        public GridSquare gridSquare
-        {
-            get
-            {
-                return _gridSquare;
-            }
-            set
-            {
-                if (_destinations.Count < 3)
-                {
-                    _gridSquare = value;
-                    _destinations.Enqueue(_gridSquare.position);
-                    destinationState = DestinationState.OffDestination;
-                }
-            }
-        }
 
-        public Entity()
+        public Entity(GridSquare gridSquare)
         {
             _destinations = new Queue<Vector2>();
-            destinationState = DestinationState.OffDestination;
+            gridSquare.entity = this;
+
+            // When we set the GridSquare's entity it also sets this entities GridSquare.
+            // On the first time we need to override this.
+            _destinations.Clear();
+            position = gridSquare.position;
+            destinationState = DestinationState.AtDestination;
         }
 
         public void ChangeGridSquare(GridSquare gridSquare)
         {
-            this.gridSquare = gridSquare;
+            if (_destinations.Count < 3)
+            {
+                _gridSquare = gridSquare;
+                _destinations.Enqueue(_gridSquare.position);
+                destinationState = DestinationState.OffDestination;
+            }
         }
 
         public virtual void FrameTick(GameTime gameTime)

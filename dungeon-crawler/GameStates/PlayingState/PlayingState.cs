@@ -15,8 +15,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             _viewManager = viewManager;
             _gridManager = new GridManager();
-            _player = new Player(_gridManager, this);
-            _gridManager.MoveToRandom(_player);
+            _player = new Player(_gridManager, this, _gridManager.GetRandomGridSquare());
             _gridManager.UpdateVisibilityStates();
         }
 

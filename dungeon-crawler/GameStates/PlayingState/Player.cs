@@ -13,8 +13,8 @@ namespace dungeoncrawler.GameStates.PlayingState
         private int _desiredXMovement = 0;
         private int _desiredYMovement = 0;
 
-        public Player(GridManager gridManager, PlayingState playingState) :
-            base()
+        public Player(GridManager gridManager, PlayingState playingState, GridSquare gridSquare) :
+            base(gridSquare)
         {
             _gridManager = gridManager;
             _playingState = playingState;

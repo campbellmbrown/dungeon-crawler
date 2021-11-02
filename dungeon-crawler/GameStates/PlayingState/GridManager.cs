@@ -29,25 +29,24 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
         }
 
-
         /// <summary>
-        /// Moves an entity to a random spot in the grid.
-        /// Main use would be on creation of the entity where a random position needs to be assigned.
+        /// Gets a random GridSquare from the list.
         /// </summary>
         /// <remarks>
-        /// Maybe the move entity should be a function in the PlayingState instead of the GridManager.
+        /// In the future this could have an input which specifies the type of GridSquare to receive.
         /// </remarks>
-        /// <param name="entity">The entity to move to a random spot.</param>
-        public void MoveToRandom(Entity entity)
+        /// <returns>A random GridSquare if successful, null if unsuccessful</returns>
+        public GridSquare GetRandomGridSquare()
         {
             List<GridSquare> gridSquaresWithoutEntities = _gridSquares.Where(sq => !sq.hasEntity).ToList();
             if (gridSquaresWithoutEntities.Count > 0)
             {
-                int idx = Game1.random.Next(gridSquaresWithoutEntities.Count);
-                gridSquaresWithoutEntities[idx].entity = entity;
+                int idx = Game1.random.Next(0, gridSquaresWithoutEntities.Count);
+                return gridSquaresWithoutEntities[idx];
             }
             else
             {
+                return null;
                 // TODO: raise a warning here.
             }
         }
