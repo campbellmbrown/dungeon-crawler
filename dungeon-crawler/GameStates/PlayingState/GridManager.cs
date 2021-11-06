@@ -16,17 +16,9 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             _gridSquares = new List<GridSquare>();
             _drawableGridSquares = new List<GridSquare>();
-            // TODO: remove
-            for (int xIdx = 0; xIdx < 30; xIdx++)
-            {
-                for (int yIdx = 0; yIdx < 30; yIdx++)
-                {
-                    if (Game1.random.Next(0, 101) > 30)
-                    {
-                        _gridSquares.Add(new GridSquare(this, xIdx, yIdx));
-                    }
-                }
-            }
+
+            RoomGenerator roomGenerator = new RoomGenerator();
+            roomGenerator.GenerateFloor(this, _gridSquares);
         }
 
         /// <summary>
@@ -49,6 +41,11 @@ namespace dungeoncrawler.GameStates.PlayingState
                 return null;
                 // TODO: raise a warning here.
             }
+        }
+
+        public GridSquare GetStartingTile()
+        {
+            return _gridSquares.Find(sq => sq.xIdx == 0 && sq.yIdx == 0);
         }
 
         /// <summary>

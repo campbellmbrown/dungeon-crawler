@@ -1,0 +1,253 @@
+﻿using dungeoncrawler.Utility;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace dungeoncrawler.GameStates.PlayingState
+{
+    public class RoomGenerator
+    {
+        private readonly GridManager _gridManager;
+        private readonly List<GridSquare> _gridSquares;
+
+        private enum Direction
+        {
+            Up = 0,
+            Down = 1,
+            Left = 2,
+            Right = 3,
+        }
+
+        // Takes in a Direction, returns a tuple containing the xDelta and yDelta for one step in that direction.
+        private static Dictionary<Direction, (int, int)> _indexDeltas = new Dictionary<Direction, (int, int)>()
+        {
+            {  Direction.Up, (0, -1) },
+            {  Direction.Down, (0, 1) },
+            {  Direction.Left, (-1, 0) },
+            {  Direction.Right, (1, 0) },
+        };
+        private static Dictionary<Direction, Direction> _oppositeDirection = new Dictionary<Direction, Direction>()
+        {
+            { Direction.Up, Direction.Down },
+            { Direction.Down, Direction.Up },
+            { Direction.Left, Direction.Right },
+            { Direction.Right, Direction.Left },
+        };
+        private static Dictionary<Direction, List<Direction>> _turn90DegreesOptions = new Dictionary<Direction, List<Direction>>()
+        {
+            { Direction.Up, new List<Direction>(){ Direction.Left, Direction.Right } },
+            { Direction.Down, new List<Direction>(){ Direction.Left, Direction.Right } },
+            { Direction.Left, new List<Direction>(){ Direction.Up, Direction.Down } },
+            { Direction.Right, new List<Direction>(){ Direction.Up, Direction.Down } },
+        };
+
+        private const int MAIN_PATH_MIN_LENGTH = 70;
+        private const int MAIN_PATH_MAX_LENGTH = 90;
+        private const int BRANCH_MAX_LENGTH = 6;
+        private const int BRANCH_MIN_LENGTH = 4;
+        private const int MIN_ROOM_WIDTH = 2;
+        private const int MAX_ROOM_WIDTH = 4;
+        private const int MIN_ROOM_HEIGHT = 2;
+        private const int MAX_ROOM_HEIGHT = 4;
+
+        private const int BRANCH_AT_DIRECTION_CHANGE_CHANCE = 50; // %
+
+        private const int DISTANCE_UNTIL_TURN_MEAN = 6;
+        private const int DISTANCE_UNTIL_TURN_STD_DEV = 1;
+        private const int DISTANCE_UNTIL_TURN_MIN = 2;
+
+        private const int DEFAULT_DIRECTION_WEIGHT = 1;
+        private const int PRIORITY_DIRECTION_WEIGHT = 3;
+
+        private Dictionary<Direction, RNG.Weight> _changeDirectionWeights = new Dictionary<Direction, RNG.Weight>()
+        {
+            { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Down, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Left, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+        };
+
+        private Dictionary<Direction, RNG.Weight> _branchDirectionWeights = new Dictionary<Direction, RNG.Weight>()
+        {
+            { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Down, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Left, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+        };
+
+        public RoomGenerator(GridManager gridManager, List<GridSquare> gridSquares)
+        {
+            _gridManager = gridManager;
+            _gridSquares = gridSquares;
+        }
+
+        public void GenerateRoom()
+        {
+            GenerateFloor();
+        }
+
+        private int NewDistanceUntilDirectionChange()
+        {
+            return RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
+        }
+
+        private int NewDistanceUntilBranch()
+        {
+            return RNG.Guassian(6, 2, 3);
+        }
+
+        private Direction ChooseNewDirection(Direction currentDirection)
+        {
+            // return RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
+            return RNG.ChooseWeighted(_turn90DegreesOptions[currentDirection], _changeDirectionWeights);
+        }
+
+        public void GenerateFloor()
+        {
+            // (1) Create the original square
+            GridSquare currentGridSquare = CreateNewTile(_gridManager, _gridSquares, 0, 0);
+
+            // (2) Create the room at the beginning
+            // CreateRoom(gridManager, gridSquares, currentGridSquare);
+
+            // (3) Choose a direction to go in
+            Direction currentDirection = RNG.RandomEnum<Direction>();
+
+            // (4) Set the weight of the direction high. Choose a 90 degree direction and weigh that one high as well.
+            Direction weightedDirection1 = currentDirection;
+            Direction weightedDirection2 = RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
+            _changeDirectionWeights[weightedDirection1].weight = PRIORITY_DIRECTION_WEIGHT;
+            _changeDirectionWeights[weightedDirection2].weight = PRIORITY_DIRECTION_WEIGHT;
+            _branchDirectionWeights[_oppositeDirection[weightedDirection1]].weight = PRIORITY_DIRECTION_WEIGHT;
+            _branchDirectionWeights[_oppositeDirection[weightedDirection2]].weight = PRIORITY_DIRECTION_WEIGHT;
+
+            // (5) Choose a length for the main path
+            int mainPathLength = Game1.random.Next(MAIN_PATH_MIN_LENGTH, MAIN_PATH_MAX_LENGTH + 1);
+
+            // (6) Calculate the distance until a direction change
+            int distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
+
+            // (7) Calculate the distance until a branch
+            int distanceUntilBranch = NewDistanceUntilBranch();
+
+            // (8) Create the main branch
+            for (int idx = 0; idx < mainPathLength; idx++)
+            {
+                // (8a) Check a direction change
+                if (distanceUntilDirectionChange == 0)
+                {
+                    Direction previousDirection = currentDirection;
+                    currentDirection = ChooseNewDirection(currentDirection);
+                    distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
+                    if (RNG.PercentChance(BRANCH_AT_DIRECTION_CHANGE_CHANCE))
+                    {
+                        CreateBranch(
+                            _gridManager,
+                            _gridSquares,
+                            currentGridSquare,
+                            RNG.ChooseWeighted(
+                                new List<Direction>()
+                                {
+                                    _oppositeDirection[previousDirection],
+                                    _oppositeDirection[currentDirection]
+                                },
+                                _branchDirectionWeights)
+                            );
+                        distanceUntilBranch = NewDistanceUntilBranch();
+                    }
+                }
+
+                // (8b) Check for a branch
+                if (distanceUntilBranch == 0)
+                {
+                    CreateBranch(_gridManager, _gridSquares, currentGridSquare, RNG.ChooseWeighted(_turn90DegreesOptions[currentDirection], _branchDirectionWeights));
+                    distanceUntilBranch = NewDistanceUntilBranch();
+                }
+
+                // (8c) Create a GridSquare in the direction we are facing
+                currentGridSquare = CreateGridSquareInDirection(_gridManager, _gridSquares, currentGridSquare, currentDirection);
+
+                // (8d) Lower distance for direction change
+                distanceUntilDirectionChange--;
+
+                // (8c) Lower distance for branch
+                distanceUntilBranch--;
+            }
+
+            // (9) Create a room at the end
+        }
+
+        private void CreateBranch(GridManager gridManager, List<GridSquare> gridSquares, GridSquare start, Direction direction)
+        {
+            GridSquare currentGridSquare = start;
+            int branch_length = Game1.random.Next(BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH + 1);
+            for (int idx = 0; idx < branch_length; idx++)
+            {
+                (int, int) idxDelta = _indexDeltas[direction];
+                int newXIdx = currentGridSquare.xIdx + idxDelta.Item1;
+                int newYIdx = currentGridSquare.yIdx + idxDelta.Item2;
+                currentGridSquare = CreateNewTile(gridManager, gridSquares, newXIdx, newYIdx);
+            }
+            // CreateRoom(gridManager, gridSquares, currentGridSquare);
+        }
+
+        private void CreateRoom(
+            GridManager gridManager,
+            List<GridSquare> gridSquares,
+            GridSquare center,
+            int minW = MIN_ROOM_WIDTH,
+            int maxW = MAX_ROOM_WIDTH,
+            int minH = MIN_ROOM_HEIGHT,
+            int maxH = MAX_ROOM_HEIGHT)
+        {
+            int roomHeight = Game1.random.Next(minH, maxH + 1);
+            int roomWidth = Game1.random.Next(minW, maxW + 1);
+
+            // If the height/width is odd the center will be true.
+            // e.g. for a width of 5 the origin will be 1 - (5 + 1)/2 = -2
+            // [-2] [-1] [center] [1] [2]
+
+            // If the height/width is even the center will be slightly off. It will be closer to the top left.
+            // e.g. for a width of 6 the origin will be 1 - (6 + 1)/2 = -2
+            // [-2] [-1] [center] [1] [2] [3]
+            int originX = center.xIdx + 1 - ((roomWidth + 1) / 2);
+            int originY = center.yIdx + 1 - ((roomHeight + 1) / 2);
+
+            for (int xIdx = 0; xIdx < roomWidth; xIdx++)
+            {
+                for (int yIdx = 0; yIdx < roomHeight; yIdx++)
+                {
+                    CreateNewTile(gridManager, gridSquares, originX + xIdx, originY + yIdx);
+                }
+            }
+        }
+
+        private GridSquare CreateGridSquareInDirection(GridManager gridManager, List<GridSquare> gridSquares, GridSquare current, Direction direction)
+        {
+            (int, int) idxDelta = _indexDeltas[direction];
+            int newXIdx = current.xIdx + idxDelta.Item1;
+            int newYIdx = current.yIdx + idxDelta.Item2;
+            return CreateNewTile(gridManager, gridSquares, newXIdx, newYIdx);
+        }
+
+        /// <summary>
+        /// Adds a new GridSquare at a specific location.
+        /// </summary>
+        /// <param name="xIdx">X index of the new GridSquare.</param>
+        /// <param name="yIdx">Y index of the new GridSquare</param>
+        /// <returns>The GridSquare at the new position. Can return an already existing GridSquare.</returns>
+        private GridSquare CreateNewTile(GridManager gridManager, List<GridSquare> gridSquares, int xIdx, int yIdx)
+        {
+            GridSquare gridSquareExists = gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
+            if (gridSquareExists == null)
+            {
+                GridSquare newGridSquare = new GridSquare(gridManager, xIdx, yIdx);
+                gridSquares.Add(newGridSquare);
+                return newGridSquare;
+            }
+            else
+            {
+                return gridSquareExists;
+            }
+        }
+    }
+}

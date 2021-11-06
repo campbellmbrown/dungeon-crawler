@@ -39,12 +39,9 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public void ChangeGridSquare(GridSquare gridSquare)
         {
-            if (_destinations.Count < 3)
-            {
-                _gridSquare = gridSquare;
-                _destinations.Enqueue(_gridSquare.position);
-                destinationState = DestinationState.OffDestination;
-            }
+            _gridSquare = gridSquare;
+            _destinations.Enqueue(_gridSquare.position);
+            destinationState = DestinationState.OffDestination;
         }
 
         public virtual void FrameTick(GameTime gameTime)
