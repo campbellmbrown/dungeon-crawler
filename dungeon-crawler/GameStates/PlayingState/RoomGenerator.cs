@@ -6,9 +6,6 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class RoomGenerator
     {
-        private readonly GridManager _gridManager;
-        private readonly List<GridSquare> _gridSquares;
-
         private enum Direction
         {
             Up = 0,
@@ -40,6 +37,10 @@ namespace dungeoncrawler.GameStates.PlayingState
             { Direction.Right, new List<Direction>(){ Direction.Up, Direction.Down } },
         };
 
+        private readonly GridManager _gridManager;
+        private readonly List<GridSquare> _gridSquares;
+
+        // Min/max constants
         private const int MAIN_PATH_MIN_LENGTH = 70;
         private const int MAIN_PATH_MAX_LENGTH = 90;
         private const int BRANCH_MAX_LENGTH = 6;
@@ -49,15 +50,17 @@ namespace dungeoncrawler.GameStates.PlayingState
         private const int MIN_ROOM_HEIGHT = 2;
         private const int MAX_ROOM_HEIGHT = 4;
 
+        // Percent chances
         private const int BRANCH_AT_DIRECTION_CHANGE_CHANCE = 50; // %
 
+        // Guassian constants
         private const int DISTANCE_UNTIL_TURN_MEAN = 6;
         private const int DISTANCE_UNTIL_TURN_STD_DEV = 1;
         private const int DISTANCE_UNTIL_TURN_MIN = 2;
 
+        // Direction weightings
         private const int DEFAULT_DIRECTION_WEIGHT = 1;
         private const int PRIORITY_DIRECTION_WEIGHT = 3;
-
         private Dictionary<Direction, RNG.Weight> _changeDirectionWeights = new Dictionary<Direction, RNG.Weight>()
         {
             { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
@@ -65,7 +68,6 @@ namespace dungeoncrawler.GameStates.PlayingState
             { Direction.Left, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
             { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
         };
-
         private Dictionary<Direction, RNG.Weight> _branchDirectionWeights = new Dictionary<Direction, RNG.Weight>()
         {
             { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
@@ -90,21 +92,15 @@ namespace dungeoncrawler.GameStates.PlayingState
             return RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
         }
 
-        private int NewDistanceUntilBranch()
-        {
-            return RNG.Guassian(6, 2, 3);
-        }
-
         private Direction ChooseNewDirection(Direction currentDirection)
         {
-            // return RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
             return RNG.ChooseWeighted(_turn90DegreesOptions[currentDirection], _changeDirectionWeights);
         }
 
         public void GenerateFloor()
         {
             // (1) Create the original square
-            GridSquare currentGridSquare = CreateNewTile(_gridManager, _gridSquares, 0, 0);
+            GridSquare currentGridSquare = TryCreateNewGridSquare(0, 0);
 
             // (2) Create the room at the beginning
             // CreateRoom(gridManager, gridSquares, currentGridSquare);
@@ -126,9 +122,6 @@ namespace dungeoncrawler.GameStates.PlayingState
             // (6) Calculate the distance until a direction change
             int distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
 
-            // (7) Calculate the distance until a branch
-            int distanceUntilBranch = NewDistanceUntilBranch();
-
             // (8) Create the main branch
             for (int idx = 0; idx < mainPathLength; idx++)
             {
@@ -141,8 +134,6 @@ namespace dungeoncrawler.GameStates.PlayingState
                     if (RNG.PercentChance(BRANCH_AT_DIRECTION_CHANGE_CHANCE))
                     {
                         CreateBranch(
-                            _gridManager,
-                            _gridSquares,
                             currentGridSquare,
                             RNG.ChooseWeighted(
                                 new List<Direction>()
@@ -152,44 +143,31 @@ namespace dungeoncrawler.GameStates.PlayingState
                                 },
                                 _branchDirectionWeights)
                             );
-                        distanceUntilBranch = NewDistanceUntilBranch();
                     }
                 }
 
-                // (8b) Check for a branch
-                if (distanceUntilBranch == 0)
-                {
-                    CreateBranch(_gridManager, _gridSquares, currentGridSquare, RNG.ChooseWeighted(_turn90DegreesOptions[currentDirection], _branchDirectionWeights));
-                    distanceUntilBranch = NewDistanceUntilBranch();
-                }
-
                 // (8c) Create a GridSquare in the direction we are facing
-                currentGridSquare = CreateGridSquareInDirection(_gridManager, _gridSquares, currentGridSquare, currentDirection);
+                currentGridSquare = CreateGridSquareInDirection(currentGridSquare, currentDirection);
 
                 // (8d) Lower distance for direction change
                 distanceUntilDirectionChange--;
-
-                // (8c) Lower distance for branch
-                distanceUntilBranch--;
             }
 
             // (9) Create a room at the end
         }
 
-        private void CreateBranch(GridManager gridManager, List<GridSquare> gridSquares, GridSquare start, Direction direction)
+        private void CreateBranch(GridSquare start, Direction direct)
         {
-            GridSquare currentGridSquare = start;
+            GridSquare branchCurrentGridSquare = start;
             int branch_length = Game1.random.Next(BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH + 1);
             for (int idx = 0; idx < branch_length; idx++)
             {
-                (int, int) idxDelta = _indexDeltas[direction];
-                int newXIdx = currentGridSquare.xIdx + idxDelta.Item1;
-                int newYIdx = currentGridSquare.yIdx + idxDelta.Item2;
-                currentGridSquare = CreateNewTile(gridManager, gridSquares, newXIdx, newYIdx);
+                branchCurrentGridSquare = CreateGridSquareInDirection(branchCurrentGridSquare, direct);
             }
             // CreateRoom(gridManager, gridSquares, currentGridSquare);
         }
 
+#if false
         private void CreateRoom(
             GridManager gridManager,
             List<GridSquare> gridSquares,
@@ -220,28 +198,29 @@ namespace dungeoncrawler.GameStates.PlayingState
                 }
             }
         }
+#endif
 
-        private GridSquare CreateGridSquareInDirection(GridManager gridManager, List<GridSquare> gridSquares, GridSquare current, Direction direction)
+        private GridSquare CreateGridSquareInDirection(GridSquare current, Direction direction)
         {
             (int, int) idxDelta = _indexDeltas[direction];
             int newXIdx = current.xIdx + idxDelta.Item1;
             int newYIdx = current.yIdx + idxDelta.Item2;
-            return CreateNewTile(gridManager, gridSquares, newXIdx, newYIdx);
+            return TryCreateNewGridSquare(newXIdx, newYIdx);
         }
 
         /// <summary>
-        /// Adds a new GridSquare at a specific location.
+        /// Creates a new GridSquare at a specific location, or gets a GridSquare if it already exists.
         /// </summary>
         /// <param name="xIdx">X index of the new GridSquare.</param>
         /// <param name="yIdx">Y index of the new GridSquare</param>
-        /// <returns>The GridSquare at the new position. Can return an already existing GridSquare.</returns>
-        private GridSquare CreateNewTile(GridManager gridManager, List<GridSquare> gridSquares, int xIdx, int yIdx)
+        /// <returns>The new GridSquare, or an existing GridSquare if there is one already at the index.</returns>
+        private GridSquare TryCreateNewGridSquare(int xIdx, int yIdx)
         {
-            GridSquare gridSquareExists = gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
+            GridSquare gridSquareExists = _gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
             if (gridSquareExists == null)
             {
-                GridSquare newGridSquare = new GridSquare(gridManager, xIdx, yIdx);
-                gridSquares.Add(newGridSquare);
+                GridSquare newGridSquare = new GridSquare(_gridManager, xIdx, yIdx);
+                _gridSquares.Add(newGridSquare);
                 return newGridSquare;
             }
             else
