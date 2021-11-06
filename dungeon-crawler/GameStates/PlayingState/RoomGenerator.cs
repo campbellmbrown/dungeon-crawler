@@ -40,6 +40,8 @@ namespace dungeoncrawler.GameStates.PlayingState
         private readonly GridManager _gridManager;
         private readonly List<GridSquare> _gridSquares;
 
+        private int _distanceUntilDirectionChange;
+
         // Min/max constants
         private const int MAIN_PATH_MIN_LENGTH = 70;
         private const int MAIN_PATH_MAX_LENGTH = 90;
@@ -105,55 +107,56 @@ namespace dungeoncrawler.GameStates.PlayingState
             // (2) Create the room at the beginning
             // CreateRoom(gridManager, gridSquares, currentGridSquare);
 
-            // (3) Choose a direction to go in
+            // (3) Choose a direction to start
             Direction currentDirection = RNG.RandomEnum<Direction>();
 
-            // (4) Set the weight of the direction high. Choose a 90 degree direction and weigh that one high as well.
-            Direction weightedDirection1 = currentDirection;
-            Direction weightedDirection2 = RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
-            _changeDirectionWeights[weightedDirection1].weight = PRIORITY_DIRECTION_WEIGHT;
-            _changeDirectionWeights[weightedDirection2].weight = PRIORITY_DIRECTION_WEIGHT;
-            _branchDirectionWeights[_oppositeDirection[weightedDirection1]].weight = PRIORITY_DIRECTION_WEIGHT;
-            _branchDirectionWeights[_oppositeDirection[weightedDirection2]].weight = PRIORITY_DIRECTION_WEIGHT;
+            // (4) Choose the priority directions
+            UpdateDirectionWeights(currentDirection);
 
             // (5) Choose a length for the main path
             int mainPathLength = Game1.random.Next(MAIN_PATH_MIN_LENGTH, MAIN_PATH_MAX_LENGTH + 1);
 
             // (6) Calculate the distance until a direction change
-            int distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
+            _distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
 
-            // (8) Create the main branch
+            // (7) Create the main branch
             for (int idx = 0; idx < mainPathLength; idx++)
             {
-                // (8a) Check a direction change
-                if (distanceUntilDirectionChange == 0)
+                // (7a) Check a direction change
+                if (_distanceUntilDirectionChange == 0)
                 {
-                    Direction previousDirection = currentDirection;
-                    currentDirection = ChooseNewDirection(currentDirection);
-                    distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
-                    if (RNG.PercentChance(BRANCH_AT_DIRECTION_CHANGE_CHANCE))
-                    {
-                        CreateBranch(
-                            currentGridSquare,
-                            RNG.ChooseWeighted(
-                                new List<Direction>()
-                                {
-                                    _oppositeDirection[previousDirection],
-                                    _oppositeDirection[currentDirection]
-                                },
-                                _branchDirectionWeights)
-                            );
-                    }
+                    currentDirection = ChangeDirection(currentGridSquare, currentDirection);
                 }
 
-                // (8c) Create a GridSquare in the direction we are facing
+                // (7c) Create a GridSquare in the direction we are facing
                 currentGridSquare = CreateGridSquareInDirection(currentGridSquare, currentDirection);
 
-                // (8d) Lower distance for direction change
-                distanceUntilDirectionChange--;
+                // (7d) Lower distance for direction change
+                _distanceUntilDirectionChange--;
             }
 
-            // (9) Create a room at the end
+            // (8) Create a room at the end
+        }
+
+        private Direction ChangeDirection(GridSquare currentGridSquare, Direction currentDirection)
+        {
+            Direction previousDirection = currentDirection;
+            Direction newDirection = ChooseNewDirection(currentDirection);
+            _distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
+            if (RNG.PercentChance(BRANCH_AT_DIRECTION_CHANGE_CHANCE))
+            {
+                CreateBranch(
+                    currentGridSquare,
+                    RNG.ChooseWeighted(
+                        new List<Direction>()
+                        {
+                            _oppositeDirection[previousDirection],
+                            _oppositeDirection[newDirection]
+                        },
+                        _branchDirectionWeights)
+                    );
+            }
+            return newDirection;
         }
 
         private void CreateBranch(GridSquare start, Direction direct)
@@ -199,6 +202,16 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
         }
 #endif
+
+        private void UpdateDirectionWeights(Direction currentDirection)
+        {
+            Direction weightedDirection1 = currentDirection;
+            Direction weightedDirection2 = RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
+            _changeDirectionWeights[weightedDirection1].weight = PRIORITY_DIRECTION_WEIGHT;
+            _changeDirectionWeights[weightedDirection2].weight = PRIORITY_DIRECTION_WEIGHT;
+            _branchDirectionWeights[_oppositeDirection[weightedDirection1]].weight = PRIORITY_DIRECTION_WEIGHT;
+            _branchDirectionWeights[_oppositeDirection[weightedDirection2]].weight = PRIORITY_DIRECTION_WEIGHT;
+        }
 
         private GridSquare CreateGridSquareInDirection(GridSquare current, Direction direction)
         {
