@@ -1,10 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
@@ -39,12 +36,9 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public void ChangeGridSquare(GridSquare gridSquare)
         {
-            if (_destinations.Count < 3)
-            {
-                _gridSquare = gridSquare;
-                _destinations.Enqueue(_gridSquare.position);
-                destinationState = DestinationState.OffDestination;
-            }
+            _gridSquare = gridSquare;
+            _destinations.Enqueue(_gridSquare.position);
+            destinationState = DestinationState.OffDestination;
         }
 
         public virtual void FrameTick(GameTime gameTime)

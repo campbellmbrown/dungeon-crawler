@@ -8,6 +8,9 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class GridManager
     {
+        public const int STARTING_X = 0;
+        public const int STARTING_Y = 0;
+
         private List<GridSquare> _gridSquares;
 
         private List<GridSquare> _drawableGridSquares;
@@ -16,17 +19,9 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             _gridSquares = new List<GridSquare>();
             _drawableGridSquares = new List<GridSquare>();
-            // TODO: remove
-            for (int xIdx = 0; xIdx < 30; xIdx++)
-            {
-                for (int yIdx = 0; yIdx < 30; yIdx++)
-                {
-                    if (Game1.random.Next(0, 101) > 30)
-                    {
-                        _gridSquares.Add(new GridSquare(this, xIdx, yIdx));
-                    }
-                }
-            }
+
+            LevelGenerator levelGenerator = new LevelGenerator(this, _gridSquares);
+            levelGenerator.GenerateLevel();
         }
 
         /// <summary>
@@ -49,6 +44,11 @@ namespace dungeoncrawler.GameStates.PlayingState
                 return null;
                 // TODO: raise a warning here.
             }
+        }
+
+        public GridSquare GetStartingTile()
+        {
+            return _gridSquares.Find(sq => sq.xIdx == STARTING_X && sq.yIdx == STARTING_Y);
         }
 
         /// <summary>
