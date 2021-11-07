@@ -91,7 +91,8 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private int NewDistanceUntilDirectionChange()
         {
-            return RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
+            int guassian = RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
+            return guassian;
         }
 
         private Direction ChooseNewDirection(Direction currentDirection)
@@ -105,7 +106,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             GridSquare currentGridSquare = TryCreateNewGridSquare(0, 0);
 
             // (2) Create the room at the beginning
-            // CreateRoom(gridManager, gridSquares, currentGridSquare);
+            CreateRoom(currentGridSquare);
 
             // (3) Choose a direction to start
             Direction currentDirection = RNG.RandomEnum<Direction>();
@@ -136,6 +137,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
 
             // (8) Create a room at the end
+            CreateRoom(currentGridSquare);
         }
 
         private Direction ChangeDirection(GridSquare currentGridSquare, Direction currentDirection)
@@ -145,51 +147,43 @@ namespace dungeoncrawler.GameStates.PlayingState
             _distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
             if (RNG.PercentChance(BRANCH_AT_DIRECTION_CHANGE_CHANCE))
             {
+                List<Direction> options = new List<Direction>()
+                {
+                    previousDirection,
+                    _oppositeDirection[newDirection]
+                };
                 CreateBranch(
                     currentGridSquare,
-                    RNG.ChooseWeighted(
-                        new List<Direction>()
-                        {
-                            _oppositeDirection[previousDirection],
-                            _oppositeDirection[newDirection]
-                        },
-                        _branchDirectionWeights)
-                    );
+                    RNG.ChooseWeighted(options, _branchDirectionWeights)
+                );
             }
             return newDirection;
         }
 
-        private void CreateBranch(GridSquare start, Direction direct)
+        private void CreateBranch(GridSquare start, Direction branchDirection)
         {
             GridSquare branchCurrentGridSquare = start;
             int branch_length = Game1.random.Next(BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH + 1);
             for (int idx = 0; idx < branch_length; idx++)
             {
-                branchCurrentGridSquare = CreateGridSquareInDirection(branchCurrentGridSquare, direct);
+                branchCurrentGridSquare = CreateGridSquareInDirection(branchCurrentGridSquare, branchDirection);
             }
-            // CreateRoom(gridManager, gridSquares, currentGridSquare);
+            CreateRoom(branchCurrentGridSquare);
         }
 
-#if false
-        private void CreateRoom(
-            GridManager gridManager,
-            List<GridSquare> gridSquares,
-            GridSquare center,
-            int minW = MIN_ROOM_WIDTH,
-            int maxW = MAX_ROOM_WIDTH,
-            int minH = MIN_ROOM_HEIGHT,
-            int maxH = MAX_ROOM_HEIGHT)
+        private void CreateRoom(GridSquare center, int minW = MIN_ROOM_WIDTH, int maxW = MAX_ROOM_WIDTH, int minH = MIN_ROOM_HEIGHT, int maxH = MAX_ROOM_HEIGHT)
         {
             int roomHeight = Game1.random.Next(minH, maxH + 1);
             int roomWidth = Game1.random.Next(minW, maxW + 1);
 
-            // If the height/width is odd the center will be true.
-            // e.g. for a width of 5 the origin will be 1 - (5 + 1)/2 = -2
-            // [-2] [-1] [center] [1] [2]
+            // The center will always be closer to the top left, e.g.
+            //    +-------+   +-------+   +-----+
+            //    |X X X X|   |X X X X|   |X X X|
+            //    |X C X X|   |X C X X|   |X C X|
+            //    |X X X X|   |X X X X|   |X X X|
+            //    |X X X X|   +-------+   +-----+
+            //    +-------+
 
-            // If the height/width is even the center will be slightly off. It will be closer to the top left.
-            // e.g. for a width of 6 the origin will be 1 - (6 + 1)/2 = -2
-            // [-2] [-1] [center] [1] [2] [3]
             int originX = center.xIdx + 1 - ((roomWidth + 1) / 2);
             int originY = center.yIdx + 1 - ((roomHeight + 1) / 2);
 
@@ -197,11 +191,10 @@ namespace dungeoncrawler.GameStates.PlayingState
             {
                 for (int yIdx = 0; yIdx < roomHeight; yIdx++)
                 {
-                    CreateNewTile(gridManager, gridSquares, originX + xIdx, originY + yIdx);
+                    TryCreateNewGridSquare(originX + xIdx, originY + yIdx);
                 }
             }
         }
-#endif
 
         private void UpdateDirectionWeights(Direction currentDirection)
         {
