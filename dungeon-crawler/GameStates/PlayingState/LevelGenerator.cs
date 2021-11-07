@@ -1,10 +1,11 @@
 ﻿using dungeoncrawler.Utility;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
-    public class RoomGenerator
+    public class LevelGenerator
     {
         private enum Direction
         {
@@ -43,8 +44,8 @@ namespace dungeoncrawler.GameStates.PlayingState
         private int _distanceUntilDirectionChange;
 
         // Min/max constants
-        private const int MAIN_PATH_MIN_LENGTH = 70;
-        private const int MAIN_PATH_MAX_LENGTH = 90;
+        private const int MAIN_PATH_MIN_LENGTH = 65;
+        private const int MAIN_PATH_MAX_LENGTH = 80;
         private const int BRANCH_MAX_LENGTH = 6;
         private const int BRANCH_MIN_LENGTH = 4;
         private const int MIN_ROOM_WIDTH = 3;
@@ -54,6 +55,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         // Percent chances
         private const int BRANCH_AT_DIRECTION_CHANGE_CHANCE = 50; // %
+        private const int ROOM_AT_DIRECTION_CHANGE_CHANCE = 10; // %
         private const int SHIFT_CHANCE = 20; // %
         private const int REMOVE_ROOM_CORNER_CHANCE = 30; // %
 
@@ -80,63 +82,51 @@ namespace dungeoncrawler.GameStates.PlayingState
             { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
         };
 
-        public RoomGenerator(GridManager gridManager, List<GridSquare> gridSquares)
+        public LevelGenerator(GridManager gridManager, List<GridSquare> gridSquares)
         {
             _gridManager = gridManager;
             _gridSquares = gridSquares;
         }
 
-        public void GenerateRoom()
+        public void GenerateLevel()
         {
             GenerateFloor();
         }
 
-        public void GenerateFloor()
+        private void GenerateFloor()
         {
-            // (1) Create the original square
             GridSquare currentGridSquare = TryCreateNewGridSquare(0, 0);
-
-            // (2) Create the room at the beginning
             CreateRoom(currentGridSquare);
-
-            // (3) Choose a direction to start
             Direction currentDirection = RNG.RandomEnum<Direction>();
-
-            // (4) Choose the priority directions
             UpdateDirectionWeights(currentDirection);
-
-            // (5) Choose a length for the main path
             int mainPathLength = Game1.random.Next(MAIN_PATH_MIN_LENGTH, MAIN_PATH_MAX_LENGTH + 1);
-
-            // (6) Calculate the distance until a direction change
             _distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
 
-            // (7) Create the main branch
             for (int idx = 0; idx < mainPathLength; idx++)
             {
-                // (7a) Check a direction change
                 if (_distanceUntilDirectionChange == 0)
                 {
                     currentDirection = ChangeDirection(currentGridSquare, currentDirection);
                 }
 
-                // Shift
                 if (RNG.PercentChance(SHIFT_CHANCE))
                 {
                     currentGridSquare = ShiftSidewaysOne(currentGridSquare, currentDirection);
                 }
 
-                // (7c) Create a GridSquare in the direction we are facing
                 currentGridSquare = CreateGridSquareInDirection(currentGridSquare, currentDirection);
-
-                // (7d) Lower distance for direction change
                 _distanceUntilDirectionChange--;
             }
-
-            // (8) Create a room at the end
             CreateRoom(currentGridSquare);
         }
 
+        /// <summary>
+        /// Changes the direction that the main path is heading in. Can also branch and create rooms.
+        /// Will only turn 90 degrees from the current direction.
+        /// </summary>
+        /// <param name="currentGridSquare">The current GridSquare in the main path.</param>
+        /// <param name="currentDirection">The current direction of the main path</param>
+        /// <returns>A new direction.</returns>
         private Direction ChangeDirection(GridSquare currentGridSquare, Direction currentDirection)
         {
             Direction previousDirection = currentDirection;
@@ -154,9 +144,18 @@ namespace dungeoncrawler.GameStates.PlayingState
                     RNG.ChooseWeighted(options, _branchDirectionWeights)
                 );
             }
+            if (RNG.PercentChance(ROOM_AT_DIRECTION_CHANGE_CHANCE))
+            {
+                CreateRoom(currentGridSquare);
+            }
             return newDirection;
         }
 
+        /// <summary>
+        /// Creates a single-direction branch from a certain point 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="branchDirection"></param>
         private void CreateBranch(GridSquare start, Direction branchDirection)
         {
             GridSquare branchCurrentGridSquare = start;
@@ -168,16 +167,34 @@ namespace dungeoncrawler.GameStates.PlayingState
             CreateRoom(branchCurrentGridSquare);
         }
 
+        /// <summary>
+        /// Generates a number that determines how many GridSquares until the direction will be changed.
+        /// </summary>
+        /// <returns>How many GridSquares until a direction change.</returns>
         private int NewDistanceUntilDirectionChange()
         {
             return RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
         }
 
+        /// <summary>
+        /// Chooses a new direction. The new direction will always be 90 degrees from the current position, and will be weighted.
+        /// </summary>
+        /// <param name="currentDirection">The current direction.</param>
+        /// <returns>The new direction.</returns>
         private Direction ChooseNewDirection(Direction currentDirection)
         {
             return RNG.ChooseWeighted(_turn90DegreesOptions[currentDirection], _changeDirectionWeights);
         }
 
+        /// <summary>
+        /// Creates a room centered around a particular position. The corners of the room have a chance to not be generated
+        /// to have a rugged look.
+        /// </summary>
+        /// <param name="center">The center of the room. If the room has an even dimension, this will be favored towards the top left.</param>
+        /// <param name="minW">The minimum width of the room.</param>
+        /// <param name="maxW">The maximum width of the room.</param>
+        /// <param name="minH">The minimum height of the room.</param>
+        /// <param name="maxH">The maximum height of the room.</param>
         private void CreateRoom(GridSquare center, int minW = MIN_ROOM_WIDTH, int maxW = MAX_ROOM_WIDTH, int minH = MIN_ROOM_HEIGHT, int maxH = MAX_ROOM_HEIGHT)
         {
             int roomHeight = Game1.random.Next(minH, maxH + 1);
@@ -207,6 +224,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
         }
 
+        /// <summary>
+        /// Puts weights on a particular direction. The direction is always diagonal, and will always be in the
+        /// direction of the current direction.
+        /// </summary>
+        /// <param name="currentDirection">The current direction.</param>
         private void UpdateDirectionWeights(Direction currentDirection)
         {
             Direction weightedDirection1 = currentDirection;
@@ -217,6 +239,23 @@ namespace dungeoncrawler.GameStates.PlayingState
             _branchDirectionWeights[_oppositeDirection[weightedDirection2]].weight = PRIORITY_DIRECTION_WEIGHT;
         }
 
+        /// <summary>
+        /// Moves one GridSquare to the side.
+        /// </summary>
+        /// <param name="currentGridSquare">The GridSquare to shift to the side of.</param>
+        /// <param name="currentDirection">The current direction.</param>
+        /// <returns>The new GridSquare, or an existing GridSquare if there is one already at the index.</returns>
+        private GridSquare ShiftSidewaysOne(GridSquare currentGridSquare, Direction currentDirection)
+        {
+            return CreateGridSquareInDirection(currentGridSquare, RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]));
+        }
+
+        /// <summary>
+        /// Creates a GridSquare in a particular direction.
+        /// </summary>
+        /// <param name="current">The GridSquare to move from.</param>
+        /// <param name="direction">The direction to move into.</param>
+        /// <returns>The new GridSquare, or an existing GridSquare if there is one already at the index.</returns>
         private GridSquare CreateGridSquareInDirection(GridSquare current, Direction direction)
         {
             (int, int) idxDelta = _indexDeltas[direction];
@@ -244,11 +283,6 @@ namespace dungeoncrawler.GameStates.PlayingState
             {
                 return gridSquareExists;
             }
-        }
-
-        private GridSquare ShiftSidewaysOne(GridSquare currentGridSquare, Direction currentDirection)
-        {
-            return CreateGridSquareInDirection(currentGridSquare, RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]));
         }
     }
 }

@@ -17,8 +17,8 @@ namespace dungeoncrawler.GameStates.PlayingState
             _gridSquares = new List<GridSquare>();
             _drawableGridSquares = new List<GridSquare>();
 
-            RoomGenerator roomGenerator = new RoomGenerator(this, _gridSquares);
-            roomGenerator.GenerateFloor();
+            LevelGenerator levelGenerator = new LevelGenerator(this, _gridSquares);
+            levelGenerator.GenerateLevel();
         }
 
         /// <summary>
