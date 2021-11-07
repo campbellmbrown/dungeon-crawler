@@ -8,6 +8,9 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class GridManager
     {
+        public const int STARTING_X = 0;
+        public const int STARTING_Y = 0;
+
         private List<GridSquare> _gridSquares;
 
         private List<GridSquare> _drawableGridSquares;
@@ -45,7 +48,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public GridSquare GetStartingTile()
         {
-            return _gridSquares.Find(sq => sq.xIdx == 0 && sq.yIdx == 0);
+            return _gridSquares.Find(sq => sq.xIdx == STARTING_X && sq.yIdx == STARTING_Y);
         }
 
         /// <summary>

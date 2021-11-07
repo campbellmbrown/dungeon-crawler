@@ -1,7 +1,5 @@
 ﻿using dungeoncrawler.Utility;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
@@ -95,7 +93,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private void GenerateFloor()
         {
-            GridSquare currentGridSquare = TryCreateNewGridSquare(0, 0);
+            GridSquare currentGridSquare = TryCreateNewGridSquare(GridManager.STARTING_X, GridManager.STARTING_Y);
             CreateRoom(currentGridSquare);
             Direction currentDirection = RNG.RandomEnum<Direction>();
             UpdateDirectionWeights(currentDirection);
