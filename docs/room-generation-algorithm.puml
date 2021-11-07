@@ -1,0 +1,39 @@
+@startuml Level Generation Algorithm
+
+title Level Generation Algorithm
+
+!pragma useVerticalIf on
+
+start
+
+:New GridSquare at {0, 0};
+:Create room;
+:Choose random direction;
+:Weigh directions;
+:Choose random main
+path length;
+
+repeat
+    if (Direction change) then (yes)
+        :Choose new direction;
+        if (Branch chance) then (yes)
+            repeat
+                :Move forward one GridSquare;
+                :Create room;
+            repeat while (Reached branch length) is (no)
+        endif
+        if (Room chance) then (yes)
+            :Create room;
+        endif
+    endif
+    if (Shift chance) then (yes)
+        :Shift one tile sideways;
+    endif
+    :Move forward one GridSquare;
+repeat while (Reached main path length) is (no)
+
+: Create room;
+
+stop
+
+@enduml
