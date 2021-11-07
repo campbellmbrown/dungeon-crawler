@@ -47,13 +47,15 @@ namespace dungeoncrawler.GameStates.PlayingState
         private const int MAIN_PATH_MAX_LENGTH = 90;
         private const int BRANCH_MAX_LENGTH = 6;
         private const int BRANCH_MIN_LENGTH = 4;
-        private const int MIN_ROOM_WIDTH = 2;
-        private const int MAX_ROOM_WIDTH = 4;
-        private const int MIN_ROOM_HEIGHT = 2;
-        private const int MAX_ROOM_HEIGHT = 4;
+        private const int MIN_ROOM_WIDTH = 3;
+        private const int MAX_ROOM_WIDTH = 5;
+        private const int MIN_ROOM_HEIGHT = 3;
+        private const int MAX_ROOM_HEIGHT = 5;
 
         // Percent chances
         private const int BRANCH_AT_DIRECTION_CHANGE_CHANCE = 50; // %
+        private const int SHIFT_CHANCE = 20; // %
+        private const int REMOVE_ROOM_CORNER_CHANCE = 30; // %
 
         // Guassian constants
         private const int DISTANCE_UNTIL_TURN_MEAN = 6;
@@ -89,17 +91,6 @@ namespace dungeoncrawler.GameStates.PlayingState
             GenerateFloor();
         }
 
-        private int NewDistanceUntilDirectionChange()
-        {
-            int guassian = RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
-            return guassian;
-        }
-
-        private Direction ChooseNewDirection(Direction currentDirection)
-        {
-            return RNG.ChooseWeighted(_turn90DegreesOptions[currentDirection], _changeDirectionWeights);
-        }
-
         public void GenerateFloor()
         {
             // (1) Create the original square
@@ -127,6 +118,12 @@ namespace dungeoncrawler.GameStates.PlayingState
                 if (_distanceUntilDirectionChange == 0)
                 {
                     currentDirection = ChangeDirection(currentGridSquare, currentDirection);
+                }
+
+                // Shift
+                if (RNG.PercentChance(SHIFT_CHANCE))
+                {
+                    currentGridSquare = ShiftSidewaysOne(currentGridSquare, currentDirection);
                 }
 
                 // (7c) Create a GridSquare in the direction we are facing
@@ -171,6 +168,16 @@ namespace dungeoncrawler.GameStates.PlayingState
             CreateRoom(branchCurrentGridSquare);
         }
 
+        private int NewDistanceUntilDirectionChange()
+        {
+            return RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
+        }
+
+        private Direction ChooseNewDirection(Direction currentDirection)
+        {
+            return RNG.ChooseWeighted(_turn90DegreesOptions[currentDirection], _changeDirectionWeights);
+        }
+
         private void CreateRoom(GridSquare center, int minW = MIN_ROOM_WIDTH, int maxW = MAX_ROOM_WIDTH, int minH = MIN_ROOM_HEIGHT, int maxH = MAX_ROOM_HEIGHT)
         {
             int roomHeight = Game1.random.Next(minH, maxH + 1);
@@ -191,7 +198,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             {
                 for (int yIdx = 0; yIdx < roomHeight; yIdx++)
                 {
-                    TryCreateNewGridSquare(originX + xIdx, originY + yIdx);
+                    bool corner = (xIdx == 0 || xIdx == (roomWidth - 1)) && (yIdx == 0 || yIdx == (roomHeight - 1));
+                    if (!(corner && RNG.PercentChance(REMOVE_ROOM_CORNER_CHANCE)))
+                    {
+                        TryCreateNewGridSquare(originX + xIdx, originY + yIdx);
+                    }
                 }
             }
         }
@@ -233,6 +244,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             {
                 return gridSquareExists;
             }
+        }
+
+        private GridSquare ShiftSidewaysOne(GridSquare currentGridSquare, Direction currentDirection)
+        {
+            return CreateGridSquareInDirection(currentGridSquare, RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]));
         }
     }
 }
