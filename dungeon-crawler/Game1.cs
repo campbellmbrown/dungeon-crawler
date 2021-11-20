@@ -3,6 +3,7 @@ using dungeoncrawler.Management;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.BitmapFonts;
 using System;
 using System.Collections.Generic;
 
@@ -20,13 +21,18 @@ namespace dungeoncrawler
         private Color _backgroundColor;
 
         public static Dictionary<string, Texture2D> textures { get; set; }
+        public static Dictionary<string, BitmapFont> fonts { get; set; }
         public static Random random;
 
+        private static LogManager _log;
         private ViewManager _viewManager;
         private GameState _gameState;
         private PlayingState _playingState;
 
-        public const string VERSION_STR = "v0.1.5";
+        private const float HEARTBEAT_TIME = 1f; // sec
+        private float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
+
+        public const string VERSION_STR = "v0.2.1";
 
         public Game1()
         {
@@ -50,8 +56,14 @@ namespace dungeoncrawler
 
             textures = new Dictionary<string, Texture2D>();
 
+            fonts = new Dictionary<string, BitmapFont>()
+            {
+                { "normal_font", Content.Load<BitmapFont>("fonts/normal_font") },
+            };
+
             _viewManager = new ViewManager(GraphicsDevice, _graphics, Window);
             _playingState = new PlayingState(_viewManager);
+            _log = new LogManager(_viewManager);
         }
 
         protected override void Update(GameTime gameTime)
@@ -61,16 +73,18 @@ namespace dungeoncrawler
                 Exit();
             }
 
+            HeartBeat(gameTime);
+
             switch (_gameState)
             {
                 case GameState.Playing:
                     _playingState.FrameTick(gameTime);
                     break;
                 default:
-                    // TODO: add logging warning here
+                    Log("Invalid GameState for updating", LogLevel.Error);
                     break;
             }
-
+            _log.FrameTick();
             base.Update(gameTime);
         }
 
@@ -92,12 +106,27 @@ namespace dungeoncrawler
                     _playingState.Draw(_spriteBatch);
                     break;
                 default:
-                    // TODO: add logging warning here
+                    Log("Invalid GameState for drawing", LogLevel.Error);
                     break;
             }
-            _viewManager.UpdateCameraPosition(Vector2.Zero); // TODO: move out of here to the player class
+            _log.Draw(_spriteBatch);
             base.Draw(gameTime);
             _spriteBatch.End();
+        }
+
+        public static void Log(string message, LogLevel logLevel = LogLevel.Trace)
+        {
+            _log.AddLogMessage(message, logLevel);
+        }
+
+        private void HeartBeat(GameTime gameTime)
+        {
+            _timeSinceLastHeartBeat += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (_timeSinceLastHeartBeat >= HEARTBEAT_TIME)
+            {
+                Log("Heartbeat", LogLevel.Trace);
+                _timeSinceLastHeartBeat -= HEARTBEAT_TIME;
+            }
         }
     }
 }
