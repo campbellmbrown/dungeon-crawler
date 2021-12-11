@@ -28,22 +28,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public VisibilityState visibilityState { get; set; }
         private float _opacity = 0;
 
-        private Entity _entity;
-        public Entity entity
-        {
-            get
-            {
-                return _entity;
-            }
-            set
-            {
-                _entity = value;
-                if (_entity != null)
-                {
-                    _entity.ChangeGridSquare(this);
-                }
-            }
-        }
+        public Entity entity { get; set; }
         public bool hasEntity { get { return entity != null; } }
 
         public GridSquare(GridManager gridManager, int xIdx, int yIdx)

@@ -130,8 +130,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             GridSquare gridSquare = gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
             if (gridSquare != null)
             {
-                gridSquare.entity = containingEntity.entity;
-                containingEntity.entity = null;
+                containingEntity.entity.ChangeGridSquare(gridSquare);
                 return MovementStatus.Success;
             }
             else

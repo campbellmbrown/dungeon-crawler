@@ -30,18 +30,23 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             _gridManager = gridManager;
             _destinations = new Queue<Vector2>();
+            _gridSquare = gridSquare;
             gridSquare.entity = this;
 
-            // When we set the GridSquare's entity it also sets this entities GridSquare.
-            // On the first time we need to override this.
-            _destinations.Clear();
-            position = gridSquare.position;
+            position = _gridSquare.position;
             destinationState = DestinationState.AtDestination;
         }
 
+        /// <summary>
+        /// Sets the GridSquare for this Entity, and this Entity for the GridSquare.  
+        /// Also clears the Entity from the GridSquare the Entity is originally in. 
+        /// </summary>
+        /// <param name="gridSquare">The new GridSquare for this entity to belong to.</param>
         public void ChangeGridSquare(GridSquare gridSquare)
         {
+            _gridSquare.entity = null;
             _gridSquare = gridSquare;
+            _gridSquare.entity = this;
             _destinations.Enqueue(_gridSquare.position);
             destinationState = DestinationState.OffDestination;
         }
