@@ -14,7 +14,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         private int _desiredYMovement = 0;
 
         public Player(GridManager gridManager, PlayingState playingState, GridSquare gridSquare) :
-            base(gridSquare)
+            base(gridManager, gridSquare)
         {
             _gridManager = gridManager;
             _playingState = playingState;
@@ -24,6 +24,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             _inputManager.AddSingleShotInput(Keys.S, MoveDown);
             _inputManager.AddSingleShotInput(Keys.A, MoveLeft);
             _inputManager.AddSingleShotInput(Keys.D, MoveRight);
+            _inputManager.AddSingleShotInput(Keys.Q, TestDijkstra);
         }
 
         public override void FrameTick(GameTime gameTime)

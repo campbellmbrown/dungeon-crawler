@@ -11,16 +11,16 @@ namespace dungeoncrawler.GameStates.PlayingState
         public const int STARTING_X = 0;
         public const int STARTING_Y = 0;
 
-        private List<GridSquare> _gridSquares;
+        public List<GridSquare> gridSquares;
 
         private List<GridSquare> _drawableGridSquares;
 
         public GridManager()
         {
-            _gridSquares = new List<GridSquare>();
+            gridSquares = new List<GridSquare>();
             _drawableGridSquares = new List<GridSquare>();
 
-            LevelGenerator levelGenerator = new LevelGenerator(this, _gridSquares);
+            LevelGenerator levelGenerator = new LevelGenerator(this, gridSquares);
             levelGenerator.GenerateLevel();
         }
 
@@ -33,7 +33,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <returns>A random GridSquare if successful, null if unsuccessful</returns>
         public GridSquare GetRandomGridSquare()
         {
-            List<GridSquare> gridSquaresWithoutEntities = _gridSquares.Where(sq => !sq.hasEntity).ToList();
+            List<GridSquare> gridSquaresWithoutEntities = gridSquares.Where(sq => !sq.hasEntity).ToList();
             if (gridSquaresWithoutEntities.Count > 0)
             {
                 int idx = Game1.random.Next(0, gridSquaresWithoutEntities.Count);
@@ -48,7 +48,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public GridSquare GetStartingTile()
         {
-            return _gridSquares.Find(sq => sq.xIdx == STARTING_X && sq.yIdx == STARTING_Y);
+            return gridSquares.Find(sq => sq.xIdx == STARTING_X && sq.yIdx == STARTING_Y);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private MovementStatus MoveEntityInStraightLine(Entity entity, int deltaX, int deltaY)
         {
-            GridSquare containingEntity = _gridSquares.Find(sq => sq.entity == entity);
+            GridSquare containingEntity = gridSquares.Find(sq => sq.entity == entity);
             int desiredX = containingEntity.xIdx + deltaX;
             int desiredY = containingEntity.yIdx + deltaY;
             return MoveEntityFromTo(containingEntity, desiredX, desiredY);
@@ -127,7 +127,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             // TODO: should also check if there is something that can block the entity, such as another entity or a wall.
             // Or maybe there can be 'swappable' entities, that swap position with the player.
             // In that case, we should call gridSquare.swapEntity(gridSquareContainingEntity) instead of the logic below.
-            GridSquare gridSquare = _gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
+            GridSquare gridSquare = gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
             if (gridSquare != null)
             {
                 gridSquare.entity = containingEntity.entity;
@@ -143,7 +143,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public void FrameTick(GameTime gameTime)
         {
-            foreach (var gridSquare in _gridSquares)
+            foreach (var gridSquare in gridSquares)
             {
                 gridSquare.FrameTick(gameTime);
             }
@@ -157,8 +157,8 @@ namespace dungeoncrawler.GameStates.PlayingState
         public void UpdateVisibilityStates()
         {
             // Any gridSquare within the range of the player is visible.
-            GridSquare containingPlayer = _gridSquares.Find(sq => sq.entity is Player);
-            foreach (var gridSquare in _gridSquares)
+            GridSquare containingPlayer = gridSquares.Find(sq => sq.entity is Player);
+            foreach (var gridSquare in gridSquares)
             {
                 gridSquare.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
             }
