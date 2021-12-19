@@ -2,59 +2,59 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
     public class Entity
     {
-        private enum DestinationState
+        protected enum DestinationState
         {
             AtDestination,
             OffDestination,
         }
 
-        private const float MOVEMENT_SPEED = 48f; // 16 pixels/second.
-        private const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
-        private const float MAX_QUEUED_DESTINATIONS = 3;
+        private readonly GridManager _gridManager;
+        private readonly Dijkstra _pathFinding;
 
-        private DestinationState destinationState;
-        private Queue<Vector2> _destinations;
+        private const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
+        private const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
+        private const int MAX_GRIDSQUARES_PER_PATHFIND = 10;
+
+        protected DestinationState destinationState;
+        private Vector2 _destination;
+        public Queue<GridSquare> queuedGridSquares { get; }
         public Vector2 position { get; private set; }
         private GridSquare _gridSquare;
 
-        public Entity(GridSquare gridSquare)
+        public Entity(GridManager gridManager, GridSquare gridSquare)
         {
-            _destinations = new Queue<Vector2>();
+            _gridManager = gridManager;
+            _pathFinding = new Dijkstra(_gridManager);
+            queuedGridSquares = new Queue<GridSquare>();
+            _gridSquare = gridSquare;
             gridSquare.entity = this;
 
-            // When we set the GridSquare's entity it also sets this entities GridSquare.
-            // On the first time we need to override this.
-            _destinations.Clear();
-            position = gridSquare.position;
+            position = _gridSquare.position;
             destinationState = DestinationState.AtDestination;
         }
 
-        public void ChangeGridSquare(GridSquare gridSquare)
-        {
-            _gridSquare = gridSquare;
-            _destinations.Enqueue(_gridSquare.position);
-            destinationState = DestinationState.OffDestination;
-        }
+        public const int FRAME_TICKS_PER_STEP = 10;
 
         public virtual void FrameTick(GameTime gameTime)
         {
+            // If not at destination
             if (destinationState == DestinationState.OffDestination)
             {
-                Vector2 currentDestination = _destinations.Peek();
-                position += Vector2.Normalize(currentDestination - position) * MOVEMENT_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if ((currentDestination - position).Length() < DESTINATION_HYSTERESIS)
+                Vector2 diff = _destination - position;
+                if (diff.Length() > 0) // Cannot normalize a vector of length 0
                 {
-                    position = currentDestination;
-                    _destinations.Dequeue();
-                    if (_destinations.Count == 0)
-                    {
-                        destinationState = DestinationState.AtDestination;
-                    }
+                    position += Vector2.Normalize(diff) * MOVEMENT_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                if ((_destination - position).Length() < DESTINATION_HYSTERESIS)
+                {
+                    position = _destination;
+                    destinationState = DestinationState.AtDestination;
                 }
             }
         }
@@ -66,7 +66,37 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public virtual void ActionTick()
         {
+            Game1.Log("Entity " + GetHashCode().ToString() + " ActionTick triggered.", LogLevel.Debug);
+            if (queuedGridSquares.Count > 0)
+            {
+                _gridSquare.entity = null;
+                _gridSquare = queuedGridSquares.Dequeue();
+                _gridSquare.entity = this;
+                _destination = _gridSquare.position;
+                destinationState = DestinationState.OffDestination;
+            }
+        }
 
+        public void SetDestination(GridSquare destination)
+        {
+            Stack<GridSquare> sequence = _pathFinding.FindShortestPath(_gridSquare, destination);
+            if (sequence.Count() > MAX_GRIDSQUARES_PER_PATHFIND)
+            {
+                Game1.Log("The destination is too far away from the source.", LogLevel.Warning);
+            }
+            else
+            {
+                while (sequence.Count > 0)
+                {
+                    GridSquare step = sequence.Pop();
+                    queuedGridSquares.Enqueue(step);
+                }
+            }
+        }
+
+        public bool Busy()
+        {
+            return destinationState != DestinationState.AtDestination;
         }
     }
 }

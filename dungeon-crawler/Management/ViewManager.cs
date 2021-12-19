@@ -29,7 +29,7 @@ namespace dungeoncrawler.Management
                 return new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             }
         }
-        private GraphicsDevice _graphicsDevice;
+        private readonly GraphicsDevice _graphicsDevice;
         public Vector2 windowSize
         {
             get

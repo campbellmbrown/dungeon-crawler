@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeoncrawler.Management;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
@@ -18,6 +19,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         }
 
         private readonly GridManager _gridManager;
+        private readonly ClickManager _clickManager;
 
         public const int GRID_SQUARE_SIZE = 16;
         private const float OPACITY_RATE = 1.0f; // 0 -> 1 opacity in 1 second.
@@ -28,34 +30,23 @@ namespace dungeoncrawler.GameStates.PlayingState
         public VisibilityState visibilityState { get; set; }
         private float _opacity = 0;
 
-        private Entity _entity;
-        public Entity entity
-        {
-            get
-            {
-                return _entity;
-            }
-            set
-            {
-                _entity = value;
-                if (_entity != null)
-                {
-                    _entity.ChangeGridSquare(this);
-                }
-            }
-        }
+        public Entity entity { get; set; }
         public bool hasEntity { get { return entity != null; } }
 
-        public GridSquare(GridManager gridManager, int xIdx, int yIdx)
+        public GridSquare(GridManager gridManager, ClickManager clickManager, int xIdx, int yIdx)
         {
             _gridManager = gridManager;
+            _clickManager = clickManager;
             this.xIdx = xIdx;
             this.yIdx = yIdx;
             visibilityState = VisibilityState.NotVisible;
+            // TODO: move to the child class for floor gridsquares.
+            _clickManager.AddLeftClick(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), SetPlayerDestination);
         }
 
         public void FrameTick(GameTime gameTime)
         {
+            // TODO: Move to an entity manager
             if (hasEntity)
             {
                 entity.FrameTick(gameTime);
@@ -104,6 +95,12 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <param name="range">The range away from the focus to initiate a state change.</param>
         public void ActionTick(int xIdxOfFocus, int yIdxOfFocus, int range)
         {
+            // TODO: Move to an entity manager
+            if (hasEntity)
+            {
+                entity.ActionTick();
+            }
+
             bool withinRange = ((Math.Abs(xIdxOfFocus - xIdx) < range) && (Math.Abs(yIdxOfFocus - yIdx) < range));
 
             switch (visibilityState)
@@ -133,6 +130,24 @@ namespace dungeoncrawler.GameStates.PlayingState
                         _gridManager.AddToDrawables(this);
                     }
                     break;
+            }
+        }
+
+        public void SetPlayerDestination()
+        {
+            _gridManager.SetPlayerDestination(this);
+        }
+
+        public bool Busy()
+        {
+            // TODO: Move to an entity manager
+            if (hasEntity)
+            {
+                return entity.Busy();
+            }
+            else
+            {
+                return false;
             }
         }
     }

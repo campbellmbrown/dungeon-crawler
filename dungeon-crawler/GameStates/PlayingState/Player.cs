@@ -6,67 +6,42 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class Player : Entity
     {
-        private readonly GridManager _gridManager;
         private readonly PlayingState _playingState;
 
         private readonly InputManager _inputManager;
-        private int _desiredXMovement = 0;
-        private int _desiredYMovement = 0;
 
         public Player(GridManager gridManager, PlayingState playingState, GridSquare gridSquare) :
-            base(gridSquare)
+            base(gridManager, gridSquare)
         {
-            _gridManager = gridManager;
             _playingState = playingState;
 
             _inputManager = new InputManager();
-            _inputManager.AddSingleShotInput(Keys.W, MoveUp);
-            _inputManager.AddSingleShotInput(Keys.S, MoveDown);
-            _inputManager.AddSingleShotInput(Keys.A, MoveLeft);
-            _inputManager.AddSingleShotInput(Keys.D, MoveRight);
+        }
+
+        public void PriorityFrameTick(GameTime gameTime)
+        {
+            _inputManager.FrameTick();
+            // TODO: determine the best place for this to be. Maybe this should happen when the player clicks on a grid square.
+            if (queuedGridSquares.Count > 0 && destinationState == DestinationState.AtDestination)
+            {
+                _playingState.ActionTick();
+            }
+            base.FrameTick(gameTime);
+        }
+
+        public void PriorityActionTick()
+        {
+            base.ActionTick();
         }
 
         public override void FrameTick(GameTime gameTime)
         {
-            _inputManager.FrameTick();
-            base.FrameTick(gameTime);
-        }
-
-        public void MoveUp()
-        {
-            _desiredYMovement -= 1;
-            MovementCommon();
-        }
-
-        public void MoveDown()
-        {
-            _desiredYMovement += 1;
-            MovementCommon();
-        }
-
-        public void MoveLeft()
-        {
-            _desiredXMovement -= 1;
-            MovementCommon();
-        }
-
-        public void MoveRight()
-        {
-            _desiredXMovement += 1;
-            MovementCommon();
-        }
-
-        private void MovementCommon()
-        {
-            _playingState.ActionTick();
+            // Do nothing. The frame tick should be done before all other entities, performed in the PriorityFrameTick.
         }
 
         public override void ActionTick()
         {
-            _gridManager.MoveEntityDiagonally(this, _desiredXMovement, _desiredYMovement);
-
-            _desiredXMovement = 0;
-            _desiredYMovement = 0;
+            // Do nothing. The action tick should be done before all other entities, performed in the PriorityActionTick.
         }
     }
 }
