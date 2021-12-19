@@ -20,7 +20,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             _inputManager = new InputManager();
         }
 
-        public override void FrameTick(GameTime gameTime)
+        public void PriorityFrameTick(GameTime gameTime)
         {
             _inputManager.FrameTick();
             // TODO: determine the best place for this to be. Maybe this should happen when the player clicks on a grid square.
@@ -31,9 +31,19 @@ namespace dungeoncrawler.GameStates.PlayingState
             base.FrameTick(gameTime);
         }
 
-        public override void ActionTick()
+        public void PriorityActionTick()
         {
             base.ActionTick();
+        }
+
+        public override void FrameTick(GameTime gameTime)
+        {
+            // Do nothing. The frame tick should be done before all other entities, performed in the PriorityFrameTick.
+        }
+
+        public override void ActionTick()
+        {
+            // Do nothing. The action tick should be done before all other entities, performed in the PriorityActionTick.
         }
     }
 }

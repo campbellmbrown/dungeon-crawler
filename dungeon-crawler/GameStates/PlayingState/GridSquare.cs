@@ -46,6 +46,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public void FrameTick(GameTime gameTime)
         {
+            // TODO: Move to an entity manager
             if (hasEntity)
             {
                 entity.FrameTick(gameTime);
@@ -94,6 +95,12 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <param name="range">The range away from the focus to initiate a state change.</param>
         public void ActionTick(int xIdxOfFocus, int yIdxOfFocus, int range)
         {
+            // TODO: Move to an entity manager
+            if (hasEntity)
+            {
+                entity.ActionTick();
+            }
+
             bool withinRange = ((Math.Abs(xIdxOfFocus - xIdx) < range) && (Math.Abs(yIdxOfFocus - yIdx) < range));
 
             switch (visibilityState)
@@ -134,7 +141,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public bool Busy()
         {
             // TODO: Move to an entity manager
-            if (entity != null)
+            if (hasEntity)
             {
                 return entity.Busy();
             }

@@ -5,6 +5,9 @@ participant Game1
 participant PlayingState
 participant GridManager
 participant GridSquare
+participant ClickManager
+participant Player
+participant Entity
 
 Game1 -> PlayingState : FrameTick
 activate PlayingState #Green
@@ -23,12 +26,12 @@ activate PlayingState #Green
         end
     deactivate
 
-    PlayingState -> Player : FrameTick
+    PlayingState -> Player : PrioirityFrameTick
     activate Player #Green
         alt There are queuedGridSquares and AtDestination
             Player -> PlayingState : ActionTick
             activate PlayingState #Orange
-                PlayingState -> Player : ActionTick
+                PlayingState -> Player : PriorityActionTick
                 activate Player #Orange
                     alt there are queuedGridSquares
                         Player -> GridSquare : Set entity to this
@@ -40,11 +43,21 @@ activate PlayingState #Green
                     loop for each GridSquare
                         GridManager -> GridSquare : ActionTick
                         activate GridSquare #Orange
+                            GridSquare -> Entity : ActionTick
+                            activate Entity #Orange
+                                alt there are queuedGridSquares
+                                    Entity -> GridSquare : Set entity to this
+                                    Entity -> Entity : New destination
+                                end
+                            deactivate
                             GridSquare -> GridSquare : Update visibility state
                         deactivate
                     end
                 deactivate
             deactivate
+            alt Off destination
+                Player -> Player : Move towards destination
+            end
         end
     deactivate
 
@@ -53,14 +66,14 @@ activate PlayingState #Green
         loop for each GridSquare
             GridManager -> GridSquare
             activate GridSquare #Green
-                
+                GridSquare -> Entity : FrameTick
+                activate Entity #Green
+                    alt Off destination
+                        Entity -> Entity : Move towards destination
+                    end
+                deactivate
             deactivate
         end
-    deactivate
-
-    PlayingState -> ViewManager : UpdateCameraPosition
-    activate ViewManager #Green
-
     deactivate
 deactivate
 

@@ -24,7 +24,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public void FrameTick(GameTime gameTime)
         {
             _clickManager.FrameTick();
-            _player.FrameTick(gameTime);
+            _player.PriorityFrameTick(gameTime);
             _gridManager.FrameTick(gameTime);
 
             _viewManager.UpdateCameraPosition(_player.position);
@@ -37,7 +37,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public void ActionTick()
         {
-            _player.ActionTick();
+            _player.PriorityActionTick();
             _gridManager.ActionTick();
         }
 
