@@ -1,4 +1,5 @@
-﻿using dungeoncrawler.Utility;
+﻿using dungeoncrawler.Management;
+using dungeoncrawler.Utility;
 using System.Collections.Generic;
 
 namespace dungeoncrawler.GameStates.PlayingState
@@ -38,6 +39,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private readonly GridManager _gridManager;
         private readonly List<GridSquare> _gridSquares;
+        private readonly ClickManager _clickManager;
 
         private int _distanceUntilDirectionChange;
 
@@ -80,10 +82,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
         };
 
-        public LevelGenerator(GridManager gridManager, List<GridSquare> gridSquares)
+        public LevelGenerator(GridManager gridManager, List<GridSquare> gridSquares, ClickManager clickManager)
         {
             _gridManager = gridManager;
             _gridSquares = gridSquares;
+            _clickManager = clickManager;
         }
 
         public void GenerateLevel()
@@ -273,7 +276,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             GridSquare gridSquareExists = _gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
             if (gridSquareExists == null)
             {
-                GridSquare newGridSquare = new GridSquare(_gridManager, xIdx, yIdx);
+                GridSquare newGridSquare = new GridSquare(_gridManager, _clickManager, xIdx, yIdx);
                 _gridSquares.Add(newGridSquare);
                 return newGridSquare;
             }

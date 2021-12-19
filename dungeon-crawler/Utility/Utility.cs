@@ -11,6 +11,11 @@ namespace dungeoncrawler.Utility
         {
             return new Vector2(point.X, point.Y);
         }
+
+        public static Point Vector2ToPoint(Vector2 vector2)
+        {
+            return new Point((int)vector2.X, (int)vector2.Y);
+        }
     }
 
     public static class RNG

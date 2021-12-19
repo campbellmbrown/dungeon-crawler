@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace dungeoncrawler
 {
@@ -114,9 +115,13 @@ namespace dungeoncrawler
             _spriteBatch.End();
         }
 
-        public static void Log(string message, LogLevel logLevel = LogLevel.Trace)
+        public static void Log(string message, LogLevel logLevel = LogLevel.Trace, bool writeToOutput = false)
         {
             _log.AddLogMessage(message, logLevel);
+            if (writeToOutput)
+            {
+                Debug.WriteLine(message);
+            }
         }
 
         private void HeartBeat(GameTime gameTime)

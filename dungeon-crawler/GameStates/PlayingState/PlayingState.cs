@@ -9,18 +9,21 @@ namespace dungeoncrawler.GameStates.PlayingState
         private readonly ViewManager _viewManager;
 
         private GridManager _gridManager;
+        private ClickManager _clickManager;
         private Player _player;
 
         public PlayingState(ViewManager viewManager)
         {
             _viewManager = viewManager;
-            _gridManager = new GridManager();
+            _clickManager = new ClickManager(_viewManager);
+            _gridManager = new GridManager(this, _clickManager);
             _player = new Player(_gridManager, this, _gridManager.GetStartingTile());
             _gridManager.UpdateVisibilityStates();
         }
 
         public void FrameTick(GameTime gameTime)
         {
+            _clickManager.FrameTick();
             _player.FrameTick(gameTime);
             _gridManager.FrameTick(gameTime);
 
@@ -36,6 +39,18 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             _player.ActionTick();
             _gridManager.ActionTick();
+        }
+
+        public void SetPlayerDestination(GridSquare gridSquare)
+        {
+            if (_gridManager.Busy())
+            {
+                Game1.Log("Action tick triggered but something is busy.", LogLevel.Warning);
+            }
+            else
+            {
+                _player.SetDestination(gridSquare);
+            }
         }
     }
 }

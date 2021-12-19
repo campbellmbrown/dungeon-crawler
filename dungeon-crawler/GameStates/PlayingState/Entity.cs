@@ -2,14 +2,13 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
     public class Entity
     {
-        private enum DestinationState
+        protected enum DestinationState
         {
             AtDestination,
             OffDestination,
@@ -17,19 +16,20 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private readonly GridManager _gridManager;
 
-        private const float MOVEMENT_SPEED = 48f; // 16 pixels/second.
+        private const float MOVEMENT_SPEED = 48f; // 48 pixels/second.
         private const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
-        private const float MAX_QUEUED_DESTINATIONS = 3;
+        private const int MAX_GRIDSQUARES_PER_PATHFIND = 10;
 
-        private DestinationState destinationState;
-        private Queue<Vector2> _destinations;
+        protected DestinationState destinationState;
+        private Vector2 _destination;
+        public Queue<GridSquare> queuedGridSquares { get; }
         public Vector2 position { get; private set; }
         private GridSquare _gridSquare;
 
         public Entity(GridManager gridManager, GridSquare gridSquare)
         {
             _gridManager = gridManager;
-            _destinations = new Queue<Vector2>();
+            queuedGridSquares = new Queue<GridSquare>();
             _gridSquare = gridSquare;
             gridSquare.entity = this;
 
@@ -37,34 +37,22 @@ namespace dungeoncrawler.GameStates.PlayingState
             destinationState = DestinationState.AtDestination;
         }
 
-        /// <summary>
-        /// Sets the GridSquare for this Entity, and this Entity for the GridSquare.  
-        /// Also clears the Entity from the GridSquare the Entity is originally in. 
-        /// </summary>
-        /// <param name="gridSquare">The new GridSquare for this entity to belong to.</param>
-        public void ChangeGridSquare(GridSquare gridSquare)
-        {
-            _gridSquare.entity = null;
-            _gridSquare = gridSquare;
-            _gridSquare.entity = this;
-            _destinations.Enqueue(_gridSquare.position);
-            destinationState = DestinationState.OffDestination;
-        }
+        public const int FRAME_TICKS_PER_STEP = 10;
 
         public virtual void FrameTick(GameTime gameTime)
         {
+            // If not at destination
             if (destinationState == DestinationState.OffDestination)
             {
-                Vector2 currentDestination = _destinations.Peek();
-                position += Vector2.Normalize(currentDestination - position) * MOVEMENT_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if ((currentDestination - position).Length() < DESTINATION_HYSTERESIS)
+                Vector2 diff = _destination - position;
+                if (diff.Length() > 0) // Cannot normalize a vector of length 0
                 {
-                    position = currentDestination;
-                    _destinations.Dequeue();
-                    if (_destinations.Count == 0)
-                    {
-                        destinationState = DestinationState.AtDestination;
-                    }
+                    position += Vector2.Normalize(diff) * MOVEMENT_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                if ((_destination - position).Length() < DESTINATION_HYSTERESIS)
+                {
+                    position = _destination;
+                    destinationState = DestinationState.AtDestination;
                 }
             }
         }
@@ -76,13 +64,16 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public virtual void ActionTick()
         {
-
+            Game1.Log("Entity " + GetHashCode().ToString() + " ActionTick triggered.", LogLevel.Debug);
+            if (queuedGridSquares.Count > 0)
+            {
+                _gridSquare.entity = null;
+                _gridSquare = queuedGridSquares.Dequeue();
+                _gridSquare.entity = this;
+                _destination = _gridSquare.position;
+                destinationState = DestinationState.OffDestination;
+            }
         }
-
-        // private List<GridSquare> FindPathTo()
-        // {
-
-        // }
 
         private class Vertex
         {
@@ -103,7 +94,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
         }
 
-        private Stack<GridSquare> Dijkstra(GridSquare dest)
+        private Stack<GridSquare> Dijkstra(GridSquare orig, GridSquare dest)
         {
             // See https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm for implementation.
 
@@ -114,7 +105,7 @@ namespace dungeoncrawler.GameStates.PlayingState
                 Q.Add(new Vertex(v.xIdx, v.yIdx));
             }
             Vertex target = Q.Find(v => (v.xIdx == dest.xIdx) && (v.yIdx == dest.yIdx));
-            Vertex source = Q.Find(v => (v.xIdx == 0) && (v.yIdx == 0));
+            Vertex source = Q.Find(v => (v.xIdx == orig.xIdx) && (v.yIdx == orig.yIdx));
             source.dist = 0;
             Vertex u;
 
@@ -128,13 +119,7 @@ namespace dungeoncrawler.GameStates.PlayingState
                     break;
                 }
 
-                List<(int, int)> possibleNeighbours = new List<(int, int)>()
-                {
-                    (0, -1),
-                    (1, 0),
-                    (0, 1),
-                    (-1, 0)
-                };
+                List<(int, int)> possibleNeighbours = new List<(int, int)>() { (0, -1), (1, 0), (0, 1), (-1, 0) };
 
                 foreach (var pn in possibleNeighbours)
                 {
@@ -152,7 +137,6 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
 
             Stack<GridSquare> S = new Stack<GridSquare>();
-
             u = target;
 
             if (u.prev != null || u == source)
@@ -165,22 +149,31 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
 
             Game1.Log("A total of " + (_gridManager.gridSquares.Count - Q.Count).ToString() + "/" + _gridManager.gridSquares.Count.ToString() + " were checked.");
+            // Remove the first one - this should be the source.
+            S.Pop();
             return S;
         }
 
-        public void TestDijkstra()
+        public void SetDestination(GridSquare destination)
         {
-            int idx = Game1.random.Next(_gridManager.gridSquares.Count);
-            GridSquare destination = _gridManager.gridSquares[idx];
-            Debug.WriteLine("From [0, 0] to [" + destination.xIdx + ", " + destination.yIdx + "]", LogLevel.Info);
-            Stack<GridSquare> sequence = Dijkstra(destination);
-            while (sequence.Count > 0)
+            Stack<GridSquare> sequence = Dijkstra(_gridSquare, destination);
+            if (sequence.Count() > MAX_GRIDSQUARES_PER_PATHFIND)
             {
-                GridSquare step = sequence.Pop();
-                Debug.WriteLine("[" + step.xIdx + ", " + step.yIdx + "]");
-                _destinations.Enqueue(step.position);
+                Game1.Log("The destination is too far away from the source.", LogLevel.Warning);
             }
-            Debug.WriteLine(_destinations.Count.ToString(), LogLevel.Debug);
+            else
+            {
+                while (sequence.Count > 0)
+                {
+                    GridSquare step = sequence.Pop();
+                    queuedGridSquares.Enqueue(step);
+                }
+            }
+        }
+
+        public bool Busy()
+        {
+            return destinationState != DestinationState.AtDestination;
         }
     }
 }

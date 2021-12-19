@@ -1,3 +1,4 @@
+using dungeoncrawler.Management;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,6 +9,8 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class GridManager
     {
+        private readonly PlayingState _playingState;
+
         public const int STARTING_X = 0;
         public const int STARTING_Y = 0;
 
@@ -15,12 +18,13 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private List<GridSquare> _drawableGridSquares;
 
-        public GridManager()
+        public GridManager(PlayingState playingState, ClickManager clickManager)
         {
+            _playingState = playingState;
             gridSquares = new List<GridSquare>();
             _drawableGridSquares = new List<GridSquare>();
 
-            LevelGenerator levelGenerator = new LevelGenerator(this, gridSquares);
+            LevelGenerator levelGenerator = new LevelGenerator(this, gridSquares, clickManager);
             levelGenerator.GenerateLevel();
         }
 
@@ -130,7 +134,8 @@ namespace dungeoncrawler.GameStates.PlayingState
             GridSquare gridSquare = gridSquares.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
             if (gridSquare != null)
             {
-                containingEntity.entity.ChangeGridSquare(gridSquare);
+                Game1.Log("This shouldn't happen anymore.", LogLevel.Fatal);
+                containingEntity.entity.queuedGridSquares.Enqueue(gridSquare);
                 return MovementStatus.Success;
             }
             else
@@ -179,6 +184,28 @@ namespace dungeoncrawler.GameStates.PlayingState
         public void RemoveFromDrawables(GridSquare gridSquare)
         {
             _drawableGridSquares.Remove(gridSquare);
+        }
+
+        public void SetPlayerDestination(GridSquare gridSquare)
+        {
+            if (_drawableGridSquares.Contains(gridSquare))
+            {
+                _playingState.SetPlayerDestination(gridSquare);
+            }
+            else
+            {
+                Game1.Log("The destination isn't visible.", LogLevel.Warning);
+            }
+        }
+
+        public bool Busy()
+        {
+            bool busy = false;
+            foreach (var gs in gridSquares)
+            {
+                busy |= gs.Busy();
+            }
+            return busy;
         }
     }
 }
