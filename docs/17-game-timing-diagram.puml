@@ -1,0 +1,67 @@
+@startuml Game Sequence Diagram
+title Game Sequence Diagram
+
+participant Game1
+participant PlayingState
+participant GridManager
+participant GridSquare
+
+Game1 -> PlayingState : FrameTick
+activate PlayingState #Green
+    PlayingState -> ClickManager : FrameTick
+    activate ClickManager #Green
+        alt Left click GridSquare
+            ClickManager -> GridSquare : SetPlayerDestination
+            GridSquare -> GridManager : SetPlayerDestination
+            alt GridSquare is visible
+            GridManager -> PlayingState : SetPlayerDestination
+                alt GridManager not busy
+                    PlayingState -> Player : SetDestination
+                    Player -> Player : Add to queuedGridSquares
+                end
+            end
+        end
+    deactivate
+
+    PlayingState -> Player : FrameTick
+    activate Player #Green
+        alt There are queuedGridSquares and AtDestination
+            Player -> PlayingState : ActionTick
+            activate PlayingState #Orange
+                PlayingState -> Player : ActionTick
+                activate Player #Orange
+                    alt there are queuedGridSquares
+                        Player -> GridSquare : Set entity to this
+                        Player -> Player : New destination
+                    end
+                deactivate
+                PlayingState -> GridManager : ActionTick
+                activate GridManager #Orange
+                    loop for each GridSquare
+                        GridManager -> GridSquare : ActionTick
+                        activate GridSquare #Orange
+                            GridSquare -> GridSquare : Update visibility state
+                        deactivate
+                    end
+                deactivate
+            deactivate
+        end
+    deactivate
+
+    PlayingState -> GridManager : FrameTick
+    activate GridManager #Green
+        loop for each GridSquare
+            GridManager -> GridSquare
+            activate GridSquare #Green
+                
+            deactivate
+        end
+    deactivate
+
+    PlayingState -> ViewManager : UpdateCameraPosition
+    activate ViewManager #Green
+
+    deactivate
+deactivate
+
+@enduml
