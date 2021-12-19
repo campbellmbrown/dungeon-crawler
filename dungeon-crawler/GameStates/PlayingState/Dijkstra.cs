@@ -5,7 +5,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class Dijkstra
     {
-        private GridManager _gridManager;
+        private readonly GridManager _gridManager;
 
         public Dijkstra(GridManager gridManager)
         {
@@ -14,7 +14,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private class Vertex
         {
-            public static int INF = 9999;
+            public const int INF = 9999;
 
             public int xIdx { get; }
             public int yIdx { get; }

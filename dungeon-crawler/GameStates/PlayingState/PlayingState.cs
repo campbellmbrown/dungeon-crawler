@@ -7,10 +7,9 @@ namespace dungeoncrawler.GameStates.PlayingState
     public class PlayingState : IGameState
     {
         private readonly ViewManager _viewManager;
-
-        private GridManager _gridManager;
-        private ClickManager _clickManager;
-        private Player _player;
+        private readonly GridManager _gridManager;
+        private readonly ClickManager _clickManager;
+        private readonly Player _player;
 
         public PlayingState(ViewManager viewManager)
         {

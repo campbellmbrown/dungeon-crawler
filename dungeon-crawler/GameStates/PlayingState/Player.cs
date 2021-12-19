@@ -6,7 +6,6 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class Player : Entity
     {
-        private readonly GridManager _gridManager;
         private readonly PlayingState _playingState;
 
         private readonly InputManager _inputManager;
@@ -14,7 +13,6 @@ namespace dungeoncrawler.GameStates.PlayingState
         public Player(GridManager gridManager, PlayingState playingState, GridSquare gridSquare) :
             base(gridManager, gridSquare)
         {
-            _gridManager = gridManager;
             _playingState = playingState;
 
             _inputManager = new InputManager();

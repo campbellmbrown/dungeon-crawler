@@ -15,6 +15,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         }
 
         private readonly GridManager _gridManager;
+        private readonly Dijkstra _pathFinding;
 
         private const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
         private const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
@@ -25,7 +26,6 @@ namespace dungeoncrawler.GameStates.PlayingState
         public Queue<GridSquare> queuedGridSquares { get; }
         public Vector2 position { get; private set; }
         private GridSquare _gridSquare;
-        private Dijkstra _pathFinding;
 
         public Entity(GridManager gridManager, GridSquare gridSquare)
         {

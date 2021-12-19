@@ -17,7 +17,7 @@ namespace dungeoncrawler
             Playing,
         }
 
-        private GraphicsDeviceManager _graphics;
+        private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Color _backgroundColor;
 

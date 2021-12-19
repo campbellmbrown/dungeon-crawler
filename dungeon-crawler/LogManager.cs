@@ -25,7 +25,7 @@ namespace dungeoncrawler
         public static float scale = 4;
         private static Vector2 _textOffset = new Vector2(145 / scale, 0);
         private static Vector2 _levelOffset = new Vector2(80 / scale, 0);
-        private static Dictionary<LogLevel, Color> _logColors = new Dictionary<LogLevel, Color>()
+        private static readonly Dictionary<LogLevel, Color> _logColors = new Dictionary<LogLevel, Color>()
         {
             { LogLevel.Trace, Color.Gray },
             { LogLevel.Debug, Color.LightGreen },
@@ -36,9 +36,9 @@ namespace dungeoncrawler
             { LogLevel.Other, Color.White },
         };
 
-        private string _logText;
-        private LogLevel _logLevel;
-        private DateTime _logTime;
+        private readonly string _logText;
+        private readonly LogLevel _logLevel;
+        private readonly DateTime _logTime;
 
         public LogPrint(string logText, LogLevel logLevel)
         {
@@ -70,12 +70,12 @@ namespace dungeoncrawler
         private const int MAX_LOGS = 200;
         private const int ACCEPTABLE_LOGS = 100;
         private const int MAX_LOGS_ON_SCREEN = 50;
-        private static Vector2 cornerBuffer = new Vector2(4, -2);
+        private static Vector2 _cornerBuffer = new Vector2(4, -2);
 
         private readonly ViewManager _viewManager;
+        private readonly InputManager _inputManager;
+        private readonly List<LogPrint> _logPrints;
 
-        private InputManager _inputManager;
-        private List<LogPrint> _logPrints;
         private LogLevel _currentLogLevel;
         private bool _logActive { get { return _currentLogLevel != LogLevel.LogOff; } }
 
@@ -107,7 +107,7 @@ namespace dungeoncrawler
                     {
                         opacity = (MAX_LOGS_ON_SCREEN - idx) / 5.0f;
                     }
-                    Vector2 position = _viewManager.bottomLeft + cornerBuffer - new Vector2(0, (1 + idx) * Game1.fonts["normal_font"].LineHeight / LogPrint.scale);
+                    Vector2 position = _viewManager.bottomLeft + _cornerBuffer - new Vector2(0, (1 + idx) * Game1.fonts["normal_font"].LineHeight / LogPrint.scale);
                     _logPrints[_logPrints.Count - 1 - idx].Draw(spriteBatch, position, opacity);
                 }
             }
