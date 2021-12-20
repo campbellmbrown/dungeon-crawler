@@ -16,7 +16,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             _viewManager = viewManager;
             _clickManager = new ClickManager(_viewManager);
             _gridManager = new GridManager(this, _clickManager);
-            _player = new Player(_gridManager, this, _gridManager.GetStartingTile());
+            _player = new Player(_gridManager, this, _gridManager.GetStartingFloor());
             _gridManager.UpdateVisibilityStates();
         }
 
@@ -40,7 +40,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             _gridManager.ActionTick();
         }
 
-        public void SetPlayerDestination(GridSquare gridSquare)
+        public void SetPlayerDestination(Floor floor)
         {
             if (_gridManager.Busy())
             {
@@ -48,7 +48,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
             else
             {
-                _player.SetDestination(gridSquare);
+                _player.SetDestination(floor);
             }
         }
     }

@@ -15,28 +15,28 @@ namespace dungeoncrawler.GameStates.PlayingState
         public const int STARTING_X = 0;
         public const int STARTING_Y = 0;
 
-        public List<GridSquare> gridSquares { get; set; }
+        public List<Floor> floors { get; set; }
 
         public GridManager(PlayingState playingState, ClickManager clickManager)
         {
             _playingState = playingState;
-            gridSquares = new List<GridSquare>();
+            floors = new List<Floor>();
             _drawableGridSquares = new List<GridSquare>();
 
-            LevelGenerator levelGenerator = new LevelGenerator(this, gridSquares, clickManager);
+            LevelGenerator levelGenerator = new LevelGenerator(this, clickManager);
             levelGenerator.GenerateLevel();
         }
 
-        public GridSquare GetStartingTile()
+        public Floor GetStartingFloor()
         {
-            return gridSquares.Find(sq => sq.xIdx == STARTING_X && sq.yIdx == STARTING_Y);
+            return floors.Find(sq => sq.xIdx == STARTING_X && sq.yIdx == STARTING_Y);
         }
 
         public void FrameTick(GameTime gameTime)
         {
-            foreach (var gridSquare in gridSquares)
+            foreach (var floor in floors)
             {
-                gridSquare.FrameTick(gameTime);
+                floor.FrameTick(gameTime);
             }
         }
 
@@ -47,11 +47,11 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public void UpdateVisibilityStates()
         {
-            // Any gridSquare within the range of the player is visible.
-            GridSquare containingPlayer = gridSquares.Find(sq => sq.entity is Player);
-            foreach (var gridSquare in gridSquares)
+            // Any GridSquare within the range of the player is visible.
+            GridSquare containingPlayer = floors.Find(sq => sq.entity is Player);
+            foreach (var floor in floors)
             {
-                gridSquare.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
+                floor.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
             }
         }
 
@@ -73,11 +73,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             _drawableGridSquares.Remove(gridSquare);
         }
 
-        public void SetPlayerDestination(GridSquare gridSquare)
+        public void SetPlayerDestination(Floor floor)
         {
-            if (_drawableGridSquares.Contains(gridSquare))
+            if (_drawableGridSquares.Contains(floor))
             {
-                _playingState.SetPlayerDestination(gridSquare);
+                _playingState.SetPlayerDestination(floor);
             }
             else
             {
@@ -88,9 +88,9 @@ namespace dungeoncrawler.GameStates.PlayingState
         public bool Busy()
         {
             bool busy = false;
-            foreach (var gs in gridSquares)
+            foreach (var floor in floors)
             {
-                busy |= gs.Busy();
+                busy |= floor.Busy();
             }
             return busy;
         }
