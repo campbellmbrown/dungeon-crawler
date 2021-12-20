@@ -1,0 +1,8 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--max-line-length=120",
+        "--disable=logging-fstring-interpolation,global-variable-undefined,missing-class-docstring,missing-module-docstring,missing-function-docstring,invalid-name"
+    ]
+}
