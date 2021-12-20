@@ -19,23 +19,23 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
         private const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
-        private const int MAX_GRIDSQUARES_PER_PATHFIND = 10;
+        private const int MAX_FLOORS_PER_PATHFIND = 10;
 
         protected DestinationState destinationState;
         private Vector2 _destination;
-        public Queue<GridSquare> queuedGridSquares { get; }
+        public Queue<Floor> queuedFloors { get; }
         public Vector2 position { get; private set; }
-        private GridSquare _gridSquare;
+        private Floor _floor;
 
-        public Entity(GridManager gridManager, GridSquare gridSquare)
+        public Entity(GridManager gridManager, Floor floor)
         {
             _gridManager = gridManager;
             _pathFinding = new Dijkstra(_gridManager);
-            queuedGridSquares = new Queue<GridSquare>();
-            _gridSquare = gridSquare;
-            gridSquare.entity = this;
+            queuedFloors = new Queue<Floor>();
+            _floor = floor;
+            _floor.entity = this;
 
-            position = _gridSquare.position;
+            position = _floor.position;
             destinationState = DestinationState.AtDestination;
         }
 
@@ -67,20 +67,20 @@ namespace dungeoncrawler.GameStates.PlayingState
         public virtual void ActionTick()
         {
             Game1.Log("Entity " + GetHashCode().ToString() + " ActionTick triggered.", LogLevel.Debug);
-            if (queuedGridSquares.Count > 0)
+            if (queuedFloors.Count > 0)
             {
-                _gridSquare.entity = null;
-                _gridSquare = queuedGridSquares.Dequeue();
-                _gridSquare.entity = this;
-                _destination = _gridSquare.position;
+                _floor.entity = null;
+                _floor = queuedFloors.Dequeue();
+                _floor.entity = this;
+                _destination = _floor.position;
                 destinationState = DestinationState.OffDestination;
             }
         }
 
-        public void SetDestination(GridSquare destination)
+        public void SetDestination(Floor destination)
         {
-            Stack<GridSquare> sequence = _pathFinding.FindShortestPath(_gridSquare, destination);
-            if (sequence.Count() > MAX_GRIDSQUARES_PER_PATHFIND)
+            Stack<Floor> sequence = _pathFinding.FindShortestPath(_floor, destination);
+            if (sequence.Count() > MAX_FLOORS_PER_PATHFIND)
             {
                 Game1.Log("The destination is too far away from the source.", LogLevel.Warning);
             }
@@ -88,8 +88,8 @@ namespace dungeoncrawler.GameStates.PlayingState
             {
                 while (sequence.Count > 0)
                 {
-                    GridSquare step = sequence.Pop();
-                    queuedGridSquares.Enqueue(step);
+                    Floor step = sequence.Pop();
+                    queuedFloors.Enqueue(step);
                 }
             }
         }

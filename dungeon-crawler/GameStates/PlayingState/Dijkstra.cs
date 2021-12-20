@@ -31,15 +31,15 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
         }
 
-        public Stack<GridSquare> FindShortestPath(GridSquare orig, GridSquare dest)
+        public Stack<Floor> FindShortestPath(Floor orig, Floor dest)
         {
             // See https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm for implementation.
 
             // Create a list of unvisited nodes. Set the distance to 0 for the source node.
             List<Vertex> unvisited = new List<Vertex>();
-            foreach (var gs in _gridManager.gridSquares)
+            foreach (var floor in _gridManager.floors)
             {
-                unvisited.Add(new Vertex(gs.xIdx, gs.yIdx));
+                unvisited.Add(new Vertex(floor.xIdx, floor.yIdx));
             }
             Vertex target = unvisited.Find(v => (v.xIdx == dest.xIdx) && (v.yIdx == dest.yIdx));
             Vertex source = unvisited.Find(v => (v.xIdx == orig.xIdx) && (v.yIdx == orig.yIdx));
@@ -74,19 +74,19 @@ namespace dungeoncrawler.GameStates.PlayingState
                 }
             }
 
-            // Create a path of GridSquares.
-            Stack<GridSquare> path = new Stack<GridSquare>();
+            // Create a path of Floors.
+            Stack<Floor> path = new Stack<Floor>();
             curr = target;
             if (curr.prev != null || curr == source)
             {
                 while (curr != null)
                 {
-                    path.Push(_gridManager.gridSquares.Find(gs => (gs.xIdx == curr.xIdx) && (gs.yIdx == curr.yIdx)));
+                    path.Push(_gridManager.floors.Find(gs => (gs.xIdx == curr.xIdx) && (gs.yIdx == curr.yIdx)));
                     curr = curr.prev;
                 }
             }
 
-            Game1.Log("A total of " + (_gridManager.gridSquares.Count - unvisited.Count).ToString() + "/" + _gridManager.gridSquares.Count.ToString() + " were checked.", LogLevel.Debug);
+            Game1.Log("A total of " + (_gridManager.floors.Count - unvisited.Count).ToString() + "/" + _gridManager.floors.Count.ToString() + " were checked.", LogLevel.Debug);
             // Remove the first one - this should be the origin.
             path.Pop();
             return path;

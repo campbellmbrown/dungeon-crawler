@@ -18,70 +18,54 @@ namespace dungeoncrawler.GameStates.PlayingState
             NotVisible,
         }
 
-        private readonly GridManager _gridManager;
-        private readonly ClickManager _clickManager;
+        protected readonly GridManager gridManager;
 
         public const int GRID_SQUARE_SIZE = 16;
-        private const float OPACITY_RATE = 1.0f; // 0 -> 1 opacity in 1 second.
+        protected const float OPACITY_RATE = 1.0f; // 0 -> 1 opacity in 1 second.
 
         public Vector2 position { get { return GRID_SQUARE_SIZE * new Vector2(xIdx, yIdx); } }
         public int xIdx { get; }
         public int yIdx { get; }
         public VisibilityState visibilityState { get; set; }
-        private float _opacity = 0;
+        protected float opacity = 0;
 
-        public Entity entity { get; set; }
-        public bool hasEntity { get { return entity != null; } }
-
-        public GridSquare(GridManager gridManager, ClickManager clickManager, int xIdx, int yIdx)
+        public GridSquare(GridManager gridManager, int xIdx, int yIdx)
         {
-            _gridManager = gridManager;
-            _clickManager = clickManager;
+            this.gridManager = gridManager;
             this.xIdx = xIdx;
             this.yIdx = yIdx;
             visibilityState = VisibilityState.NotVisible;
-            // TODO: move to the child class for floor gridsquares.
-            _clickManager.AddLeftClick(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), SetPlayerDestination);
         }
 
-        public void FrameTick(GameTime gameTime)
+        public virtual void FrameTick(GameTime gameTime)
         {
-            // TODO: Move to an entity manager
-            if (hasEntity)
-            {
-                entity.FrameTick(gameTime);
-            }
             switch (visibilityState)
             {
                 case VisibilityState.FadingOut:
                     // Fade out the opacity until it reaches 0.
-                    _opacity -= OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (_opacity <= 0)
+                    opacity -= OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (opacity <= 0)
                     {
-                        _opacity = 0;
+                        opacity = 0;
                         visibilityState = VisibilityState.NotVisible;
-                        _gridManager.RemoveFromDrawables(this);
+                        gridManager.RemoveFromDrawables(this);
                     }
                     break;
                 case VisibilityState.FadingIn:
                     // Fade in the opacity until it reaches 1.
-                    _opacity += OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (_opacity >= 1)
+                    opacity += OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (opacity >= 1)
                     {
-                        _opacity = 1;
+                        opacity = 1;
                         visibilityState = VisibilityState.Visible;
                     }
                     break;
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawRectangle(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), Color.Red * _opacity);
-            if (hasEntity)
-            {
-                entity.Draw(spriteBatch);
-            }
+            // Do nothing.
         }
 
         /// <summary>
@@ -90,17 +74,11 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <remarks>
         /// The xIdxOfFocus, yIdxOfFocus, and range could go into a Focus structure if desired.
         /// </remarks>
-        /// <param name="xIdx">The X index of where the focus is. </param>
-        /// <param name="yIdx">The Y index of where the focus is. </param>
+        /// <param name="xIdx">The X index of where the focus is.</param>
+        /// <param name="yIdx">The Y index of where the focus is.</param>
         /// <param name="range">The range away from the focus to initiate a state change.</param>
-        public void ActionTick(int xIdxOfFocus, int yIdxOfFocus, int range)
+        public virtual void ActionTick(int xIdxOfFocus, int yIdxOfFocus, int range)
         {
-            // TODO: Move to an entity manager
-            if (hasEntity)
-            {
-                entity.ActionTick();
-            }
-
             bool withinRange = ((Math.Abs(xIdxOfFocus - xIdx) < range) && (Math.Abs(yIdxOfFocus - yIdx) < range));
 
             switch (visibilityState)
@@ -127,27 +105,9 @@ namespace dungeoncrawler.GameStates.PlayingState
                     if (withinRange)
                     {
                         visibilityState = VisibilityState.FadingIn;
-                        _gridManager.AddToDrawables(this);
+                        gridManager.AddToDrawables(this);
                     }
                     break;
-            }
-        }
-
-        public void SetPlayerDestination()
-        {
-            _gridManager.SetPlayerDestination(this);
-        }
-
-        public bool Busy()
-        {
-            // TODO: Move to an entity manager
-            if (hasEntity)
-            {
-                return entity.Busy();
-            }
-            else
-            {
-                return false;
             }
         }
     }
