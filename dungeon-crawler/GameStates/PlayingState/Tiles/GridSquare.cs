@@ -21,13 +21,13 @@ namespace dungeoncrawler.GameStates.PlayingState
         protected readonly GridManager gridManager;
 
         public const int GRID_SQUARE_SIZE = 16;
-        private const float OPACITY_RATE = 1.0f; // 0 -> 1 opacity in 1 second.
+        protected const float OPACITY_RATE = 1.0f; // 0 -> 1 opacity in 1 second.
 
         public Vector2 position { get { return GRID_SQUARE_SIZE * new Vector2(xIdx, yIdx); } }
         public int xIdx { get; }
         public int yIdx { get; }
         public VisibilityState visibilityState { get; set; }
-        private float _opacity = 0;
+        protected float opacity = 0;
 
         public GridSquare(GridManager gridManager, int xIdx, int yIdx)
         {
@@ -43,20 +43,20 @@ namespace dungeoncrawler.GameStates.PlayingState
             {
                 case VisibilityState.FadingOut:
                     // Fade out the opacity until it reaches 0.
-                    _opacity -= OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (_opacity <= 0)
+                    opacity -= OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (opacity <= 0)
                     {
-                        _opacity = 0;
+                        opacity = 0;
                         visibilityState = VisibilityState.NotVisible;
                         gridManager.RemoveFromDrawables(this);
                     }
                     break;
                 case VisibilityState.FadingIn:
                     // Fade in the opacity until it reaches 1.
-                    _opacity += OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (_opacity >= 1)
+                    opacity += OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (opacity >= 1)
                     {
-                        _opacity = 1;
+                        opacity = 1;
                         visibilityState = VisibilityState.Visible;
                     }
                     break;
@@ -65,7 +65,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawRectangle(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), Color.Red * _opacity);
+            // Do nothing.
         }
 
         /// <summary>

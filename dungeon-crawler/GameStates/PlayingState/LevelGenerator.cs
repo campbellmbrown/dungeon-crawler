@@ -1,6 +1,7 @@
 ﻿using dungeoncrawler.Management;
 using dungeoncrawler.Utility;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
@@ -90,6 +91,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public void GenerateLevel()
         {
             GenerateFloor();
+            GenerateWalls();
         }
 
         private void GenerateFloor()
@@ -117,6 +119,20 @@ namespace dungeoncrawler.GameStates.PlayingState
                 _distanceUntilDirectionChange--;
             }
             CreateRoom(currentFloor);
+        }
+
+        private void GenerateWalls()
+        {
+            foreach (var floor in _gridManager.floors)
+            {
+                for (int xOff = -1; xOff <= 1; xOff++)
+                {
+                    for (int yOff = -1; yOff <= 1; yOff++)
+                    {
+                        TryCreateNewWall(floor.xIdx + xOff, floor.yIdx + yOff);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -271,7 +287,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <returns>The new Floor, or an existing Floor if there is one already at the index.</returns>
         private Floor TryCreateNewFloor(int xIdx, int yIdx)
         {
-            Floor floorExists = _gridManager.floors.Find(sq => sq.xIdx == xIdx && sq.yIdx == yIdx);
+            Floor floorExists = _gridManager.floors.Find(floor => floor.xIdx == xIdx && floor.yIdx == yIdx);
             if (floorExists == null)
             {
                 Floor newFloor = new Floor(_gridManager, _clickManager, xIdx, yIdx);
@@ -281,6 +297,19 @@ namespace dungeoncrawler.GameStates.PlayingState
             else
             {
                 return floorExists;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new Wall at a specific location.
+        /// </summary>
+        /// <param name="xIdx">X index of the new Wall.</param>
+        /// <param name="yIdx">Y index of the new Wall.</param>
+        private void TryCreateNewWall(int xIdx, int yIdx)
+        {
+            if (!_gridManager.DoesGridSquareExistAt(xIdx, yIdx))
+            {
+                _gridManager.walls.Add(new Wall(_gridManager, xIdx, yIdx));
             }
         }
     }

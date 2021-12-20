@@ -45,6 +45,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            spriteBatch.DrawRectangle(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), Color.Red * opacity);
             base.Draw(spriteBatch);
 
             // TODO: Move to an entity manager

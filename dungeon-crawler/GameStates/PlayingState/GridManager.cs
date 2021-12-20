@@ -16,15 +16,25 @@ namespace dungeoncrawler.GameStates.PlayingState
         public const int STARTING_Y = 0;
 
         public List<Floor> floors { get; set; }
+        public List<Wall> walls { get; set; }
 
         public GridManager(PlayingState playingState, ClickManager clickManager)
         {
             _playingState = playingState;
             floors = new List<Floor>();
+            walls = new List<Wall>();
             _drawableGridSquares = new List<GridSquare>();
 
             LevelGenerator levelGenerator = new LevelGenerator(this, clickManager);
             levelGenerator.GenerateLevel();
+        }
+
+        public bool DoesGridSquareExistAt(int xIdx, int yIdx)
+        {
+            bool exists = false;
+            exists |= floors.Any(floor => floor.xIdx == xIdx && floor.yIdx == yIdx);
+            exists |= walls.Any(wall => wall.xIdx == xIdx && wall.yIdx == yIdx);
+            return exists;
         }
 
         public Floor GetStartingFloor()
@@ -37,6 +47,10 @@ namespace dungeoncrawler.GameStates.PlayingState
             foreach (var floor in floors)
             {
                 floor.FrameTick(gameTime);
+            }
+            foreach (var wall in walls)
+            {
+                wall.FrameTick(gameTime);
             }
         }
 
@@ -52,6 +66,10 @@ namespace dungeoncrawler.GameStates.PlayingState
             foreach (var floor in floors)
             {
                 floor.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
+            }
+            foreach (var wall in walls)
+            {
+                wall.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
             }
         }
 
