@@ -15,21 +15,21 @@ namespace dungeoncrawler.GameStates.PlayingState
         }
 
         // Takes in a Direction, returns a tuple containing the xDelta and yDelta for one step in that direction.
-        private static Dictionary<Direction, (int, int)> _indexDeltas = new Dictionary<Direction, (int, int)>()
+        private static readonly Dictionary<Direction, (int, int)> _indexDeltas = new Dictionary<Direction, (int, int)>()
         {
             {  Direction.Up, (0, -1) },
             {  Direction.Down, (0, 1) },
             {  Direction.Left, (-1, 0) },
             {  Direction.Right, (1, 0) },
         };
-        private static Dictionary<Direction, Direction> _oppositeDirection = new Dictionary<Direction, Direction>()
+        private static readonly Dictionary<Direction, Direction> _oppositeDirection = new Dictionary<Direction, Direction>()
         {
             { Direction.Up, Direction.Down },
             { Direction.Down, Direction.Up },
             { Direction.Left, Direction.Right },
             { Direction.Right, Direction.Left },
         };
-        private static Dictionary<Direction, List<Direction>> _turn90DegreesOptions = new Dictionary<Direction, List<Direction>>()
+        private static readonly Dictionary<Direction, List<Direction>> _turn90DegreesOptions = new Dictionary<Direction, List<Direction>>()
         {
             { Direction.Up, new List<Direction>(){ Direction.Left, Direction.Right } },
             { Direction.Down, new List<Direction>(){ Direction.Left, Direction.Right } },
@@ -59,7 +59,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         private const int SHIFT_CHANCE = 20; // %
         private const int REMOVE_ROOM_CORNER_CHANCE = 30; // %
 
-        // Guassian constants
+        // Gaussian constants
         private const int DISTANCE_UNTIL_TURN_MEAN = 6;
         private const int DISTANCE_UNTIL_TURN_STD_DEV = 1;
         private const int DISTANCE_UNTIL_TURN_MIN = 2;
@@ -67,14 +67,14 @@ namespace dungeoncrawler.GameStates.PlayingState
         // Direction weightings
         private const int DEFAULT_DIRECTION_WEIGHT = 1;
         private const int PRIORITY_DIRECTION_WEIGHT = 3;
-        private Dictionary<Direction, RNG.Weight> _changeDirectionWeights = new Dictionary<Direction, RNG.Weight>()
+        private readonly Dictionary<Direction, RNG.Weight> _changeDirectionWeights = new Dictionary<Direction, RNG.Weight>()
         {
             { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
             { Direction.Down, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
             { Direction.Left, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
             { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
         };
-        private Dictionary<Direction, RNG.Weight> _branchDirectionWeights = new Dictionary<Direction, RNG.Weight>()
+        private readonly Dictionary<Direction, RNG.Weight> _branchDirectionWeights = new Dictionary<Direction, RNG.Weight>()
         {
             { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
             { Direction.Down, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
@@ -174,7 +174,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <returns>How many GridSquares until a direction change.</returns>
         private int NewDistanceUntilDirectionChange()
         {
-            return RNG.Guassian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
+            return RNG.Gaussian(DISTANCE_UNTIL_TURN_MEAN, DISTANCE_UNTIL_TURN_STD_DEV, DISTANCE_UNTIL_TURN_MIN);
         }
 
         /// <summary>

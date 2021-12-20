@@ -62,7 +62,7 @@ namespace dungeoncrawler.Utility
             return Game1.random.Next(100) < percent;
         }
 
-        public static int Guassian(int mean, int stdDev, int lowLimit = -999, int upLimit = 999)
+        public static int Gaussian(int mean, int stdDev, int lowLimit = -999, int upLimit = 999)
         {
             // Using the Irwin-Hall method:
             double val = 0;
