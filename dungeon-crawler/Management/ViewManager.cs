@@ -4,9 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.ViewportAdapters;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace dungeoncrawler.Management
 {
@@ -32,7 +29,7 @@ namespace dungeoncrawler.Management
                 return new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             }
         }
-        private GraphicsDevice _graphicsDevice;
+        private readonly GraphicsDevice _graphicsDevice;
         public Vector2 windowSize
         {
             get
