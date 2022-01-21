@@ -55,7 +55,10 @@ namespace dungeoncrawler
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            textures = new Dictionary<string, Texture2D>();
+            textures = new Dictionary<string, Texture2D>()
+            {
+                { "level_gray_brick", Content.Load<Texture2D>("textures/tilesheets/level_gray_brick") },
+            };
 
             fonts = new Dictionary<string, BitmapFont>()
             {

@@ -133,6 +133,18 @@ namespace dungeoncrawler.GameStates.PlayingState
                     }
                 }
             }
+            foreach (var wall in _gridManager.walls)
+            {
+                Wall wallAbove = _gridManager.walls.Find(w => w.xIdx == wall.xIdx && w.yIdx == wall.yIdx - 1);
+                Wall wallRight = _gridManager.walls.Find(w => w.xIdx == wall.xIdx + 1 && w.yIdx == wall.yIdx);
+                Wall wallBelow = _gridManager.walls.Find(w => w.xIdx == wall.xIdx && w.yIdx == wall.yIdx + 1);
+                Wall wallLeft = _gridManager.walls.Find(w => w.xIdx == wall.xIdx - 1 && w.yIdx == wall.yIdx);
+                int id = (wallAbove != null) ? 1 : 0;
+                id += (wallRight != null) ? 2 : 0;
+                id += (wallBelow != null) ? 4 : 0;
+                id += (wallLeft != null) ? 8 : 0;
+                wall.UpdateID(id);
+            }
         }
 
         /// <summary>

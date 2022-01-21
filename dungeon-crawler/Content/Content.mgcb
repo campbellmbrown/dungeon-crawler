@@ -15,8 +15,8 @@
 #---------------------------------- Content ---------------------------------#
 
 #begin fonts/normal_font.fnt
-/importer:
-/processor:
+/importer:BitmapFontImporter
+/processor:BitmapFontProcessor
 /build:fonts/normal_font.fnt
 
 #begin fonts/normal_font_0.png
@@ -30,4 +30,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:fonts/normal_font_0.png
+
+#begin textures/tilesheets/level_gray_brick.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:textures/tilesheets/level_gray_brick.png
 
