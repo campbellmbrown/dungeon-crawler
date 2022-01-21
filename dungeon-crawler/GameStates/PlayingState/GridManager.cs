@@ -112,5 +112,10 @@ namespace dungeoncrawler.GameStates.PlayingState
             }
             return busy;
         }
+
+        public float GetNumberDrawableGridSquares()
+        {
+            return _drawableGridSquares.Count;
+        }
     }
 }
