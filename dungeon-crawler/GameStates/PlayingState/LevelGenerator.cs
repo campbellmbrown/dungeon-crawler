@@ -1,4 +1,5 @@
-﻿using dungeoncrawler.Management;
+﻿using dungeoncrawler.GameStates.PlayingState.Tiles;
+using dungeoncrawler.Management;
 using dungeoncrawler.Utility;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,6 +120,12 @@ namespace dungeoncrawler.GameStates.PlayingState
                 _distanceUntilDirectionChange--;
             }
             CreateRoom(currentFloor);
+
+            BitMask floorBitMask = new BitMask();
+            foreach (var floor in _gridManager.floors)
+            {
+                floor.UpdateID(floorBitMask.FindValue(BitMask.BitMaskType.Bits8, _gridManager.floors, floor));
+            }
         }
 
         private void GenerateWalls()
@@ -133,17 +140,10 @@ namespace dungeoncrawler.GameStates.PlayingState
                     }
                 }
             }
+            BitMask wallBitMask = new BitMask();
             foreach (var wall in _gridManager.walls)
             {
-                Wall wallAbove = _gridManager.walls.Find(w => w.xIdx == wall.xIdx && w.yIdx == wall.yIdx - 1);
-                Wall wallRight = _gridManager.walls.Find(w => w.xIdx == wall.xIdx + 1 && w.yIdx == wall.yIdx);
-                Wall wallBelow = _gridManager.walls.Find(w => w.xIdx == wall.xIdx && w.yIdx == wall.yIdx + 1);
-                Wall wallLeft = _gridManager.walls.Find(w => w.xIdx == wall.xIdx - 1 && w.yIdx == wall.yIdx);
-                int id = (wallAbove != null) ? 1 : 0;
-                id += (wallRight != null) ? 2 : 0;
-                id += (wallBelow != null) ? 4 : 0;
-                id += (wallLeft != null) ? 8 : 0;
-                wall.UpdateID(id);
+                wall.UpdateID(wallBitMask.FindValue(BitMask.BitMaskType.Bits4, _gridManager.walls, wall));
             }
         }
 

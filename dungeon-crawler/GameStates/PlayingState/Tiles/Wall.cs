@@ -8,7 +8,7 @@ using System.Text;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
-    public class Wall : GridSquare
+    public class Wall : GridSquare, HasSpriteSheet
     {
         public const int WALL_HEIGHT = 23;
         private readonly SpriteSheet _sprite;
@@ -33,15 +33,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             { 15, new Rectangle(3 * GRID_SQUARE_SIZE, 3 * WALL_HEIGHT, GRID_SQUARE_SIZE, WALL_HEIGHT) }
         };
 
-        public void UpdateID(int id)
-        {
-            _sprite.ChangeTextureRectangle(id);
-        }
 
         public Wall(GridManager gridManager, int xIdx, int yIdx) :
             base(gridManager, xIdx, yIdx)
         {
-            _sprite = new SpriteSheet(Game1.textures["level_gray_brick"], textureRectangleLookup, 0);
+            _sprite = new SpriteSheet(Game1.textures["gray_brick_walls"], textureRectangleLookup, 0);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -49,6 +45,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             Vector2 offset = new Vector2(0, GRID_SQUARE_SIZE - WALL_HEIGHT);
             _sprite.Draw(spriteBatch, position + offset, opacity);
             base.Draw(spriteBatch);
+        }
+
+        public void UpdateID(int id)
+        {
+            _sprite.ChangeTextureRectangle(id);
         }
     }
 }
