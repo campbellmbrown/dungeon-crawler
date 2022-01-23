@@ -8,12 +8,9 @@ name: Lint Code Base
 
 on:
   push:
-    branches:
-      - develop
+    branches-ignore: [develop]
   pull_request:
-    branches:
-      - develop
-    # types: ['synchronize', 'assigned', 'opened', 'reopened']
+    branches: [develop]
 
 jobs:
   build:
@@ -21,8 +18,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo ${{ github.base_ref }}
-
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
@@ -33,7 +28,7 @@ jobs:
         uses: github/super-linter@v4
         env:
           VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: ${{ github.base_ref }}
+          DEFAULT_BRANCH: develop
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_CSHARP: true
           VALIDATE_GITHUB_ACTIONS: true
