@@ -13,6 +13,7 @@ on:
   pull_request:
     branches:
       - develop
+    # types: ['synchronize', 'assigned', 'opened', 'reopened']
 
 jobs:
   build:
@@ -20,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - run: echo ${{ github.base_ref }}
+
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
