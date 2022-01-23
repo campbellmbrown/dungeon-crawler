@@ -82,6 +82,16 @@ namespace dungeoncrawler.GameStates.PlayingState.Tiles
             }
         }
 
+        /// <summary>
+        /// Finds the value of the GridSquare, considering only the directly connected 4 tiles.
+        /// </summary>
+        /// 
+        /// The GridSquares have the following values:
+        ///     [1]
+        /// [2] [ ] [4]
+        ///     [8]
+        /// If a neighboring tile is present, it contributes to the value. Therefore, there are
+        /// 16 unique textures.
         private int FindValueWith4Bits<T>(List<T> _gridSquares, GridSquare gridSquare)
             where T : GridSquare
         {
@@ -96,6 +106,22 @@ namespace dungeoncrawler.GameStates.PlayingState.Tiles
             return val;
         }
 
+        /// <summary>
+        /// Finds the value of the GridSquare, considering all surrounding 8 tiles.
+        /// </summary>
+        /// 
+        /// The GridSquares have the following values:
+        /// [ 1 ] [ 2 ] [ 4 ]
+        /// [ 8 ] [   ] [ 16]
+        /// [ 32] [ 64] [128]
+        /// 
+        /// There is something else to consider though: When a corner is present, without ANY of it's horizontal or
+        /// vertical neighbors, it doesn't contribute towards the value. E.g. if There was the top-left (1), top-
+        /// middle (2), and middle-right (16), then this would look identical to a value of 18 (2 + 16). So the 1
+        /// isn't counted.
+        /// 
+        /// Therefore, there are only 47 unique textures.
+        /// The _8BitRemap is used to convert the large numbers into this range.
         private int FindValueWith8Bits<T>(List<T> _gridSquares, GridSquare gridSquare)
             where T : GridSquare
         {
