@@ -75,7 +75,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             _clickManager = clickManager;
             _clickManager.AddLeftClick(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), SetPlayerDestination);
-            _sprite = new SpriteSheet(Game1.textures["gray_brick_floor"], textureRectangleLookup, 0);
+            _sprite = new SpriteSheet(Game1.textures["gray_brick_floors"], textureRectangleLookup, 0);
         }
 
         public override void FrameTick(GameTime gameTime)

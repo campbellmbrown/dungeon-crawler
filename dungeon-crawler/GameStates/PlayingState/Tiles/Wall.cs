@@ -37,7 +37,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public Wall(GridManager gridManager, int xIdx, int yIdx) :
             base(gridManager, xIdx, yIdx)
         {
-            _sprite = new SpriteSheet(Game1.textures["level_gray_brick"], textureRectangleLookup, 0);
+            _sprite = new SpriteSheet(Game1.textures["gray_brick_walls"], textureRectangleLookup, 0);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

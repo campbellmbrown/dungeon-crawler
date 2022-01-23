@@ -31,7 +31,7 @@
 /processorParam:TextureFormat=Color
 /build:fonts/normal_font_0.png
 
-#begin textures/tilesheets/gray_brick_floor.png
+#begin textures/tilesheets/gray_brick_floors.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -41,9 +41,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:textures/tilesheets/gray_brick_floor.png
+/build:textures/tilesheets/gray_brick_floors.png
 
-#begin textures/tilesheets/level_gray_brick.png
+#begin textures/tilesheets/gray_brick_walls.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -53,5 +53,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:textures/tilesheets/level_gray_brick.png
+/build:textures/tilesheets/gray_brick_walls.png
 
