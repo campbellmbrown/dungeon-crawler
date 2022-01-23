@@ -58,6 +58,7 @@ namespace dungeoncrawler
             textures = new Dictionary<string, Texture2D>()
             {
                 { "level_gray_brick", Content.Load<Texture2D>("textures/tilesheets/level_gray_brick") },
+                { "gray_brick_floor", Content.Load<Texture2D>("textures/tilesheets/gray_brick_floor") },
             };
 
             fonts = new Dictionary<string, BitmapFont>()

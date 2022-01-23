@@ -120,6 +120,12 @@ namespace dungeoncrawler.GameStates.PlayingState
                 _distanceUntilDirectionChange--;
             }
             CreateRoom(currentFloor);
+
+            BitMask floorBitMask = new BitMask();
+            foreach (var floor in _gridManager.floors)
+            {
+                floor.UpdateID(floorBitMask.FindValue(BitMask.BitMaskType.Bits8, _gridManager.floors, floor));
+            }
         }
 
         private void GenerateWalls()
