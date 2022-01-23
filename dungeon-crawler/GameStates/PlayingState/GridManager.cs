@@ -18,6 +18,9 @@ namespace dungeoncrawler.GameStates.PlayingState
         public List<Floor> floors { get; set; }
         public List<Wall> walls { get; set; }
 
+        public int minY { get; set; }
+        public int maxY { get; set; }
+
         public GridManager(PlayingState playingState, ClickManager clickManager)
         {
             _playingState = playingState;
@@ -27,6 +30,8 @@ namespace dungeoncrawler.GameStates.PlayingState
 
             LevelGenerator levelGenerator = new LevelGenerator(this, clickManager);
             levelGenerator.GenerateLevel();
+            minY = (int)Math.Min(floors.Min(fl => fl.position.Y), walls.Min(wa => wa.position.Y));
+            maxY = (int)Math.Max(floors.Max(fl => fl.position.Y), walls.Max(wa => wa.position.Y));
         }
 
         public bool DoesGridSquareExistAt(int xIdx, int yIdx)

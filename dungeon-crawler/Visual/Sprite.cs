@@ -22,12 +22,15 @@ namespace dungeoncrawler.Visual
 
         public void FrameTick(GameTime gameTime)
         {
-
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch, Vector2 position, float opacity = 1f)
+        public virtual void Draw(SpriteBatch spriteBatch, Vector2 position, float opacity = 1f, float layer = DrawOrder.DEFAULT)
         {
-            spriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            if (layer == DrawOrder.DEFAULT)
+            {
+                Game1.Log("Drawing at default layer", LogLevel.Warning);
+            }
+            spriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
         }
     }
 }

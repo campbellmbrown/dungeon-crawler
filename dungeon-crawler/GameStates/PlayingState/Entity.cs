@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeoncrawler.Visual;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System.Collections.Generic;
@@ -61,7 +62,13 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawRectangle(new RectangleF(position.X, position.Y, 4, 4), Color.Yellow);
+            spriteBatch.DrawRectangle(new RectangleF(position.X, position.Y, 16, 16), Color.Yellow, 1f, FindLayerDepth());
+        }
+
+        // Temporary - create proper function (with an interface?) when drawing an actual sprite.
+        public float FindLayerDepth()
+        {
+            return DrawOrder.FOREGROUND_CONTENT_BOTTOM + ((position.Y - _gridManager.minY) / (_gridManager.maxY - _gridManager.minY) * (DrawOrder.FOREGROUND_CONTENT_TOP - DrawOrder.FOREGROUND_CONTENT_BOTTOM));
         }
 
         public virtual void ActionTick()
