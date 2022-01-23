@@ -1,4 +1,5 @@
 ﻿using dungeoncrawler.Management;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -16,13 +17,11 @@ namespace dungeoncrawler.Statistics
         public const float Y_AXIS_LEN = 40f;
 
         private readonly ViewManager _viewManager;
-        private string _name;
-        private string _units;
+        private readonly string _name;
+        private readonly string _units;
         public readonly BitmapFont font;
         public float lifeTime { get; private set; }
         public float scale { get { return 1 / _viewManager.cameraZoom; } }
-
-        private const float Y_AXIS_ROTATION = 3 * (float)Math.PI / 2f;
 
         // Positional properties
         private Vector2 _originRelativeToBottomRight;
@@ -37,7 +36,7 @@ namespace dungeoncrawler.Statistics
         public float xAxisLimit { get; }
 
         private int _seriesNumber = 0;
-        private List<Series> _series;
+        private readonly List<Series> _series;
 
         public Plot(ViewManager viewManager, string name, string units, Vector2 offsetFromBottomRightCorner, float xAxisLimit)
         {
@@ -81,16 +80,16 @@ namespace dungeoncrawler.Statistics
         public void Draw(SpriteBatch spriteBatch)
         {
             // X and Y-axis lines
-            spriteBatch.DrawLine(origin, xAxisEnd, Color.White, scale);
-            spriteBatch.DrawLine(origin, yAxisEnd, Color.White, scale);
+            spriteBatch.DrawLine(origin, xAxisEnd, Color.White, scale, DrawOrder.DEBUG);
+            spriteBatch.DrawLine(origin, yAxisEnd, Color.White, scale, DrawOrder.DEBUG);
             // Plot title
             spriteBatch.DrawString(font, _name,
                 topMiddle + new Vector2(-font.MeasureString(_name).Width / 2f, -font.LineHeight) * scale,
-                Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, DrawOrder.DEBUG);
             // Y-axis label
             spriteBatch.DrawString(font, _units,
                 yAxisEnd + new Vector2(-font.MeasureString(_units).Width - 2, 0) * scale,
-                Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, DrawOrder.DEBUG);
 
             foreach (var series in _series)
             {

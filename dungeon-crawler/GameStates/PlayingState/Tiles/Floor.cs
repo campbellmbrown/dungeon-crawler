@@ -10,11 +10,11 @@ using System.Text;
 namespace dungeoncrawler.GameStates.PlayingState
 {
 
-    public class Floor : GridSquare, HasSpriteSheet
+    public class Floor : GridSquare, IHasSpriteSheet
     {
         private readonly ClickManager _clickManager;
 
-        private SpriteSheet _sprite;
+        private readonly SpriteSheet _sprite;
         public Entity entity { get; set; }
         public bool hasEntity { get { return entity != null; } }
 
@@ -101,7 +101,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            _sprite.Draw(spriteBatch, position, opacity);
+            _sprite.Draw(spriteBatch, position, opacity, DrawOrder.BACKGROUND_CONTENT);
             base.Draw(spriteBatch);
 
             // TODO: Move to an entity manager

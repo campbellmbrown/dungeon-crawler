@@ -33,7 +33,7 @@ namespace dungeoncrawler
         private const float HEARTBEAT_TIME = 1f; // sec
         private float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
 
-        public const string VERSION_STR = "v0.2.1";
+        public const string VERSION_STR = "v0.3.3";
 
         public Game1()
         {
@@ -96,7 +96,7 @@ namespace dungeoncrawler
         protected override void Draw(GameTime gameTime)
         {
             _spriteBatch.Begin(
-                SpriteSortMode.Deferred,
+                SpriteSortMode.FrontToBack,
                 BlendState.AlphaBlend,
                 SamplerState.PointClamp,
                 DepthStencilState.None,

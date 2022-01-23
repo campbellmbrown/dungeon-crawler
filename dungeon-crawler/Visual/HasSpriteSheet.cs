@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace dungeoncrawler.Visual
+﻿namespace dungeoncrawler.Visual
 {
-    public interface HasSpriteSheet
+    public interface IHasSpriteSheet
     {
         public void UpdateID(int id);
     }

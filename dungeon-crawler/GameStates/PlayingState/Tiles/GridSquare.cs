@@ -1,10 +1,7 @@
-﻿using dungeoncrawler.Management;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
@@ -109,6 +106,18 @@ namespace dungeoncrawler.GameStates.PlayingState
                     }
                     break;
             }
+        }
+
+        /// <summary>
+        /// Finds the layer depth value for drawing.
+        /// </summary>
+        /// Calculates the layer depth by using the min and max position of the GridSquares, finding where
+        /// the position of interest lies between these two values, and converts it to a value between
+        /// FOREGROUND_CONTENT_TOP and FOREGROUND_CONTENT_BOTTOM.
+        public float FindLayerDepth()
+        {
+            float positionRatio = (position.Y - gridManager.minY) / (gridManager.maxY - gridManager.minY);
+            return DrawOrder.FOREGROUND_CONTENT_BOTTOM + (positionRatio * (DrawOrder.FOREGROUND_CONTENT_TOP - DrawOrder.FOREGROUND_CONTENT_BOTTOM));
         }
     }
 }

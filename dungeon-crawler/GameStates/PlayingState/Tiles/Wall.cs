@@ -8,7 +8,7 @@ using System.Text;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
-    public class Wall : GridSquare, HasSpriteSheet
+    public class Wall : GridSquare, IHasSpriteSheet
     {
         public const int WALL_HEIGHT = 23;
         private readonly SpriteSheet _sprite;
@@ -43,7 +43,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public override void Draw(SpriteBatch spriteBatch)
         {
             Vector2 offset = new Vector2(0, GRID_SQUARE_SIZE - WALL_HEIGHT);
-            _sprite.Draw(spriteBatch, position + offset, opacity);
+            _sprite.Draw(spriteBatch, position + offset, opacity, FindLayerDepth());
             base.Draw(spriteBatch);
         }
 

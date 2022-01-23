@@ -1,4 +1,5 @@
 ﻿using dungeoncrawler.Management;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -52,16 +53,16 @@ namespace dungeoncrawler
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"], _logTime.ToString("HH:mm:ss.fff"),
                 position,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, 0f);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, DrawOrder.DEBUG);
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"], Enum.GetName(typeof(LogLevel), _logLevel).ToUpper(),
                 position + _levelOffset,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, 0f);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, DrawOrder.DEBUG);
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"],
                 _logText,
                 position + _textOffset,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, 0f);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, DrawOrder.DEBUG);
         }
     }
 

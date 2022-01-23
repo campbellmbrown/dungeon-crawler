@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using dungeoncrawler.Visual;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
@@ -13,13 +14,13 @@ namespace dungeoncrawler.Statistics
     {
         private readonly Plot _plot;
 
-        private string _name;
+        private readonly string _name;
         private Color _color;
-        private GetStatsFunc _getStatsFunc;
-        private int _seriesNumber;
+        private readonly GetStatsFunc _getStatsFunc;
+        private readonly int _seriesNumber;
 
         // Variable, time
-        private List<(float, float)> _samples;
+        private readonly List<(float, float)> _samples;
 
         public float maxData
         {
@@ -73,7 +74,7 @@ namespace dungeoncrawler.Statistics
             for (int idx = 1; idx < _samples.Count; idx++)
             {
                 point2 = CalculatePositionOnPlot(_samples[idx].Item2, _samples[idx].Item1);
-                spriteBatch.DrawLine(point1, point2, _color, _plot.scale);
+                spriteBatch.DrawLine(point1, point2, _color, _plot.scale, DrawOrder.DEBUG);
                 point1 = point2;
             }
             DrawLegendLabel(spriteBatch);
@@ -95,12 +96,12 @@ namespace dungeoncrawler.Statistics
             spriteBatch.DrawLine(
                 _plot.yAxisEnd + new Vector2(1, (_seriesNumber + 0.5f) * _plot.font.LineHeight * _plot.scale),
                 _plot.yAxisEnd + new Vector2(5, (_seriesNumber + 0.5f) * _plot.font.LineHeight * _plot.scale),
-                _color, _plot.scale);
+                _color, _plot.scale, DrawOrder.DEBUG);
             // Label text
             spriteBatch.DrawString(_plot.font,
                 _name,
                 _plot.yAxisEnd + new Vector2(6, _seriesNumber * _plot.font.LineHeight * _plot.scale),
-                _color, 0f, Vector2.Zero, _plot.scale, SpriteEffects.None, 0f);
+                _color, 0f, Vector2.Zero, _plot.scale, SpriteEffects.None, DrawOrder.DEBUG);
         }
 
         private void DrawEndValue(SpriteBatch spriteBatch)
@@ -108,9 +109,9 @@ namespace dungeoncrawler.Statistics
             if (_samples.Count > 0)
             {
                 spriteBatch.DrawString(
-                    _plot.font, _samples[_samples.Count - 1].Item1.ToString(),
-                    CalculatePositionOnPlot(_samples[_samples.Count - 1].Item2, _samples[_samples.Count - 1].Item1 - _plot.font.LineHeight * _plot.scale / 2f),
-                    _color, 0f, Vector2.Zero, _plot.scale, SpriteEffects.None, 0f);
+                    _plot.font, _samples[^1].Item1.ToString(),
+                    CalculatePositionOnPlot(_samples[^1].Item2, _samples[^1].Item1 - (_plot.font.LineHeight * _plot.scale / 2f)),
+                    _color, 0f, Vector2.Zero, _plot.scale, SpriteEffects.None, DrawOrder.DEBUG);
             }
         }
     }
