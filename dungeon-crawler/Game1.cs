@@ -1,12 +1,12 @@
-﻿using dungeoncrawler.GameStates.PlayingState;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using dungeoncrawler.GameStates.PlayingState;
 using dungeoncrawler.Management;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace dungeoncrawler
 {

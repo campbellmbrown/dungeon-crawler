@@ -1,10 +1,10 @@
-﻿using dungeoncrawler.Visual;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {

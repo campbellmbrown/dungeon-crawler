@@ -1,11 +1,11 @@
-﻿using dungeoncrawler.Management;
+﻿using System;
+using System.Collections.Generic;
+using dungeoncrawler.Management;
 using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
-using System;
-using System.Collections.Generic;
 
 namespace dungeoncrawler
 {

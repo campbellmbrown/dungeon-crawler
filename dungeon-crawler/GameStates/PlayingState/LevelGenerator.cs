@@ -1,8 +1,8 @@
-﻿using dungeoncrawler.GameStates.PlayingState.Tiles;
+﻿using System.Collections.Generic;
+using System.Linq;
+using dungeoncrawler.GameStates.PlayingState.Tiles;
 using dungeoncrawler.Management;
 using dungeoncrawler.Utility;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
