@@ -1,9 +1,9 @@
-﻿using dungeoncrawler.Management;
+﻿using System.Collections.Generic;
+using dungeoncrawler.Management;
 using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
-using System.Collections.Generic;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {

@@ -1,7 +1,7 @@
+﻿using System;
 using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {

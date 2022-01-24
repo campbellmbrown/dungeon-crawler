@@ -1,10 +1,10 @@
-﻿using dungeoncrawler.Utility;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using dungeoncrawler.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace dungeoncrawler.Management
 {
