@@ -7,7 +7,6 @@ using System.Collections.Generic;
 
 namespace dungeoncrawler.GameStates.PlayingState
 {
-
     public class Floor : GridSquare, IHasSpriteSheet
     {
         private readonly ClickManager _clickManager;
