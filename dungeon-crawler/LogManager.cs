@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using dungeoncrawler.Management;
 using dungeoncrawler.Visual;
@@ -107,7 +107,7 @@ namespace dungeoncrawler
                     {
                         opacity = (MAX_LOGS_ON_SCREEN - idx) / 5.0f;
                     }
-                    Vector2 position = _layerView.BottomLeft() + _cornerBuffer - new Vector2(0, (1 + idx) * Game1.fonts["normal_font"].LineHeight);
+                    Vector2 position = _layerView.bottomLeft + _cornerBuffer - new Vector2(0, (1 + idx) * Game1.fonts["normal_font"].LineHeight);
                     _logPrints[_logPrints.Count - 1 - idx].Draw(spriteBatch, position, opacity);
                 }
             }

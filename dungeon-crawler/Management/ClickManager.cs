@@ -45,7 +45,7 @@ namespace dungeoncrawler.Management
                 {
                     foreach (var leftClick in _leftClicks)
                     {
-                        if (leftClick.clickArea.Contains(Conversion.Vector2ToPoint(_layerView.GetMousePosition())))
+                        if (leftClick.clickArea.Contains(Conversion.Vector2ToPoint(_layerView.mousePosition)))
                         {
                             leftClick.outputFunc();
                         }

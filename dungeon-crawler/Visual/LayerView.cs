@@ -13,12 +13,12 @@ namespace dungeoncrawler.Visual
     {
         float zoom { get; }
         OrthographicCamera camera { get; }
-        Vector2 TopLeft();
-        Vector2 BottomLeft();
-        Vector2 BottomRight();
-        Vector2 TopRight();
-        Vector2 Middle();
-        Vector2 GetMousePosition();
+        Vector2 topLeft { get; }
+        Vector2 bottomLeft { get; }
+        Vector2 bottomRight { get; }
+        Vector2 topRight { get; }
+        Vector2 middle { get; }
+        Vector2 mousePosition { get; }
         void Focus(Vector2 vector);
     }
 
@@ -30,6 +30,19 @@ namespace dungeoncrawler.Visual
         // Public
         public float zoom { get; }
         public OrthographicCamera camera { get; private set; }
+        public Vector2 topLeft => camera.ScreenToWorld(Vector2.Zero);
+        public Vector2 topRight => camera.ScreenToWorld(_spriteBatchManager.windowSize.X, 0);
+        public Vector2 bottomLeft => camera.ScreenToWorld(0, _spriteBatchManager.windowSize.Y);
+        public Vector2 bottomRight => camera.ScreenToWorld(_spriteBatchManager.windowSize);
+        public Vector2 middle => camera.ScreenToWorld(_spriteBatchManager.windowSize / 2f);
+        public Vector2 mousePosition
+        {
+            get
+            {
+                Vector2 _mousePos = Conversion.PointToVector2(Mouse.GetState().Position);
+                return camera.ScreenToWorld(_mousePos.X, _mousePos.Y);
+            }
+        }
 
         // Private
         private const int SCALE_FACTOR = 1;
@@ -44,37 +57,6 @@ namespace dungeoncrawler.Visual
 
             float zoomAdjustment = zoom - SCALE_FACTOR;
             camera.ZoomIn(zoomAdjustment);
-        }
-
-        public Vector2 BottomLeft()
-        {
-            return camera.ScreenToWorld(0, _spriteBatchManager.windowSize.Y);
-        }
-
-        public Vector2 BottomRight()
-        {
-            return camera.ScreenToWorld(_spriteBatchManager.windowSize);
-        }
-
-        public Vector2 GetMousePosition()
-        {
-            Vector2 _mousePos = Conversion.PointToVector2(Mouse.GetState().Position);
-            return camera.ScreenToWorld(_mousePos.X, _mousePos.Y);
-        }
-
-        public Vector2 TopLeft()
-        {
-            return camera.ScreenToWorld(Vector2.Zero);
-        }
-
-        public Vector2 TopRight()
-        {
-            return camera.ScreenToWorld(_spriteBatchManager.windowSize.X, 0);
-        }
-
-        public Vector2 Middle()
-        {
-            return camera.ScreenToWorld(_spriteBatchManager.windowSize / 2f);
         }
 
         public void Focus(Vector2 focusPoint)

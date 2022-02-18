@@ -1,4 +1,4 @@
-using dungeoncrawler.Management;
+﻿using dungeoncrawler.Management;
 using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -45,7 +45,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             _spriteBatchManager.Switch(DrawType.ViewLightContent);
             spriteBatch.Draw(
                 Game1.textures["center_view"],
-                _spriteBatchManager.mainLayerView.Middle() - new Vector2(Game1.textures["center_view"].Width / 2f, Game1.textures["center_view"].Height / 2f),
+                _spriteBatchManager.mainLayerView.middle - new Vector2(Game1.textures["center_view"].Width / 2f, Game1.textures["center_view"].Height / 2f),
                 null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
             // TODO: remove
@@ -58,7 +58,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
             spriteBatch.Draw(
                 Game1.textures["medium_light"],
-                _spriteBatchManager.mainLayerView.GetMousePosition() - new Vector2(Game1.textures["medium_light"].Width / 2f, Game1.textures["medium_light"].Height / 2f),
+                _spriteBatchManager.mainLayerView.mousePosition - new Vector2(Game1.textures["medium_light"].Width / 2f, Game1.textures["medium_light"].Height / 2f),
                 null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
