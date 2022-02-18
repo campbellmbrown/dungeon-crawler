@@ -43,7 +43,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         public override void Draw(SpriteBatch spriteBatch)
         {
             Vector2 offset = new Vector2(0, GRID_SQUARE_SIZE - WALL_HEIGHT);
-            _sprite.Draw(spriteBatch, position + offset, opacity, FindLayerDepth());
+            _sprite.Draw(spriteBatch, position + offset, FindLayerDepth());
             base.Draw(spriteBatch);
         }
 

@@ -24,7 +24,7 @@ namespace dungeoncrawler.Visual
         {
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch, Vector2 position, float opacity = 1f, float layer = DrawOrder.DEFAULT)
+        public virtual void Draw(SpriteBatch spriteBatch, Vector2 position, float layer = DrawOrder.DEFAULT)
         {
             if (layer == DrawOrder.DEFAULT)
             {

@@ -22,13 +22,13 @@ namespace dungeoncrawler.Visual
             _currentTextureRectangle = _textureRectangles[ID];
         }
 
-        public override void Draw(SpriteBatch spriteBatch, Vector2 position, float opacity = 1f, float layer = DrawOrder.DEFAULT)
+        public override void Draw(SpriteBatch spriteBatch, Vector2 position, float layer = DrawOrder.DEFAULT)
         {
             if (layer == DrawOrder.DEFAULT)
             {
                 Game1.Log("Drawing at default layer", LogLevel.Warning);
             }
-            spriteBatch.Draw(texture, position, _currentTextureRectangle, Color.White * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
+            spriteBatch.Draw(texture, position, _currentTextureRectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         private const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
         private const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
-        private const int MAX_FLOORS_PER_PATHFIND = 10;
+        private const int MAX_FLOORS_PER_PATHFIND = 15;
 
         protected DestinationState destinationState;
         private Vector2 _destination;

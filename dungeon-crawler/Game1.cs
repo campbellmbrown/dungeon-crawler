@@ -92,8 +92,8 @@ namespace dungeoncrawler
                 { "normal_font", Content.Load<BitmapFont>("fonts/normal_font") },
             };
 
-            _playingState = new PlayingState(_spriteBatchManager);
             _log = new LogManager(_spriteBatchManager.debugLayerView);
+            _playingState = new PlayingState(_spriteBatchManager);
         }
 
         protected override void Update(GameTime gameTime)
