@@ -17,6 +17,7 @@ namespace dungeoncrawler.Visual
         Vector2 BottomLeft();
         Vector2 BottomRight();
         Vector2 TopRight();
+        Vector2 Middle();
         Vector2 GetMousePosition();
         void Focus(Vector2 vector);
     }
@@ -69,6 +70,11 @@ namespace dungeoncrawler.Visual
         public Vector2 TopRight()
         {
             return camera.ScreenToWorld(_spriteBatchManager.windowSize.X, 0);
+        }
+
+        public Vector2 Middle()
+        {
+            return camera.ScreenToWorld(_spriteBatchManager.windowSize / 2f);
         }
 
         public void Focus(Vector2 focusPoint)

@@ -85,6 +85,7 @@ namespace dungeoncrawler
                 { "gray_brick_floors", Content.Load<Texture2D>("textures/tilesheets/gray_brick_floors") },
                 // Masks
                 { "medium_light", Content.Load<Texture2D>("textures/masks/medium_light") },
+                { "center_view", Content.Load<Texture2D>("textures/masks/center_view") },
             };
 
             fonts = new Dictionary<string, BitmapFont>()

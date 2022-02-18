@@ -15,8 +15,9 @@ namespace dungeoncrawler.Visual
     {
         MainContent,
         OverlayContent,
-        LightContent,
         DebugContent,
+        PointLightContent,
+        ViewLightContent,
     }
 
     public class SpriteBatchManager
@@ -33,11 +34,13 @@ namespace dungeoncrawler.Visual
         // Render targets
         private RenderTarget2D _mainContentTarget;
         private RenderTarget2D _overlayContentTarget;
-        private RenderTarget2D _lightTarget;
+        private RenderTarget2D _pointLightTarget;
+        private RenderTarget2D _viewLightTarget;
         private RenderTarget2D _debugTarget;
 
         // Effects
-        private Effect _lightingEffect;
+        private Effect _pointlightingEffect;
+        private Effect _viewlightingEffect;
 
         Effect currentEffect = null;
         private Color _backgroundColor;
@@ -76,13 +79,15 @@ namespace dungeoncrawler.Visual
 
             _mainContentTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
             _overlayContentTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
-            _lightTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
             _debugTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
+            _pointLightTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
+            _viewLightTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
         private void LoadEffects(ContentManager content)
         {
-            _lightingEffect = content.Load<Effect>("effects/lighting");
+            _pointlightingEffect = content.Load<Effect>("effects/lighting");
+            _viewlightingEffect = content.Load<Effect>("effects/lighting");
         }
 
         private void LoadLayerViews(GraphicsDevice graphicsDevice)
@@ -107,15 +112,20 @@ namespace dungeoncrawler.Visual
                     _graphicsDevice.Clear(Color.Transparent);
                     _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: currentEffect);
                     break;
-                case DrawType.LightContent:
-                    _graphicsDevice.SetRenderTarget(_lightTarget);
-                    _graphicsDevice.Clear(Color.Gray);
-                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, effect: currentEffect, transformMatrix: mainLayerView.camera.GetViewMatrix());
-                    break;
                 case DrawType.DebugContent:
                     _graphicsDevice.SetRenderTarget(_debugTarget);
                     _graphicsDevice.Clear(Color.Transparent);
                     _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: debugLayerView.camera.GetViewMatrix());
+                    break;
+                case DrawType.ViewLightContent:
+                    _graphicsDevice.SetRenderTarget(_viewLightTarget);
+                    _graphicsDevice.Clear(Color.Black);
+                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
+                    break;
+                case DrawType.PointLightContent:
+                    _graphicsDevice.SetRenderTarget(_pointLightTarget);
+                    _graphicsDevice.Clear(new Color(10, 10, 10));
+                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
                     break;
             }
         }
@@ -130,24 +140,34 @@ namespace dungeoncrawler.Visual
         {
             _spriteBatch.End();
 
+            // 1. Draw the content target to the tmp target with pointLightEffect
+            // 2. Draw the tmp target to the backbuffer with the viewLightEffect
+
+            RenderTarget2D _tmpTarget = new RenderTarget2D(_graphicsDevice, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+            _graphicsDevice.SetRenderTarget(_tmpTarget);
+            _pointlightingEffect.Parameters["lightMask"].SetValue(_pointLightTarget);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: _pointlightingEffect);
+            _spriteBatch.Draw(_mainContentTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            _spriteBatch.End();
+
             // Now we will draw all of the render targets to the screen.
             _graphicsDevice.SetRenderTarget(null);
             _graphicsDevice.Clear(_backgroundColor);
 
-            _lightingEffect.Parameters["lightMask"].SetValue(_lightTarget);
-
             // Targets that have the light applied
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: _lightingEffect);
-            _spriteBatch.Draw(_mainContentTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            _pointlightingEffect.Parameters["lightMask"].SetValue(_viewLightTarget);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: _viewlightingEffect);
+            _spriteBatch.Draw(_tmpTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             _spriteBatch.End();
 
             // Targets that don't have light applied
             // Another option would be to have the effect: _pixelateEffect when drawing to the _mainContentTarget, then
-            // the _spriteBatch.Begin()/.End() would only need to be called once here.
+            // the _spriteBatch.Begin()/.End() would only need to be called once here?
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
             _spriteBatch.Draw(_overlayContentTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             _spriteBatch.Draw(_debugTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             _spriteBatch.End();
+
         }
     }
 }

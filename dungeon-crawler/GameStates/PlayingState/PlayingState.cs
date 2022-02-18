@@ -1,4 +1,4 @@
-﻿using dungeoncrawler.Management;
+using dungeoncrawler.Management;
 using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -42,9 +42,15 @@ namespace dungeoncrawler.GameStates.PlayingState
             _spriteBatchManager.Switch(DrawType.OverlayContent);
             spriteBatch.Draw(Game1.textures["gray_brick_walls"], new Vector2(4, 4), new Rectangle(0, 0, 40, 40), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
+            _spriteBatchManager.Switch(DrawType.ViewLightContent);
+            spriteBatch.Draw(
+                Game1.textures["center_view"],
+                _spriteBatchManager.mainLayerView.Middle() - new Vector2(Game1.textures["center_view"].Width / 2f, Game1.textures["center_view"].Height / 2f),
+                null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
             // TODO: remove
-            _spriteBatchManager.Switch(DrawType.LightContent);
-            spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            _spriteBatchManager.Switch(DrawType.PointLightContent);
+            spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(0, 0), null, Color.Red, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(30, 30), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(100, 100), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(150, 20), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
