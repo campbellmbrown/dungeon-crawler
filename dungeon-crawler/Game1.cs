@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using dungeoncrawler.GameStates;
 using dungeoncrawler.GameStates.PlayingState;
 using dungeoncrawler.Management;
 using dungeoncrawler.Utility;
@@ -29,9 +30,8 @@ namespace dungeoncrawler
         public static Random random;
 
         private static LogManager _log;
-        private ViewManager _viewManager;
         private GameState _gameState;
-        private PlayingState _playingState;
+        private IGameState _playingState;
 
         private const float HEARTBEAT_TIME = 1f; // sec
         private float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
@@ -92,12 +92,8 @@ namespace dungeoncrawler
                 { "normal_font", Content.Load<BitmapFont>("fonts/normal_font") },
             };
 
-            // TODO: add back
-            // _viewManager = new ViewManager(GraphicsDevice, _graphics, Window);
-            // _playingState = new PlayingState(_viewManager);
-            // _playingState = new PlayingState();
-            // _log = new LogManager(_viewManager);
-            // _log = new LogManager(_viewManager);
+            _playingState = new PlayingState(_spriteBatchManager);
+            _log = new LogManager(_spriteBatchManager.debugLayerView);
         }
 
         protected override void Update(GameTime gameTime)
@@ -112,46 +108,19 @@ namespace dungeoncrawler
             switch (_gameState)
             {
                 case GameState.Playing:
-                    // _playingState.FrameTick(gameTime);
+                    _playingState.FrameTick(gameTime);
                     break;
                 default:
                     Log("Invalid GameState for updating", LogLevel.Error);
                     break;
             }
-            // _log.FrameTick();
+            _log.FrameTick();
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            _spriteBatchManager.Start(SpriteBatchManager.DrawType.MainContent);
-
-            // TODO: remove
-            int size = 40;
-            for (int idx = 0; idx < 1000; idx += size)
-            {
-                for (int jdx = 0; jdx < 1000; jdx += size)
-                {
-                    _spriteBatch.Draw(textures["gray_brick_walls"], new Vector2(idx, jdx), new Rectangle(0, 0, size, size), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                }
-            }
-
-            // TODO: remove
-            _spriteBatchManager.Switch(SpriteBatchManager.DrawType.OverlayContent);
-            _spriteBatch.Draw(textures["gray_brick_walls"], new Vector2(4, 4), new Rectangle(0, 0, size, size), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-
-            // TODO: remove
-            _spriteBatchManager.Switch(SpriteBatchManager.DrawType.LightContent);
-            _spriteBatch.Draw(textures["medium_light"], new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            _spriteBatch.Draw(textures["medium_light"], new Vector2(100, 100), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            _spriteBatch.Draw(textures["medium_light"], new Vector2(150, 20), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            _spriteBatch.Draw(textures["medium_light"], new Vector2(30, 300), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-
-            _spriteBatchManager.Finish();
-
-            return;
-
-            // TODO: add back
+            _spriteBatchManager.Start(DrawType.MainContent);
             switch (_gameState)
             {
                 case GameState.Playing:
@@ -161,14 +130,16 @@ namespace dungeoncrawler
                     Log("Invalid GameState for drawing", LogLevel.Error);
                     break;
             }
+
+            _spriteBatchManager.Switch(DrawType.DebugContent);
             _log.Draw(_spriteBatch);
-            base.Draw(gameTime);
-            _spriteBatch.End();
+            // base.Draw(gameTime); // Does this need to be done?
+            _spriteBatchManager.Finish();
         }
 
         public static void Log(string message, LogLevel logLevel = LogLevel.Trace, bool writeToOutput = false)
         {
-            // _log.AddLogMessage(message, logLevel);
+            _log.AddLogMessage(message, logLevel);
             if (writeToOutput)
             {
                 Debug.WriteLine(message);

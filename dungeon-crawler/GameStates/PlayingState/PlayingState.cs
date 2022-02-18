@@ -1,5 +1,5 @@
 ﻿using dungeoncrawler.Management;
-using dungeoncrawler.Statistics;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,19 +7,20 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class PlayingState : IGameState
     {
-        private readonly ViewManager _viewManager;
+        // Dependencies
+        private readonly SpriteBatchManager _spriteBatchManager;
+
+        // Private
         private readonly GridManager _gridManager;
         private readonly ClickManager _clickManager;
-        private readonly StatsManager _statsManager;
         private readonly Player _player;
 
-        public PlayingState(ViewManager viewManager)
+        public PlayingState(SpriteBatchManager spriteBatchManager)
         {
-            _viewManager = viewManager;
-            _clickManager = new ClickManager(_viewManager);
+            _spriteBatchManager = spriteBatchManager;
+            _clickManager = new ClickManager(spriteBatchManager.mainLayerView);
             _gridManager = new GridManager(this, _clickManager);
             _player = new Player(_gridManager, this, _gridManager.GetStartingFloor());
-            _statsManager = new StatsManager(_viewManager, _gridManager);
 
             _gridManager.UpdateVisibilityStates();
         }
@@ -30,14 +31,29 @@ namespace dungeoncrawler.GameStates.PlayingState
             _player.PriorityFrameTick(gameTime);
             _gridManager.FrameTick(gameTime);
 
-            _viewManager.UpdateCameraPosition(_player.position);
-            _statsManager.FrameTick(gameTime);
+            _spriteBatchManager.mainLayerView.Focus(_player.position);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             _gridManager.Draw(spriteBatch);
-            _statsManager.Draw(spriteBatch);
+
+            // TODO: remove
+            _spriteBatchManager.Switch(DrawType.OverlayContent);
+            spriteBatch.Draw(Game1.textures["gray_brick_walls"], new Vector2(4, 4), new Rectangle(0, 0, 40, 40), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
+            // TODO: remove
+            _spriteBatchManager.Switch(DrawType.LightContent);
+            spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(30, 30), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(100, 100), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(150, 20), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Game1.textures["medium_light"], new Vector2(30, 300), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
+            spriteBatch.Draw(
+                Game1.textures["medium_light"],
+                _spriteBatchManager.mainLayerView.GetMousePosition() - new Vector2(Game1.textures["medium_light"].Width / 2f, Game1.textures["medium_light"].Height / 2f),
+                null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
         public void ActionTick()

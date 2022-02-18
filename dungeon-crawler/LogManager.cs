@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using dungeoncrawler.Management;
 using dungeoncrawler.Visual;
@@ -23,9 +23,8 @@ namespace dungeoncrawler
 
     public class LogPrint
     {
-        public static float scale = 4;
-        private static Vector2 _textOffset = new Vector2(145 / scale, 0);
-        private static Vector2 _levelOffset = new Vector2(80 / scale, 0);
+        private static Vector2 _textOffset = new Vector2(145, 0);
+        private static Vector2 _levelOffset = new Vector2(80, 0);
         private static readonly Dictionary<LogLevel, Color> _logColors = new Dictionary<LogLevel, Color>()
         {
             { LogLevel.Trace, Color.Gray },
@@ -53,16 +52,16 @@ namespace dungeoncrawler
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"], _logTime.ToString("HH:mm:ss.fff"),
                 position,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, DrawOrder.DEBUG);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEBUG);
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"], Enum.GetName(typeof(LogLevel), _logLevel).ToUpper(),
                 position + _levelOffset,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, DrawOrder.DEBUG);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEBUG);
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"],
                 _logText,
                 position + _textOffset,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1 / scale, SpriteEffects.None, DrawOrder.DEBUG);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEBUG);
         }
     }
 
@@ -73,16 +72,16 @@ namespace dungeoncrawler
         private const int MAX_LOGS_ON_SCREEN = 50;
         private static Vector2 _cornerBuffer = new Vector2(4, -2);
 
-        private readonly ViewManager _viewManager;
+        private readonly ILayerView _layerView;
         private readonly InputManager _inputManager;
         private readonly List<LogPrint> _logPrints;
 
         private LogLevel _currentLogLevel;
         private bool _logActive { get { return _currentLogLevel != LogLevel.LogOff; } }
 
-        public LogManager(ViewManager viewManager)
+        public LogManager(ILayerView layerView)
         {
-            _viewManager = viewManager;
+            _layerView = layerView;
 
             _currentLogLevel = LogLevel.LogOff;
             _inputManager = new InputManager();
@@ -108,7 +107,7 @@ namespace dungeoncrawler
                     {
                         opacity = (MAX_LOGS_ON_SCREEN - idx) / 5.0f;
                     }
-                    Vector2 position = _viewManager.bottomLeft + _cornerBuffer - new Vector2(0, (1 + idx) * Game1.fonts["normal_font"].LineHeight / LogPrint.scale);
+                    Vector2 position = _layerView.BottomLeft() + _cornerBuffer - new Vector2(0, (1 + idx) * Game1.fonts["normal_font"].LineHeight);
                     _logPrints[_logPrints.Count - 1 - idx].Draw(spriteBatch, position, opacity);
                 }
             }
