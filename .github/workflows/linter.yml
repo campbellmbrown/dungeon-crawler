@@ -35,3 +35,7 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
+
+      # - name: Linting
+      #   uses: mcr.microsoft.com/dotnet/sdk:6.0
+      #   run: dotnet-format --verify-no-changes
