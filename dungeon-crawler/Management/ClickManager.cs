@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using dungeoncrawler.Utility;
-using Microsoft.Xna.Framework;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 
@@ -24,13 +22,16 @@ namespace dungeoncrawler.Management
             }
         }
 
-        private readonly ViewManager _viewManager;
-        private List<Click> _leftClicks;
+        // Dependencies
+        private readonly ILayerView _layerView;
+
+        // Private
+        private readonly List<Click> _leftClicks;
         private bool _leftClickHeld = false;
 
-        public ClickManager(ViewManager viewManager)
+        public ClickManager(ILayerView layerView)
         {
-            _viewManager = viewManager;
+            _layerView = layerView;
             _leftClicks = new List<Click>();
         }
 
@@ -44,7 +45,7 @@ namespace dungeoncrawler.Management
                 {
                     foreach (var leftClick in _leftClicks)
                     {
-                        if (leftClick.clickArea.Contains(Conversion.Vector2ToPoint(_viewManager.mousePosition)))
+                        if (leftClick.clickArea.Contains(Conversion.Vector2ToPoint(_layerView.mousePosition)))
                         {
                             leftClick.outputFunc();
                         }

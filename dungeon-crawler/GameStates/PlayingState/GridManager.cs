@@ -14,6 +14,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public const int STARTING_X = 0;
         public const int STARTING_Y = 0;
+        public const int VIEW_RANGE = 6;
 
         public List<Floor> floors { get; set; }
         public List<Wall> walls { get; set; }
@@ -70,11 +71,11 @@ namespace dungeoncrawler.GameStates.PlayingState
             GridSquare containingPlayer = floors.Find(sq => sq.entity is Player);
             foreach (var floor in floors)
             {
-                floor.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
+                floor.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, VIEW_RANGE);
             }
             foreach (var wall in walls)
             {
-                wall.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, 4);
+                wall.ActionTick(containingPlayer.xIdx, containingPlayer.yIdx, VIEW_RANGE);
             }
         }
 

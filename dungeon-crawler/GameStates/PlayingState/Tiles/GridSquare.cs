@@ -7,57 +7,25 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class GridSquare
     {
-        public enum VisibilityState
-        {
-            Visible,
-            FadingIn,
-            FadingOut,
-            NotVisible,
-        }
-
         protected readonly GridManager gridManager;
 
         public const int GRID_SQUARE_SIZE = 16;
-        protected const float OPACITY_RATE = 1.0f; // 0 -> 1 opacity in 1 second.
 
         public Vector2 position { get { return GRID_SQUARE_SIZE * new Vector2(xIdx, yIdx); } }
         public int xIdx { get; }
         public int yIdx { get; }
-        public VisibilityState visibilityState { get; set; }
-        protected float opacity = 0;
+        public bool visible { get; set; } = false;
 
         public GridSquare(GridManager gridManager, int xIdx, int yIdx)
         {
             this.gridManager = gridManager;
             this.xIdx = xIdx;
             this.yIdx = yIdx;
-            visibilityState = VisibilityState.NotVisible;
         }
 
         public virtual void FrameTick(GameTime gameTime)
         {
-            switch (visibilityState)
-            {
-                case VisibilityState.FadingOut:
-                    // Fade out the opacity until it reaches 0.
-                    opacity -= OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (opacity <= 0)
-                    {
-                        opacity = 0;
-                        visibilityState = VisibilityState.NotVisible;
-                        gridManager.RemoveFromDrawables(this);
-                    }
-                    break;
-                case VisibilityState.FadingIn:
-                    // Fade in the opacity until it reaches 1.
-                    opacity += OPACITY_RATE * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (opacity >= 1)
-                    {
-                        opacity = 1;
-                        visibilityState = VisibilityState.Visible;
-                    }
-                    break;
-            }
+            // Do nothing.
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
@@ -76,35 +44,17 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <param name="range">The range away from the focus to initiate a state change.</param>
         public virtual void ActionTick(int xIdxOfFocus, int yIdxOfFocus, int range)
         {
-            bool withinRange = ((Math.Abs(xIdxOfFocus - xIdx) < range) && (Math.Abs(yIdxOfFocus - yIdx) < range));
+            bool withinRange = (Math.Abs(xIdxOfFocus - xIdx) < range) && (Math.Abs(yIdxOfFocus - yIdx) < range);
 
-            switch (visibilityState)
+            if (!visible && withinRange)
             {
-                case VisibilityState.Visible:
-                    if (!withinRange)
-                    {
-                        visibilityState = VisibilityState.FadingOut;
-                    }
-                    break;
-                case VisibilityState.FadingIn:
-                    if (!withinRange)
-                    {
-                        visibilityState = VisibilityState.FadingOut;
-                    }
-                    break;
-                case VisibilityState.FadingOut:
-                    if (withinRange)
-                    {
-                        visibilityState = VisibilityState.FadingIn;
-                    }
-                    break;
-                case VisibilityState.NotVisible:
-                    if (withinRange)
-                    {
-                        visibilityState = VisibilityState.FadingIn;
-                        gridManager.AddToDrawables(this);
-                    }
-                    break;
+                visible = true;
+                gridManager.AddToDrawables(this);
+            }
+            else if (visible && !withinRange)
+            {
+                visible = false;
+                gridManager.RemoveFromDrawables(this);
             }
         }
 

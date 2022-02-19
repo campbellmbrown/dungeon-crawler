@@ -98,7 +98,7 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            _sprite.Draw(spriteBatch, position, opacity, DrawOrder.BACKGROUND_CONTENT);
+            _sprite.Draw(spriteBatch, position, DrawOrder.BACKGROUND_CONTENT);
             base.Draw(spriteBatch);
 
             // TODO: Move to an entity manager

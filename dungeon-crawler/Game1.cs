@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using dungeoncrawler.GameStates;
 using dungeoncrawler.GameStates.PlayingState;
-using dungeoncrawler.Management;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -19,21 +20,22 @@ namespace dungeoncrawler
 
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Color _backgroundColor;
 
         public static Dictionary<string, Texture2D> textures { get; set; }
         public static Dictionary<string, BitmapFont> fonts { get; set; }
+
         public static Random random;
 
         private static LogManager _log;
-        private ViewManager _viewManager;
         private GameState _gameState;
-        private PlayingState _playingState;
+        private IGameState _playingState;
 
         private const float HEARTBEAT_TIME = 1f; // sec
         private float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
 
-        public const string VERSION_STR = "v0.3.3";
+        public const string VERSION_STR = "v0.3.4";
+
+        private SpriteBatchManager _spriteBatchManager;
 
         public Game1()
         {
@@ -44,21 +46,40 @@ namespace dungeoncrawler
 
         protected override void Initialize()
         {
+
+            _graphics.IsFullScreen = true;
+            Vector2 screenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+
+            // TODO: move to spritebatch manager?
+            _graphics.PreferredBackBufferWidth = (int)screenSize.X;
+            _graphics.PreferredBackBufferHeight = (int)screenSize.Y;
+
+            _graphics.SynchronizeWithVerticalRetrace = true;
+            _graphics.ApplyChanges();
+
+            var pp = GraphicsDevice.PresentationParameters;
+
             IsMouseVisible = true;
             IsFixedTimeStep = true;
-            _backgroundColor = new Color(10, 10, 12);
+
             _gameState = GameState.Playing;
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatchManager = new SpriteBatchManager(GraphicsDevice, _spriteBatch, Content);
 
             textures = new Dictionary<string, Texture2D>()
             {
+                // Tilesheets
                 { "gray_brick_walls", Content.Load<Texture2D>("textures/tilesheets/gray_brick_walls") },
                 { "gray_brick_floors", Content.Load<Texture2D>("textures/tilesheets/gray_brick_floors") },
+                // Masks
+                { "medium_light", Content.Load<Texture2D>("textures/masks/medium_light") },
+                { "center_view", Content.Load<Texture2D>("textures/masks/center_view") },
             };
 
             fonts = new Dictionary<string, BitmapFont>()
@@ -66,9 +87,8 @@ namespace dungeoncrawler
                 { "normal_font", Content.Load<BitmapFont>("fonts/normal_font") },
             };
 
-            _viewManager = new ViewManager(GraphicsDevice, _graphics, Window);
-            _playingState = new PlayingState(_viewManager);
-            _log = new LogManager(_viewManager);
+            _log = new LogManager(_spriteBatchManager.debugLayerView);
+            _playingState = new PlayingState(_spriteBatchManager);
         }
 
         protected override void Update(GameTime gameTime)
@@ -95,16 +115,7 @@ namespace dungeoncrawler
 
         protected override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Begin(
-                SpriteSortMode.FrontToBack,
-                BlendState.AlphaBlend,
-                SamplerState.PointClamp,
-                DepthStencilState.None,
-                RasterizerState.CullCounterClockwise,
-                null,
-                transformMatrix: _viewManager.camera.GetViewMatrix()
-            );
-            GraphicsDevice.Clear(_backgroundColor);
+            _spriteBatchManager.Start(DrawType.MainContent);
             switch (_gameState)
             {
                 case GameState.Playing:
@@ -114,9 +125,11 @@ namespace dungeoncrawler
                     Log("Invalid GameState for drawing", LogLevel.Error);
                     break;
             }
+
+            _spriteBatchManager.Switch(DrawType.DebugContent);
             _log.Draw(_spriteBatch);
-            base.Draw(gameTime);
-            _spriteBatch.End();
+            // base.Draw(gameTime); // Does this need to be done?
+            _spriteBatchManager.Finish();
         }
 
         public static void Log(string message, LogLevel logLevel = LogLevel.Trace, bool writeToOutput = false)

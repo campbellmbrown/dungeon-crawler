@@ -1,5 +1,5 @@
 ﻿using dungeoncrawler.Management;
-using dungeoncrawler.Statistics;
+using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,19 +7,25 @@ namespace dungeoncrawler.GameStates.PlayingState
 {
     public class PlayingState : IGameState
     {
-        private readonly ViewManager _viewManager;
+        // Dependencies
+        private readonly SpriteBatchManager _spriteBatchManager;
+
+        // Private
         private readonly GridManager _gridManager;
         private readonly ClickManager _clickManager;
-        private readonly StatsManager _statsManager;
         private readonly Player _player;
+        private Sprite _viewMask;
+        // TODO: move to a MouseManager
+        private Sprite _mouseLight;
 
-        public PlayingState(ViewManager viewManager)
+        public PlayingState(SpriteBatchManager spriteBatchManager)
         {
-            _viewManager = viewManager;
-            _clickManager = new ClickManager(_viewManager);
+            _spriteBatchManager = spriteBatchManager;
+            _clickManager = new ClickManager(spriteBatchManager.mainLayerView);
             _gridManager = new GridManager(this, _clickManager);
             _player = new Player(_gridManager, this, _gridManager.GetStartingFloor());
-            _statsManager = new StatsManager(_viewManager, _gridManager);
+            _mouseLight = new Sprite(Game1.textures["medium_light"]);
+            _viewMask = new Sprite(Game1.textures["center_view"]);
 
             _gridManager.UpdateVisibilityStates();
         }
@@ -30,14 +36,24 @@ namespace dungeoncrawler.GameStates.PlayingState
             _player.PriorityFrameTick(gameTime);
             _gridManager.FrameTick(gameTime);
 
-            _viewManager.UpdateCameraPosition(_player.position);
-            _statsManager.FrameTick(gameTime);
+            _spriteBatchManager.mainLayerView.Focus(_player.position);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            // We don't need to switch to DrawType.MainContent
             _gridManager.Draw(spriteBatch);
-            _statsManager.Draw(spriteBatch);
+
+            // Drawing overlay content
+            // Uncomment to draw overlay content
+            // _spriteBatchManager.Switch(DrawType.OverlayContent);
+
+            _spriteBatchManager.Switch(DrawType.PointLightContent);
+            // TODO: move to a MouseManager
+            _mouseLight.DrawCenter(spriteBatch, _spriteBatchManager.mainLayerView.mousePosition);
+
+            _spriteBatchManager.Switch(DrawType.ViewLightContent);
+            _viewMask.DrawCenter(spriteBatch, _spriteBatchManager.mainLayerView.middle);
         }
 
         public void ActionTick()
