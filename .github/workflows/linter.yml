@@ -21,8 +21,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+      - name: Restore Dependencies
+        run: dotnet restore
       - name: Linting
-        run: dotnet format dungeon-crawler --verify-no-changes
+        run: dotnet format dungeon-crawler --verify-no-changes --verbosity diagnostic
   # build-and-test:
     # runs-on: ubuntu-latest
       # steps:
