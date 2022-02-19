@@ -1,32 +1,37 @@
----
-name: Lint Code Base
 
 #
 # Documentation:
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 #
 
+name: Game Pipeline
 on:
+  pull-request:
+    branches:
+      - develop
   push:
-    branches-ignore: []
+    branches:
+      - develop  
 
 jobs:
   build:
-    name: Lint Code Base
+    name: Main
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+      
+      - name: Setup .NET Core SDK 3.1
+        uses: actions/setup-dotnet@v1
         with:
-          # Full git history is needed to get a proper list of changed files within super-linter
-          fetch-depth: 0
+          dotnet-version: '3.1.x'
 
-      - name: Lint Code Base
-        uses: github/super-linter@v4
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: develop
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_CSHARP: true
-          VALIDATE_GITHUB_ACTIONS: true
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
