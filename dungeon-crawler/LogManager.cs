@@ -52,16 +52,16 @@ namespace dungeoncrawler
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"], _logTime.ToString("HH:mm:ss.fff"),
                 position,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEBUG);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"], Enum.GetName(typeof(LogLevel), _logLevel).ToUpper(),
                 position + _levelOffset,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEBUG);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
             spriteBatch.DrawString(
                 Game1.fonts["normal_font"],
                 _logText,
                 position + _textOffset,
-                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEBUG);
+                _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
         }
     }
 

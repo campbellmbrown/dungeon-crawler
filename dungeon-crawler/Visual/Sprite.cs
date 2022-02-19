@@ -24,12 +24,13 @@ namespace dungeoncrawler.Visual
         {
         }
 
+        public virtual void DrawCenter(SpriteBatch spriteBatch, Vector2 position, float layer = DrawOrder.DEFAULT)
+        {
+            Draw(spriteBatch, position - size / 2f, layer);
+        }
+
         public virtual void Draw(SpriteBatch spriteBatch, Vector2 position, float layer = DrawOrder.DEFAULT)
         {
-            if (layer == DrawOrder.DEFAULT)
-            {
-                Game1.Log("Drawing at default layer", LogLevel.Warning);
-            }
             spriteBatch.Draw(texture, position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
         }
     }
