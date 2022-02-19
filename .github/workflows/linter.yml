@@ -21,12 +21,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-      - name: Setup .NET Core SDK 3.1
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
-      - name: Restore Dependencies
-        run: dotnet restore
       - name: Linting
         run: dotnet format dungeon-crawler --verify-no-changes --verbosity diagnostic
   # build-and-test:
