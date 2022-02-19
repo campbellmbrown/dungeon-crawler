@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Linting
-        run: dotnet-format dungeon-crawler --verify-no-changes
+        run: dotnet format dungeon-crawler --verify-no-changes
   # build-and-test:
     # runs-on: ubuntu-latest
       # steps:
