@@ -26,32 +26,71 @@ namespace dungeoncrawler.Visual
         private readonly GraphicsDevice _graphicsDevice;
         private readonly SpriteBatch _spriteBatch;
 
+        // Public
+        public Vector2 windowSize => new Vector2(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+
         // Layer views
         public ILayerView mainLayerView { get; set; }
         public ILayerView overlayLayerView { get; set; }
         public ILayerView debugLayerView { get; set; }
 
-        // Render targets
+        /* Render targets
+         * 
+         * Instead of drawing our sprites to the back buffer we can instruct the GraphicsDevice to draw
+         * to a render target instead. A render target is essentially an image that we are drawing to,
+         * and then when we are done drawing to that render target we can draw it to the back buffer like
+         * a regular texture. This is useful for:
+         * 
+         * - Applying effects to a specific layer
+         * - Applying global effects to all the layers (or specific layers) when we draw to the back buffer
+         * - Having different cameras for each layer (e.g. a menu overlay vs game content)
+         * 
+         * If a render target is going to be drawn to the entire screen it should be created with the
+         * same resolution as the screen.
+         */
+        /// <summary>
+        /// Render target for the main content.
+        /// </summary>
         private RenderTarget2D _mainContentTarget;
+
+        /// <summary>
+        /// Render target for content that doesn't move with the player.
+        /// </summary>
         private RenderTarget2D _overlayContentTarget;
+
+        /// <summary>
+        /// A special render target for drawing lights for the main content target.
+        /// This render target will be an input to the light effect.
+        /// </summary>
         private RenderTarget2D _pointLightTarget;
+
+        /// <summary>
+        /// A special render target for drawing shapes that narrow the view.
+        /// This render target will be an input to the light effect and applied after
+        /// the point light target.
+        /// This means it will block out the lights from the point light target.
+        /// </summary>
         private RenderTarget2D _viewLightTarget;
+
+        /// <summary>
+        /// Render target for debug prints/info.
+        /// Could be removed to increase performance if needed.
+        /// </summary>
         private RenderTarget2D _debugTarget;
+
+        /// <summary>
+        /// A temporary render target. This is used because we want to apply two light affects.
+        /// First we draw the main content target to this target with the point light effect.
+        /// Then we draw this target to the back buffer with the view light effect.
+        /// </summary>
+        private RenderTarget2D _tmpTarget;
 
         // Effects
         private Effect _pointlightingEffect;
         private Effect _viewlightingEffect;
 
-        Effect currentEffect = null;
-        private Color _backgroundColor;
-
-        public Vector2 windowSize
-        {
-            get
-            {
-                return new Vector2(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
-            }
-        }
+        private Color _pointLightClearColor = new Color(30, 50, 100);
+        private Color _viewLightClearColor = Color.Black;
 
         public static Vector2 screenSize
         {
@@ -69,8 +108,6 @@ namespace dungeoncrawler.Visual
             LoadRenderTargets();
             LoadEffects(content);
             LoadLayerViews(graphicsDevice);
-
-            _backgroundColor = Color.Black;
         }
 
         private void LoadRenderTargets()
@@ -82,6 +119,7 @@ namespace dungeoncrawler.Visual
             _debugTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
             _pointLightTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
             _viewLightTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
+            _tmpTarget = new RenderTarget2D(_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
         private void LoadEffects(ContentManager content)
@@ -98,19 +136,17 @@ namespace dungeoncrawler.Visual
 
         public void Start(DrawType drawType)
         {
-            currentEffect = null;
-
             switch (drawType)
             {
                 case DrawType.MainContent:
                     _graphicsDevice.SetRenderTarget(_mainContentTarget);
                     _graphicsDevice.Clear(Color.Transparent);
-                    _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, effect: currentEffect, transformMatrix: mainLayerView.camera.GetViewMatrix());
+                    _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
                     break;
                 case DrawType.OverlayContent:
                     _graphicsDevice.SetRenderTarget(_overlayContentTarget);
                     _graphicsDevice.Clear(Color.Transparent);
-                    _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: currentEffect);
+                    _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
                     break;
                 case DrawType.DebugContent:
                     _graphicsDevice.SetRenderTarget(_debugTarget);
@@ -119,12 +155,12 @@ namespace dungeoncrawler.Visual
                     break;
                 case DrawType.ViewLightContent:
                     _graphicsDevice.SetRenderTarget(_viewLightTarget);
-                    _graphicsDevice.Clear(Color.Black);
+                    _graphicsDevice.Clear(_viewLightClearColor);
                     _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
                     break;
                 case DrawType.PointLightContent:
                     _graphicsDevice.SetRenderTarget(_pointLightTarget);
-                    _graphicsDevice.Clear(new Color(10, 10, 10));
+                    _graphicsDevice.Clear(_pointLightClearColor);
                     _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
                     break;
             }
@@ -140,34 +176,27 @@ namespace dungeoncrawler.Visual
         {
             _spriteBatch.End();
 
-            // 1. Draw the content target to the tmp target with pointLightEffect
-            // 2. Draw the tmp target to the backbuffer with the viewLightEffect
-
-            RenderTarget2D _tmpTarget = new RenderTarget2D(_graphicsDevice, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+            // (1) Draw the main content to the temporary target with the point light as a mask.
             _graphicsDevice.SetRenderTarget(_tmpTarget);
             _pointlightingEffect.Parameters["lightMask"].SetValue(_pointLightTarget);
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: _pointlightingEffect);
             _spriteBatch.Draw(_mainContentTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             _spriteBatch.End();
 
-            // Now we will draw all of the render targets to the screen.
             _graphicsDevice.SetRenderTarget(null);
-            _graphicsDevice.Clear(_backgroundColor);
+            _graphicsDevice.Clear(Color.Black);
 
-            // Targets that have the light applied
+            // (2) Draw the main content (on the temporary target) to the back buffer with the view light as a mask.
             _pointlightingEffect.Parameters["lightMask"].SetValue(_viewLightTarget);
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, effect: _viewlightingEffect);
             _spriteBatch.Draw(_tmpTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             _spriteBatch.End();
 
-            // Targets that don't have light applied
-            // Another option would be to have the effect: _pixelateEffect when drawing to the _mainContentTarget, then
-            // the _spriteBatch.Begin()/.End() would only need to be called once here?
+            // (3) Draw the rest of the sprite batches to the back buffer.
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
             _spriteBatch.Draw(_overlayContentTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             _spriteBatch.Draw(_debugTarget, new Vector2(0, 0), null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             _spriteBatch.End();
-
         }
     }
 }
