@@ -1,15 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using dungeoncrawler.GameStates;
 using dungeoncrawler.GameStates.PlayingState;
-using dungeoncrawler.Management;
-using dungeoncrawler.Utility;
 using dungeoncrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
 namespace dungeoncrawler
@@ -36,7 +33,7 @@ namespace dungeoncrawler
         private const float HEARTBEAT_TIME = 1f; // sec
         private float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
 
-        public const string VERSION_STR = "v0.3.3";
+        public const string VERSION_STR = "v0.3.4";
 
         private SpriteBatchManager _spriteBatchManager;
 
@@ -60,10 +57,7 @@ namespace dungeoncrawler
             _graphics.SynchronizeWithVerticalRetrace = true;
             _graphics.ApplyChanges();
 
-            Console.WriteLine(_graphics.PreferredBackBufferWidth + " " + _graphics.PreferredBackBufferHeight);
-
             var pp = GraphicsDevice.PresentationParameters;
-            Debug.WriteLine(pp.BackBufferWidth + " " + pp.BackBufferHeight);
 
             IsMouseVisible = true;
             IsFixedTimeStep = true;

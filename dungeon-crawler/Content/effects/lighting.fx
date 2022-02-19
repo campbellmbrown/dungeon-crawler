@@ -1,10 +1,10 @@
 ﻿#if OPENGL
-	#define SV_POSITION POSITION
-	#define VS_SHADERMODEL vs_3_0
-	#define PS_SHADERMODEL ps_3_0
+    #define SV_POSITION POSITION
+    #define VS_SHADERMODEL vs_3_0
+    #define PS_SHADERMODEL ps_3_0
 #else
-	#define VS_SHADERMODEL vs_4_0_level_9_1
-	#define PS_SHADERMODEL ps_4_0_level_9_1
+    #define VS_SHADERMODEL vs_4_0_level_9_1
+    #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
 sampler inputTexture;
@@ -23,8 +23,8 @@ float4 MainPS(float2 coords: TEXCOORD0): COLOR0
 
 technique Techninque1
 {
-	pass Pass1
-	{
-		PixelShader = compile PS_SHADERMODEL MainPS();
-	}
+    pass Pass1
+    {
+        PixelShader = compile PS_SHADERMODEL MainPS();
+    }
 };
