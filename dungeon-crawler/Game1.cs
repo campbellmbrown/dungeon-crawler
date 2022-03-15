@@ -27,6 +27,7 @@ namespace dungeoncrawler
         public static Random random;
 
         private static LogManager _log;
+        private static PerformanceManager _performanceManager;
         private GameState _gameState;
         private IGameState _playingState;
 
@@ -57,8 +58,6 @@ namespace dungeoncrawler
             _graphics.SynchronizeWithVerticalRetrace = true;
             _graphics.ApplyChanges();
 
-            var pp = GraphicsDevice.PresentationParameters;
-
             IsMouseVisible = true;
             IsFixedTimeStep = true;
 
@@ -88,11 +87,13 @@ namespace dungeoncrawler
             };
 
             _log = new LogManager(_spriteBatchManager.debugLayerView);
+            _performanceManager = new PerformanceManager(_spriteBatchManager.debugLayerView);
             _playingState = new PlayingState(_spriteBatchManager);
         }
 
         protected override void Update(GameTime gameTime)
         {
+            _performanceManager.Start();
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Exit();
@@ -128,8 +129,10 @@ namespace dungeoncrawler
 
             _spriteBatchManager.Switch(DrawType.DebugContent);
             _log.Draw(_spriteBatch);
+            _performanceManager.Draw(_spriteBatch);
             // base.Draw(gameTime); // Does this need to be done?
             _spriteBatchManager.Finish();
+            _performanceManager.Stop();
         }
 
         public static void Log(string message, LogLevel logLevel = LogLevel.Trace, bool writeToOutput = false)
