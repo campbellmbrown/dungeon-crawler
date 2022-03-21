@@ -20,6 +20,7 @@ namespace dungeoncrawler
     {
         public int incorrectlyNamedProperty { get; set; }
         private int foo;
+        private const int incorrectlyNamed2 = 2;
     }
 
     public class PerformanceManager : IPerformanceManager
