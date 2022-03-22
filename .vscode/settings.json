@@ -28,8 +28,15 @@
             {
                 "scope": "entity.name.type.class",
                 "settings": {
-                    "foreground": "#ff6d6d",
+                    "foreground": "#f29f51",
                     "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "variable.parameter",
+                "settings": {
+                    "foreground": "#ff6145",
+                    "fontStyle": "italic"
                 }
             }
         ]

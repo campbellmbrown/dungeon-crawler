@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using dungeoncrawler.Management;
-using dungeoncrawler.Visual;
+using DungeonCrawler.Management;
+using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
 
-namespace dungeoncrawler
+namespace DungeonCrawler
 {
     public enum LogLevel
     {
@@ -50,15 +50,15 @@ namespace dungeoncrawler
         public void Draw(SpriteBatch spriteBatch, Vector2 position, float opacity)
         {
             spriteBatch.DrawString(
-                Game1.fonts["normal_font"], _logTime.ToString("HH:mm:ss.fff"),
+                Game1.Fonts["normal_font"], _logTime.ToString("HH:mm:ss.fff"),
                 position,
                 _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
             spriteBatch.DrawString(
-                Game1.fonts["normal_font"], Enum.GetName(typeof(LogLevel), _logLevel).ToUpper(),
+                Game1.Fonts["normal_font"], Enum.GetName(typeof(LogLevel), _logLevel).ToUpper(),
                 position + _levelOffset,
                 _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
             spriteBatch.DrawString(
-                Game1.fonts["normal_font"],
+                Game1.Fonts["normal_font"],
                 _logText,
                 position + _textOffset,
                 _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
@@ -107,7 +107,7 @@ namespace dungeoncrawler
                     {
                         opacity = (MAX_LOGS_ON_SCREEN - idx) / 5.0f;
                     }
-                    Vector2 position = _layerView.bottomLeft + _cornerBuffer - new Vector2(0, (1 + idx) * Game1.fonts["normal_font"].LineHeight);
+                    Vector2 position = _layerView.BottomLeft + _cornerBuffer - new Vector2(0, (1 + idx) * Game1.Fonts["normal_font"].LineHeight);
                     _logPrints[_logPrints.Count - 1 - idx].Draw(spriteBatch, position, opacity);
                 }
             }

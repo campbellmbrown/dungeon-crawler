@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace dungeoncrawler.GameStates.PlayingState
+namespace DungeonCrawler.GameStates.PlayingState
 {
     public class Dijkstra
     {
@@ -16,18 +16,18 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             public const int INF = 9999;
 
-            public int xIdx { get; }
-            public int yIdx { get; }
-            public int dist { get; set; }
-            public int weight { get; set; }
-            public Vertex prev { get; set; }
+            public int XIdx { get; }
+            public int YIdx { get; }
+            public int Dist { get; set; }
+            public int Weight { get; set; }
+            public Vertex Prev { get; set; }
 
             public Vertex(int xIdx, int yIdx)
             {
-                this.xIdx = xIdx;
-                this.yIdx = yIdx;
-                weight = 1;
-                dist = INF;
+                XIdx = xIdx;
+                YIdx = yIdx;
+                Weight = 1;
+                Dist = INF;
             }
         }
 
@@ -37,19 +37,19 @@ namespace dungeoncrawler.GameStates.PlayingState
 
             // Create a list of unvisited nodes. Set the distance to 0 for the source node.
             List<Vertex> unvisited = new List<Vertex>();
-            foreach (var floor in _gridManager.floors)
+            foreach (var floor in _gridManager.Floors)
             {
-                unvisited.Add(new Vertex(floor.xIdx, floor.yIdx));
+                unvisited.Add(new Vertex(floor.XIdx, floor.YIdx));
             }
-            Vertex target = unvisited.Find(v => (v.xIdx == dest.xIdx) && (v.yIdx == dest.yIdx));
-            Vertex source = unvisited.Find(v => (v.xIdx == orig.xIdx) && (v.yIdx == orig.yIdx));
-            source.dist = 0;
+            Vertex target = unvisited.Find(v => (v.XIdx == dest.XIdx) && (v.YIdx == dest.YIdx));
+            Vertex source = unvisited.Find(v => (v.XIdx == orig.XIdx) && (v.YIdx == orig.YIdx));
+            source.Dist = 0;
             Vertex curr;
 
             while (unvisited.Count > 0)
             {
                 // Choose unvisited node with smallest distance.
-                curr = unvisited.Aggregate((c, d) => c.dist < d.dist ? c : d);
+                curr = unvisited.Aggregate((c, d) => c.Dist < d.Dist ? c : d);
                 unvisited.Remove(curr);
 
                 if (curr == target)
@@ -61,14 +61,14 @@ namespace dungeoncrawler.GameStates.PlayingState
                 List<(int, int)> possibleNeighbours = new List<(int, int)>() { (0, -1), (1, 0), (0, 1), (-1, 0) };
                 foreach (var pn in possibleNeighbours)
                 {
-                    Vertex neighbour = unvisited.Find(v => (curr.xIdx + pn.Item1 == v.xIdx) && (curr.yIdx + pn.Item2 == v.yIdx));
+                    Vertex neighbour = unvisited.Find(v => (curr.XIdx + pn.Item1 == v.XIdx) && (curr.YIdx + pn.Item2 == v.YIdx));
                     if (neighbour != null)
                     {
-                        int alt = curr.dist + neighbour.weight;
-                        if (alt < neighbour.dist)
+                        int alt = curr.Dist + neighbour.Weight;
+                        if (alt < neighbour.Dist)
                         {
-                            neighbour.dist = alt;
-                            neighbour.prev = curr;
+                            neighbour.Dist = alt;
+                            neighbour.Prev = curr;
                         }
                     }
                 }
@@ -77,16 +77,16 @@ namespace dungeoncrawler.GameStates.PlayingState
             // Create a path of Floors.
             Stack<Floor> path = new Stack<Floor>();
             curr = target;
-            if (curr.prev != null || curr == source)
+            if (curr.Prev != null || curr == source)
             {
                 while (curr != null)
                 {
-                    path.Push(_gridManager.floors.Find(gs => (gs.xIdx == curr.xIdx) && (gs.yIdx == curr.yIdx)));
-                    curr = curr.prev;
+                    path.Push(_gridManager.Floors.Find(gs => (gs.XIdx == curr.XIdx) && (gs.YIdx == curr.YIdx)));
+                    curr = curr.Prev;
                 }
             }
 
-            Game1.Log("A total of " + (_gridManager.floors.Count - unvisited.Count).ToString() + "/" + _gridManager.floors.Count.ToString() + " were checked.", LogLevel.Debug);
+            Game1.Log("A total of " + (_gridManager.Floors.Count - unvisited.Count).ToString() + "/" + _gridManager.Floors.Count.ToString() + " were checked.", LogLevel.Debug);
             // Remove the first one - this should be the origin.
             path.Pop();
             return path;

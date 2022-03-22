@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 
-namespace dungeoncrawler.Management
+namespace DungeonCrawler.Management
 {
     public class InputManager
     {
@@ -9,15 +9,15 @@ namespace dungeoncrawler.Management
 
         public class SingleShotInput
         {
-            public Keys inputKey { get; set; }
-            public MethodDelegate outputFunc { get; }
-            public bool keyHeldDown { get; set; }
+            public Keys InputKey { get; set; }
+            public MethodDelegate OutputFunc { get; }
+            public bool KeyHeldDown { get; set; }
 
             public SingleShotInput(Keys inputKey, MethodDelegate outputFunc)
             {
-                this.inputKey = inputKey;
-                this.outputFunc = outputFunc;
-                keyHeldDown = false;
+                this.InputKey = inputKey;
+                this.OutputFunc = outputFunc;
+                KeyHeldDown = false;
             }
         }
 
@@ -34,17 +34,17 @@ namespace dungeoncrawler.Management
 
             for (int idx = 0; idx < _singleShotInputs.Count; idx++)
             {
-                if (keyboardState.IsKeyDown(_singleShotInputs[idx].inputKey))
+                if (keyboardState.IsKeyDown(_singleShotInputs[idx].InputKey))
                 {
-                    if (!_singleShotInputs[idx].keyHeldDown)
+                    if (!_singleShotInputs[idx].KeyHeldDown)
                     {
-                        _singleShotInputs[idx].outputFunc();
+                        _singleShotInputs[idx].OutputFunc();
                     }
-                    _singleShotInputs[idx].keyHeldDown = true;
+                    _singleShotInputs[idx].KeyHeldDown = true;
                 }
                 else
                 {
-                    _singleShotInputs[idx].keyHeldDown = false;
+                    _singleShotInputs[idx].KeyHeldDown = false;
                 }
             }
         }

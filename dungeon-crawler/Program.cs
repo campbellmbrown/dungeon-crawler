@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace dungeoncrawler
+namespace DungeonCrawler
 {
     public static class Program
     {

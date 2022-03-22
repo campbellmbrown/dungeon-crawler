@@ -1,8 +1,8 @@
-﻿using dungeoncrawler.Management;
+﻿using DungeonCrawler.Management;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace dungeoncrawler.GameStates.PlayingState
+namespace DungeonCrawler.GameStates.PlayingState
 {
     public class Player : Entity
     {
@@ -22,7 +22,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             _inputManager.FrameTick();
             // TODO: determine the best place for this to be. Maybe this should happen when the player clicks on a Floor.
-            if (queuedFloors.Count > 0 && destinationState == DestinationState.AtDestination)
+            if (QueuedFloors.Count > 0 && _destinationState == DestinationState.AtDestination)
             {
                 _playingState.ActionTick();
             }

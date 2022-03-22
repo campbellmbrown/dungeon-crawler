@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace dungeoncrawler.Visual
+namespace DungeonCrawler.Visual
 {
     public enum DrawType
     {
@@ -20,24 +20,24 @@ namespace dungeoncrawler.Visual
         private readonly SpriteBatch _spriteBatch;
 
         // Public
-        public Vector2 windowSize => new Vector2(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+        public Vector2 WindowSize => new Vector2(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
 
         // Layer views
-        public ILayerView mainLayerView { get; set; }
-        public ILayerView overlayLayerView { get; set; }
-        public ILayerView debugLayerView { get; set; }
+        public ILayerView MainLayerView { get; set; }
+        public ILayerView OverlayLayerView { get; set; }
+        public ILayerView DebugLayerView { get; set; }
 
         /* Render targets
-         * 
+         *
          * Instead of drawing our sprites to the back buffer we can instruct the GraphicsDevice to draw
          * to a render target instead. A render target is essentially an image that we are drawing to,
          * and then when we are done drawing to that render target we can draw it to the back buffer like
          * a regular texture. This is useful for:
-         * 
+         *
          * - Applying effects to a specific layer
          * - Applying global effects to all the layers (or specific layers) when we draw to the back buffer
          * - Having different cameras for each layer (e.g. a menu overlay vs game content)
-         * 
+         *
          * If a render target is going to be drawn to the entire screen it should be created with the
          * same resolution as the screen.
          */
@@ -85,7 +85,7 @@ namespace dungeoncrawler.Visual
         private Color _pointLightClearColor = new Color(30, 50, 100);
         private Color _viewLightClearColor = Color.Black;
 
-        public static Vector2 screenSize
+        public static Vector2 ScreenSize
         {
             get
             {
@@ -123,8 +123,8 @@ namespace dungeoncrawler.Visual
 
         private void LoadLayerViews(GraphicsDevice graphicsDevice)
         {
-            mainLayerView = new LayerView(this, graphicsDevice, 4);
-            debugLayerView = new LayerView(this, graphicsDevice, 1);
+            MainLayerView = new LayerView(this, graphicsDevice, 4);
+            DebugLayerView = new LayerView(this, graphicsDevice, 1);
         }
 
         public void Start(DrawType drawType)
@@ -134,7 +134,7 @@ namespace dungeoncrawler.Visual
                 case DrawType.MainContent:
                     _graphicsDevice.SetRenderTarget(_mainContentTarget);
                     _graphicsDevice.Clear(Color.Transparent);
-                    _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
+                    _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: MainLayerView.Camera.GetViewMatrix());
                     break;
                 case DrawType.OverlayContent:
                     _graphicsDevice.SetRenderTarget(_overlayContentTarget);
@@ -144,17 +144,17 @@ namespace dungeoncrawler.Visual
                 case DrawType.DebugContent:
                     _graphicsDevice.SetRenderTarget(_debugTarget);
                     _graphicsDevice.Clear(Color.Transparent);
-                    _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: debugLayerView.camera.GetViewMatrix());
+                    _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, transformMatrix: DebugLayerView.Camera.GetViewMatrix());
                     break;
                 case DrawType.ViewLightContent:
                     _graphicsDevice.SetRenderTarget(_viewLightTarget);
                     _graphicsDevice.Clear(_viewLightClearColor);
-                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
+                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: MainLayerView.Camera.GetViewMatrix());
                     break;
                 case DrawType.PointLightContent:
                     _graphicsDevice.SetRenderTarget(_pointLightTarget);
                     _graphicsDevice.Clear(_pointLightClearColor);
-                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: mainLayerView.camera.GetViewMatrix());
+                    _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, transformMatrix: MainLayerView.Camera.GetViewMatrix());
                     break;
             }
         }

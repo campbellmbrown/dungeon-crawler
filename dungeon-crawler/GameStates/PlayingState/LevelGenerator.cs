@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using dungeoncrawler.GameStates.PlayingState.Tiles;
-using dungeoncrawler.Management;
-using dungeoncrawler.Utility;
+using DungeonCrawler.GameStates.PlayingState.Tiles;
+using DungeonCrawler.Management;
+using DungeonCrawler.Utility;
 
-namespace dungeoncrawler.GameStates.PlayingState
+namespace DungeonCrawler.GameStates.PlayingState
 {
     public class LevelGenerator
     {
@@ -70,17 +70,17 @@ namespace dungeoncrawler.GameStates.PlayingState
         private const int PRIORITY_DIRECTION_WEIGHT = 3;
         private readonly Dictionary<Direction, RNG.Weight> _changeDirectionWeights = new Dictionary<Direction, RNG.Weight>()
         {
-            { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
-            { Direction.Down, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
-            { Direction.Left, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
-            { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Up, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Down, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Left, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Right, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
         };
         private readonly Dictionary<Direction, RNG.Weight> _branchDirectionWeights = new Dictionary<Direction, RNG.Weight>()
         {
-            { Direction.Up, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
-            { Direction.Down, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
-            { Direction.Left, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
-            { Direction.Right, new RNG.Weight() { weight = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Up, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Down, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Left, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
+            { Direction.Right, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
         };
 
         public LevelGenerator(GridManager gridManager, ClickManager clickManager)
@@ -101,7 +101,7 @@ namespace dungeoncrawler.GameStates.PlayingState
             CreateRoom(currentFloor);
             Direction currentDirection = RNG.RandomEnum<Direction>();
             UpdateDirectionWeights(currentDirection);
-            int mainPathLength = Game1.random.Next(MAIN_PATH_MIN_LENGTH, MAIN_PATH_MAX_LENGTH + 1);
+            int mainPathLength = Game1.Random.Next(MAIN_PATH_MIN_LENGTH, MAIN_PATH_MAX_LENGTH + 1);
             _distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
 
             for (int idx = 0; idx < mainPathLength; idx++)
@@ -122,28 +122,28 @@ namespace dungeoncrawler.GameStates.PlayingState
             CreateRoom(currentFloor);
 
             BitMask floorBitMask = new BitMask();
-            foreach (var floor in _gridManager.floors)
+            foreach (var floor in _gridManager.Floors)
             {
-                floor.UpdateID(floorBitMask.FindValue(BitMask.BitMaskType.Bits8, _gridManager.floors, floor));
+                floor.UpdateID(floorBitMask.FindValue(BitMask.BitMaskType.Bits8, _gridManager.Floors, floor));
             }
         }
 
         private void GenerateWalls()
         {
-            foreach (var floor in _gridManager.floors)
+            foreach (var floor in _gridManager.Floors)
             {
                 for (int xOff = -1; xOff <= 1; xOff++)
                 {
                     for (int yOff = -1; yOff <= 1; yOff++)
                     {
-                        TryCreateNewWall(floor.xIdx + xOff, floor.yIdx + yOff);
+                        TryCreateNewWall(floor.XIdx + xOff, floor.YIdx + yOff);
                     }
                 }
             }
             BitMask wallBitMask = new BitMask();
-            foreach (var wall in _gridManager.walls)
+            foreach (var wall in _gridManager.Walls)
             {
-                wall.UpdateID(wallBitMask.FindValue(BitMask.BitMaskType.Bits4, _gridManager.walls, wall));
+                wall.UpdateID(wallBitMask.FindValue(BitMask.BitMaskType.Bits4, _gridManager.Walls, wall));
             }
         }
 
@@ -179,14 +179,14 @@ namespace dungeoncrawler.GameStates.PlayingState
         }
 
         /// <summary>
-        /// Creates a single-direction branch from a certain point 
+        /// Creates a single-direction branch from a certain point
         /// </summary>
         /// <param name="start"></param>
         /// <param name="branchDirection"></param>
         private void CreateBranch(Floor start, Direction branchDirection)
         {
             Floor branchCurrentFloor = start;
-            int branch_length = Game1.random.Next(BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH + 1);
+            int branch_length = Game1.Random.Next(BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH + 1);
             for (int idx = 0; idx < branch_length; idx++)
             {
                 branchCurrentFloor = CreateFloorInDirection(branchCurrentFloor, branchDirection);
@@ -224,8 +224,8 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <param name="maxH">The maximum height of the room.</param>
         private void CreateRoom(Floor center, int minW = MIN_ROOM_WIDTH, int maxW = MAX_ROOM_WIDTH, int minH = MIN_ROOM_HEIGHT, int maxH = MAX_ROOM_HEIGHT)
         {
-            int roomHeight = Game1.random.Next(minH, maxH + 1);
-            int roomWidth = Game1.random.Next(minW, maxW + 1);
+            int roomHeight = Game1.Random.Next(minH, maxH + 1);
+            int roomWidth = Game1.Random.Next(minW, maxW + 1);
 
             // The center will always be closer to the top left, e.g.
             //    +-------+   +-------+   +-----+
@@ -235,8 +235,8 @@ namespace dungeoncrawler.GameStates.PlayingState
             //    |X X X X|   +-------+   +-----+
             //    +-------+
 
-            int originX = center.xIdx + 1 - ((roomWidth + 1) / 2);
-            int originY = center.yIdx + 1 - ((roomHeight + 1) / 2);
+            int originX = center.XIdx + 1 - ((roomWidth + 1) / 2);
+            int originY = center.YIdx + 1 - ((roomHeight + 1) / 2);
 
             for (int xIdx = 0; xIdx < roomWidth; xIdx++)
             {
@@ -260,10 +260,10 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             Direction weightedDirection1 = currentDirection;
             Direction weightedDirection2 = RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
-            _changeDirectionWeights[weightedDirection1].weight = PRIORITY_DIRECTION_WEIGHT;
-            _changeDirectionWeights[weightedDirection2].weight = PRIORITY_DIRECTION_WEIGHT;
-            _branchDirectionWeights[_oppositeDirection[weightedDirection1]].weight = PRIORITY_DIRECTION_WEIGHT;
-            _branchDirectionWeights[_oppositeDirection[weightedDirection2]].weight = PRIORITY_DIRECTION_WEIGHT;
+            _changeDirectionWeights[weightedDirection1].Value = PRIORITY_DIRECTION_WEIGHT;
+            _changeDirectionWeights[weightedDirection2].Value = PRIORITY_DIRECTION_WEIGHT;
+            _branchDirectionWeights[_oppositeDirection[weightedDirection1]].Value = PRIORITY_DIRECTION_WEIGHT;
+            _branchDirectionWeights[_oppositeDirection[weightedDirection2]].Value = PRIORITY_DIRECTION_WEIGHT;
         }
 
         /// <summary>
@@ -286,8 +286,8 @@ namespace dungeoncrawler.GameStates.PlayingState
         private Floor CreateFloorInDirection(Floor current, Direction direction)
         {
             (int, int) idxDelta = _indexDeltas[direction];
-            int newXIdx = current.xIdx + idxDelta.Item1;
-            int newYIdx = current.yIdx + idxDelta.Item2;
+            int newXIdx = current.XIdx + idxDelta.Item1;
+            int newYIdx = current.YIdx + idxDelta.Item2;
             return TryCreateNewFloor(newXIdx, newYIdx);
         }
 
@@ -299,11 +299,11 @@ namespace dungeoncrawler.GameStates.PlayingState
         /// <returns>The new Floor, or an existing Floor if there is one already at the index.</returns>
         private Floor TryCreateNewFloor(int xIdx, int yIdx)
         {
-            Floor floorExists = _gridManager.floors.Find(floor => floor.xIdx == xIdx && floor.yIdx == yIdx);
+            Floor floorExists = _gridManager.Floors.Find(floor => floor.XIdx == xIdx && floor.YIdx == yIdx);
             if (floorExists == null)
             {
                 Floor newFloor = new Floor(_gridManager, _clickManager, xIdx, yIdx);
-                _gridManager.floors.Add(newFloor);
+                _gridManager.Floors.Add(newFloor);
                 return newFloor;
             }
             else
@@ -321,7 +321,7 @@ namespace dungeoncrawler.GameStates.PlayingState
         {
             if (!_gridManager.DoesGridSquareExistAt(xIdx, yIdx))
             {
-                _gridManager.walls.Add(new Wall(_gridManager, xIdx, yIdx));
+                _gridManager.Walls.Add(new Wall(_gridManager, xIdx, yIdx));
             }
         }
     }

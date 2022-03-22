@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using dungeoncrawler.Utility;
-using dungeoncrawler.Visual;
+using DungeonCrawler.Utility;
+using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 
-namespace dungeoncrawler.Management
+namespace DungeonCrawler.Management
 {
     public class ClickManager
     {
@@ -12,13 +12,13 @@ namespace dungeoncrawler.Management
 
         public class Click
         {
-            public RectangleF clickArea { get; set; }
-            public MethodDelegate outputFunc { get; }
+            public RectangleF ClickArea { get; set; }
+            public MethodDelegate OutputFunc { get; }
 
             public Click(RectangleF clickArea, MethodDelegate outputFunc)
             {
-                this.clickArea = clickArea;
-                this.outputFunc = outputFunc;
+                ClickArea = clickArea;
+                OutputFunc = outputFunc;
             }
         }
 
@@ -45,9 +45,9 @@ namespace dungeoncrawler.Management
                 {
                     foreach (var leftClick in _leftClicks)
                     {
-                        if (leftClick.clickArea.Contains(Conversion.Vector2ToPoint(_layerView.mousePosition)))
+                        if (leftClick.ClickArea.Contains(Conversion.Vector2ToPoint(_layerView.MousePosition)))
                         {
-                            leftClick.outputFunc();
+                            leftClick.OutputFunc();
                         }
                     }
                 }
