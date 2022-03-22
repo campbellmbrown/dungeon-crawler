@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace dungeoncrawler.Visual
+namespace DungeonCrawler.Visual
 {
     public class SpriteSheet : Sprite
     {
@@ -17,9 +17,9 @@ namespace dungeoncrawler.Visual
             ChangeTextureRectangle(initialID);
         }
 
-        public void ChangeTextureRectangle(int ID)
+        public void ChangeTextureRectangle(int id)
         {
-            _currentTextureRectangle = _textureRectangles[ID];
+            _currentTextureRectangle = _textureRectangles[id];
         }
 
         public override void Draw(SpriteBatch spriteBatch, Vector2 position, float layer = DrawOrder.DEFAULT)
@@ -28,7 +28,7 @@ namespace dungeoncrawler.Visual
             {
                 Game1.Log("Drawing at default layer", LogLevel.Warning);
             }
-            spriteBatch.Draw(texture, position, _currentTextureRectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
+            spriteBatch.Draw(_texture, position, _currentTextureRectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
         }
     }
 }

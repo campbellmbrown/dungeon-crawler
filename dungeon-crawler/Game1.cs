@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using dungeoncrawler.GameStates;
-using dungeoncrawler.GameStates.PlayingState;
-using dungeoncrawler.Visual;
+using DungeonCrawler.GameStates;
+using DungeonCrawler.GameStates.PlayingState;
+using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
 
-namespace dungeoncrawler
+namespace DungeonCrawler
 {
     public class Game1 : Game
     {
@@ -18,31 +18,31 @@ namespace dungeoncrawler
             Playing,
         }
 
-        private readonly GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        readonly GraphicsDeviceManager _graphics;
+        SpriteBatch _spriteBatch;
 
-        public static Dictionary<string, Texture2D> textures { get; set; }
-        public static Dictionary<string, BitmapFont> fonts { get; set; }
+        public static Dictionary<string, Texture2D> Textures { get; set; }
+        public static Dictionary<string, BitmapFont> Fonts { get; set; }
 
-        public static Random random;
+        public static Random Random { get; private set; }
 
-        private static LogManager _log;
-        private static PerformanceManager _performanceManager;
-        private GameState _gameState;
-        private IGameState _playingState;
+        static LogManager _log;
+        static PerformanceManager _performanceManager;
+        GameState _gameState;
+        IGameState _playingState;
 
-        private const float HEARTBEAT_TIME = 1f; // sec
-        private float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
+        const float HEARTBEAT_TIME = 1f; // sec
+        float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
 
         public const string VERSION_STR = "v0.3.4";
 
-        private SpriteBatchManager _spriteBatchManager;
+        SpriteBatchManager _spriteBatchManager;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            random = new Random();
+            Random = new Random();
         }
 
         protected override void Initialize()
@@ -71,7 +71,7 @@ namespace dungeoncrawler
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _spriteBatchManager = new SpriteBatchManager(GraphicsDevice, _spriteBatch, Content);
 
-            textures = new Dictionary<string, Texture2D>()
+            Textures = new Dictionary<string, Texture2D>()
             {
                 // Tilesheets
                 { "gray_brick_walls", Content.Load<Texture2D>("textures/tilesheets/gray_brick_walls") },
@@ -81,13 +81,13 @@ namespace dungeoncrawler
                 { "center_view", Content.Load<Texture2D>("textures/masks/center_view") },
             };
 
-            fonts = new Dictionary<string, BitmapFont>()
+            Fonts = new Dictionary<string, BitmapFont>()
             {
                 { "normal_font", Content.Load<BitmapFont>("fonts/normal_font") },
             };
 
-            _log = new LogManager(_spriteBatchManager.debugLayerView);
-            _performanceManager = new PerformanceManager(_spriteBatchManager.debugLayerView);
+            _log = new LogManager(_spriteBatchManager.DebugLayerView);
+            _performanceManager = new PerformanceManager(_spriteBatchManager.DebugLayerView);
             _playingState = new PlayingState(_spriteBatchManager);
         }
 

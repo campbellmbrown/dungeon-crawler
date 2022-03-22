@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace dungeoncrawler.GameStates.PlayingState.Tiles
+namespace DungeonCrawler.GameStates.PlayingState.Tiles
 {
     public class BitMask
     {
@@ -13,7 +11,7 @@ namespace dungeoncrawler.GameStates.PlayingState.Tiles
             Bits8,
         }
 
-        private static Dictionary<int, int> _8BitRemap = new Dictionary<int, int>()
+        static Dictionary<int, int> _8BitRemap = new Dictionary<int, int>()
         {
             { 2, 1 },
             { 8, 2 },
@@ -85,20 +83,20 @@ namespace dungeoncrawler.GameStates.PlayingState.Tiles
         /// <summary>
         /// Finds the value of the GridSquare, considering only the directly connected 4 tiles.
         /// </summary>
-        /// 
+        ///
         /// The GridSquares have the following values:
         ///     [1]
         /// [2] [ ] [4]
         ///     [8]
         /// If a neighboring tile is present, it contributes to the value. Therefore, there are
         /// 16 unique textures.
-        private int FindValueWith4Bits<T>(List<T> _gridSquares, GridSquare gridSquare)
+        int FindValueWith4Bits<T>(List<T> gridSquares, GridSquare gridSquare)
             where T : GridSquare
         {
-            bool above = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx && gs.yIdx == gridSquare.yIdx - 1);
-            bool right = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx + 1 && gs.yIdx == gridSquare.yIdx);
-            bool below = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx && gs.yIdx == gridSquare.yIdx + 1);
-            bool left = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx - 1 && gs.yIdx == gridSquare.yIdx);
+            bool above = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx && gs.YIdx == gridSquare.YIdx - 1);
+            bool right = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx + 1 && gs.YIdx == gridSquare.YIdx);
+            bool below = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx && gs.YIdx == gridSquare.YIdx + 1);
+            bool left = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx - 1 && gs.YIdx == gridSquare.YIdx);
             int val = above ? 1 : 0;
             val += right ? 2 : 0;
             val += below ? 4 : 0;
@@ -109,30 +107,30 @@ namespace dungeoncrawler.GameStates.PlayingState.Tiles
         /// <summary>
         /// Finds the value of the GridSquare, considering all surrounding 8 tiles.
         /// </summary>
-        /// 
+        ///
         /// The GridSquares have the following values:
         /// [ 1 ] [ 2 ] [ 4 ]
         /// [ 8 ] [   ] [ 16]
         /// [ 32] [ 64] [128]
-        /// 
+        ///
         /// There is something else to consider though: When a corner is present, without ANY of it's horizontal or
         /// vertical neighbors, it doesn't contribute towards the value. E.g. if There was the top-left (1), top-
         /// middle (2), and middle-right (16), then this would look identical to a value of 18 (2 + 16). So the 1
         /// isn't counted.
-        /// 
+        ///
         /// Therefore, there are only 47 unique textures.
         /// The _8BitRemap is used to convert the large numbers into this range.
-        private int FindValueWith8Bits<T>(List<T> _gridSquares, GridSquare gridSquare)
+        private int FindValueWith8Bits<T>(List<T> gridSquares, GridSquare gridSquare)
             where T : GridSquare
         {
-            bool above = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx && gs.yIdx == gridSquare.yIdx - 1);
-            bool right = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx + 1 && gs.yIdx == gridSquare.yIdx);
-            bool below = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx && gs.yIdx == gridSquare.yIdx + 1);
-            bool left = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx - 1 && gs.yIdx == gridSquare.yIdx);
-            bool aboveLeft = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx - 1 && gs.yIdx == gridSquare.yIdx - 1);
-            bool aboveRight = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx + 1 && gs.yIdx == gridSquare.yIdx - 1);
-            bool belowLeft = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx - 1 && gs.yIdx == gridSquare.yIdx + 1);
-            bool belowRight = _gridSquares.Any(gs => gs.xIdx == gridSquare.xIdx + 1 && gs.yIdx == gridSquare.yIdx + 1);
+            bool above = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx && gs.YIdx == gridSquare.YIdx - 1);
+            bool right = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx + 1 && gs.YIdx == gridSquare.YIdx);
+            bool below = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx && gs.YIdx == gridSquare.YIdx + 1);
+            bool left = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx - 1 && gs.YIdx == gridSquare.YIdx);
+            bool aboveLeft = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx - 1 && gs.YIdx == gridSquare.YIdx - 1);
+            bool aboveRight = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx + 1 && gs.YIdx == gridSquare.YIdx - 1);
+            bool belowLeft = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx - 1 && gs.YIdx == gridSquare.YIdx + 1);
+            bool belowRight = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx + 1 && gs.YIdx == gridSquare.YIdx + 1);
 
             int val = (aboveLeft && above && left) ? 1 : 0;
             val += above ? 2 : 0;

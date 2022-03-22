@@ -1,4 +1,4 @@
-﻿namespace dungeoncrawler.Visual
+﻿namespace DungeonCrawler.Visual
 {
     public interface IHasSpriteSheet
     {

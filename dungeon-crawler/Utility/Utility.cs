@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-namespace dungeoncrawler.Utility
+namespace DungeonCrawler.Utility
 {
     public static class Conversion
     {
@@ -22,24 +22,24 @@ namespace dungeoncrawler.Utility
     {
         public static T ChooseRandom<T>(List<T> list)
         {
-            int idx = Game1.random.Next(list.Count);
+            int idx = Game1.Random.Next(list.Count);
             return list[idx];
         }
 
         public class Weight
         {
-            public int weight { get; set; }
+            public int Value { get; set; }
         }
 
         public static T ChooseWeighted<T>(List<T> list, Dictionary<T, Weight> weights)
         {
-            int totalWeights = list.Sum(item => weights[item].weight);
-            int rand = Game1.random.Next(totalWeights);
+            int totalWeights = list.Sum(item => weights[item].Value);
+            int rand = Game1.Random.Next(totalWeights);
             int check = 0;
             T ret = default;
             for (int idx = 0; idx < list.Count; idx++)
             {
-                check += weights[list[idx]].weight;
+                check += weights[list[idx]].Value;
                 if (rand < check)
                 {
                     ret = list[idx];
@@ -53,13 +53,13 @@ namespace dungeoncrawler.Utility
         {
             Type type = typeof(T);
             Array values = Enum.GetValues(type);
-            object value = values.GetValue(Game1.random.Next(values.Length));
+            object value = values.GetValue(Game1.Random.Next(values.Length));
             return (T)value;
         }
 
         public static bool PercentChance(int percent)
         {
-            return Game1.random.Next(100) < percent;
+            return Game1.Random.Next(100) < percent;
         }
 
         public static int Gaussian(int mean, int stdDev, int lowLimit = -999, int upLimit = 999)
@@ -68,7 +68,7 @@ namespace dungeoncrawler.Utility
             double val = 0;
             for (int idx = 0; idx < 12; idx++)
             {
-                val += Game1.random.NextDouble(); // [0, 0)
+                val += Game1.Random.NextDouble(); // [0, 0)
             }
             val -= 6;
             val = mean + (val * stdDev);

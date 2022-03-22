@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
-using dungeoncrawler.Management;
-using dungeoncrawler.Visual;
+using DungeonCrawler.Management;
+using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
-namespace dungeoncrawler.GameStates.PlayingState
+namespace DungeonCrawler.GameStates.PlayingState
 {
     public class Floor : GridSquare, IHasSpriteSheet
     {
-        private readonly ClickManager _clickManager;
+        readonly ClickManager _clickManager;
+        readonly SpriteSheet _sprite;
 
-        private readonly SpriteSheet _sprite;
-        public Entity entity { get; set; }
-        public bool hasEntity { get { return entity != null; } }
+        public Entity Entity { get; set; }
+        public bool HasEntity { get { return Entity != null; } }
 
-        public static Dictionary<int, Rectangle> textureRectangleLookup = new Dictionary<int, Rectangle>()
+        public static Dictionary<int, Rectangle> TextureRectangleLookup { get; } = new Dictionary<int, Rectangle>()
         {
             { 0, new Rectangle(0 * GRID_SQUARE_SIZE, 0 * GRID_SQUARE_SIZE, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE) },
             { 1, new Rectangle(1 * GRID_SQUARE_SIZE, 0 * GRID_SQUARE_SIZE, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE) },
@@ -71,16 +71,16 @@ namespace dungeoncrawler.GameStates.PlayingState
             : base(gridManager, xIdx, yIdx)
         {
             _clickManager = clickManager;
-            _clickManager.AddLeftClick(new RectangleF(position.X, position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), SetPlayerDestination);
-            _sprite = new SpriteSheet(Game1.textures["gray_brick_floors"], textureRectangleLookup, 0);
+            _clickManager.AddLeftClick(new RectangleF(Position.X, Position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), SetPlayerDestination);
+            _sprite = new SpriteSheet(Game1.Textures["gray_brick_floors"], TextureRectangleLookup, 0);
         }
 
         public override void FrameTick(GameTime gameTime)
         {
             // TODO: Move to an entity manager
-            if (hasEntity)
+            if (HasEntity)
             {
-                entity.FrameTick(gameTime);
+                Entity.FrameTick(gameTime);
             }
             base.FrameTick(gameTime);
         }
@@ -88,9 +88,9 @@ namespace dungeoncrawler.GameStates.PlayingState
         public override void ActionTick(int xIdxOfFocus, int yIdxOfFocus, int range)
         {
             // TODO: Move to an entity manager
-            if (hasEntity)
+            if (HasEntity)
             {
-                entity.ActionTick();
+                Entity.ActionTick();
             }
 
             base.ActionTick(xIdxOfFocus, yIdxOfFocus, range);
@@ -98,27 +98,27 @@ namespace dungeoncrawler.GameStates.PlayingState
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            _sprite.Draw(spriteBatch, position, DrawOrder.BACKGROUND_CONTENT);
+            _sprite.Draw(spriteBatch, Position, DrawOrder.BACKGROUND_CONTENT);
             base.Draw(spriteBatch);
 
             // TODO: Move to an entity manager
-            if (hasEntity)
+            if (HasEntity)
             {
-                entity.Draw(spriteBatch);
+                Entity.Draw(spriteBatch);
             }
         }
 
         public void SetPlayerDestination()
         {
-            gridManager.SetPlayerDestination(this);
+            _gridManager.SetPlayerDestination(this);
         }
 
         public bool Busy()
         {
             // TODO: Move to an entity manager
-            if (hasEntity)
+            if (HasEntity)
             {
-                return entity.Busy();
+                return Entity.Busy();
             }
             else
             {
