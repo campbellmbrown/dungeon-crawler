@@ -16,13 +16,6 @@ namespace dungeoncrawler
         void Draw(SpriteBatch spriteBatch);
     }
 
-    public class incorrectlyNamed
-    {
-        public int incorrectlyNamedProperty { get; set; }
-        private int foo;
-        private const int incorrectlyNamed2 = 2;
-    }
-
     public class PerformanceManager : IPerformanceManager
     {
         public Queue<float> times { get; set; } = new Queue<float>(); // Every 10 loops is a time
