@@ -23,10 +23,8 @@ jobs:
     # - name: Build
       # run: dotnet build --configuration Release --no-restore
 
-    steps:
     - name: Echo home
-      run:
-        echo $HOME
+      run: echo $HOME
 
     - name: Debug
       run: dir /s /b
