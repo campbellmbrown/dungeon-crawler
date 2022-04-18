@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DungeonCrawler.Management;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
@@ -88,19 +88,6 @@ namespace DungeonCrawler.GameStates.PlayingState
         public void SetPlayerDestination()
         {
             _gridManager.SetPlayerDestination(this);
-        }
-
-        public bool Busy()
-        {
-            // TODO: Move to an entity manager
-            if (HasEntity)
-            {
-                return Entity.Busy();
-            }
-            else
-            {
-                return false;
-            }
         }
 
         public void UpdateID(int id)

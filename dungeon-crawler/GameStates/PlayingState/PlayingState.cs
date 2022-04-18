@@ -65,7 +65,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public void SetPlayerDestination(Floor floor)
         {
-            if (_gridManager.Busy())
+            if (_entityManager.IsBusy())
             {
                 Game1.Log("Action tick triggered but something is busy.", LogLevel.Warning);
             }

@@ -64,15 +64,5 @@ namespace DungeonCrawler.GameStates.PlayingState
             // TODO: Add range limiting back.
             // Game1.Log("The destination isn't visible.", LogLevel.Warning);
         }
-
-        public bool Busy()
-        {
-            bool busy = false;
-            foreach (var floor in Floors)
-            {
-                busy |= floor.Busy();
-            }
-            return busy;
-        }
     }
 }

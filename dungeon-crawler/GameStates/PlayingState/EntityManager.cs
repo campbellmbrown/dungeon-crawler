@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public interface IEntityManager : IMyDrawable, IActionTickable, IFrameTickable
+    public interface IEntityManager : IMyDrawable, IActionTickable, IFrameTickable, ICouldBeBusy
     {
         Player Player { get; }
     }
@@ -48,6 +48,22 @@ namespace DungeonCrawler.GameStates.PlayingState
             {
                 entity.Draw(spriteBatch);
             }
+        }
+
+        public bool IsBusy()
+        {
+            if (Player.IsBusy())
+            {
+                return true;
+            }
+            foreach (var entity in _entities)
+            {
+                if (entity.IsBusy())
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
