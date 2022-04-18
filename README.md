@@ -1,4 +1,4 @@
-# dungeon-crawler
+# Dungeon Crawler
 
 ## Formatting
 

@@ -3,11 +3,15 @@ using System.Linq;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class Dijkstra
+    public interface IDijkstra
     {
-        private readonly GridManager _gridManager;
+    }
 
-        public Dijkstra(GridManager gridManager)
+    public class Dijkstra : IDijkstra
+    {
+        private readonly IGridManager _gridManager;
+
+        public Dijkstra(IGridManager gridManager)
         {
             _gridManager = gridManager;
         }

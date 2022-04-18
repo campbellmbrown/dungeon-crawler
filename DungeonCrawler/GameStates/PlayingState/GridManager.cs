@@ -7,7 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class GridManager
+    public interface IGridManager
+    {
+        List<Floor> Floors { get; }
+    }
+
+    public class GridManager : IGridManager
     {
         private readonly PlayingState _playingState;
 
@@ -15,11 +20,11 @@ namespace DungeonCrawler.GameStates.PlayingState
         public const int STARTING_Y = 0;
         public const int VIEW_RANGE = 6;
 
-        public List<Floor> Floors { get; set; }
-        public List<Wall> Walls { get; set; }
+        public List<Floor> Floors { get; private set; }
+        public List<Wall> Walls { get; private set; }
 
-        public int MinY { get; set; }
-        public int MaxY { get; set; }
+        public int MinY { get; private set; }
+        public int MaxY { get; private set; }
 
         public GridManager(PlayingState playingState, ClickManager clickManager)
         {
