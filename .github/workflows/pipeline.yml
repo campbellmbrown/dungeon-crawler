@@ -23,8 +23,13 @@ jobs:
     # - name: Build
       # run: dotnet build --configuration Release --no-restore
 
+    steps:
+    - name: Echo home
+      run:
+        echo $HOME
+
     - name: Debug
-      run: ls -a
+      run: dir /s /b
 
     - name: Test
       run: dotnet test DungeonCrawlerTests/DungeonCrawlerTests.csproj --no-restore --verbosity normal
