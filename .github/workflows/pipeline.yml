@@ -24,7 +24,7 @@ jobs:
       # run: dotnet build --configuration Release --no-restore
 
     - name: Debug
-      run: dir /s /b /o:n /ad
+      run: ls -a
 
     - name: Test
       run: dotnet test DungeonCrawlerTests/DungeonCrawlerTests.csproj --no-restore --verbosity normal
