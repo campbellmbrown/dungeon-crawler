@@ -1,19 +1,23 @@
-﻿using DungeonCrawler.Management;
+using DungeonCrawler.Management;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class PlayingState : IGameState
+    public interface IPlayingState : IGameState
+    {
+    }
+
+    public class PlayingState : IPlayingState
     {
         // Dependencies
         readonly SpriteBatchManager _spriteBatchManager;
 
         // Private
         readonly GridManager _gridManager;
+        readonly IEntityManager _entityManager;
         readonly ClickManager _clickManager;
-        readonly Player _player;
         Sprite _viewMask;
         // TODO: move to a MouseManager
         Sprite _mouseLight;
@@ -23,26 +27,24 @@ namespace DungeonCrawler.GameStates.PlayingState
             _spriteBatchManager = spriteBatchManager;
             _clickManager = new ClickManager(spriteBatchManager.MainLayerView);
             _gridManager = new GridManager(this, _clickManager);
-            _player = new Player(_gridManager, this, _gridManager.GetStartingFloor());
+            _entityManager = new EntityManager(_gridManager);
             _mouseLight = new Sprite(Game1.Textures["medium_light"]);
             _viewMask = new Sprite(Game1.Textures["center_view"]);
-
-            _gridManager.UpdateVisibilityStates();
         }
 
         public void FrameTick(GameTime gameTime)
         {
             _clickManager.FrameTick();
-            _player.PriorityFrameTick(gameTime);
-            _gridManager.FrameTick(gameTime);
+            _entityManager.FrameTick(gameTime);
 
-            _spriteBatchManager.MainLayerView.Focus(_player.Position);
+            _spriteBatchManager.MainLayerView.Focus(_entityManager.Player.Position);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             // We don't need to switch to DrawType.MainContent
             _gridManager.Draw(spriteBatch);
+            _entityManager.Draw(spriteBatch);
 
             // Drawing overlay content
             // Uncomment to draw overlay content
@@ -58,8 +60,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public void ActionTick()
         {
-            _player.PriorityActionTick();
-            _gridManager.ActionTick();
+            _entityManager.ActionTick();
         }
 
         public void SetPlayerDestination(Floor floor)
@@ -70,7 +71,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
             else
             {
-                _player.SetDestination(floor);
+                _entityManager.Player.SetDestination(floor);
             }
         }
     }

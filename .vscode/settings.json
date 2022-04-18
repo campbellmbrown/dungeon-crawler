@@ -1,46 +1,4 @@
 {
-    "editor.tokenColorCustomizations": {
-        "textMateRules": [
-            {
-                "scope": "variable.other.constant",
-                "settings": {
-                    "foreground": "#bb80ff"
-                }
-            },
-            {
-                "scope": "entity.name.function",
-                "settings": {
-                    "foreground": "#8fff9c"
-                }
-            },
-            {
-                "scope": "variable.other.property",
-                "settings": {
-                    "foreground": "#60fffc",
-                }
-            },
-            {
-                "scope": "entity.name.type.interface",
-                "settings": {
-                    "foreground": "#f980ff",
-                }
-            },
-            {
-                "scope": "entity.name.type.class",
-                "settings": {
-                    "foreground": "#f29f51",
-                    "fontStyle": "bold"
-                }
-            },
-            {
-                "scope": "variable.parameter",
-                "settings": {
-                    "foreground": "#ff6145",
-                    "fontStyle": "italic"
-                }
-            }
-        ]
-    },
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "python.linting.pylintArgs": [

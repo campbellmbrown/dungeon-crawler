@@ -6,7 +6,11 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class Wall : GridSquare, IHasSpriteSheet
+    public interface IWall : IMyDrawable, IHasSpriteSheet
+    {
+    }
+
+    public class Wall : GridSquare, IWall
     {
         public const int WALL_HEIGHT = 23;
         private readonly SpriteSheet _sprite;
@@ -38,11 +42,10 @@ namespace DungeonCrawler.GameStates.PlayingState
             _sprite = new SpriteSheet(Game1.Textures["gray_brick_walls"], TextureRectangleLookup, 0);
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             Vector2 offset = new Vector2(0, GRID_SQUARE_SIZE - WALL_HEIGHT);
             _sprite.Draw(spriteBatch, Position + offset, FindLayerDepth());
-            base.Draw(spriteBatch);
         }
 
         public void UpdateID(int id)

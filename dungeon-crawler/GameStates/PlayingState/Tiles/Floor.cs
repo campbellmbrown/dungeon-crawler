@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using DungeonCrawler.Management;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
@@ -7,6 +7,11 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
+    public interface IFloor : IMyDrawable, IHasSpriteSheet
+    {
+        void SetPlayerDestination();
+    }
+
     public class Floor : GridSquare, IHasSpriteSheet
     {
         readonly ClickManager _clickManager;
@@ -75,37 +80,9 @@ namespace DungeonCrawler.GameStates.PlayingState
             _sprite = new SpriteSheet(Game1.Textures["gray_brick_floors"], TextureRectangleLookup, 0);
         }
 
-        public override void FrameTick(GameTime gameTime)
-        {
-            // TODO: Move to an entity manager
-            if (HasEntity)
-            {
-                Entity.FrameTick(gameTime);
-            }
-            base.FrameTick(gameTime);
-        }
-
-        public override void ActionTick(int xIdxOfFocus, int yIdxOfFocus, int range)
-        {
-            // TODO: Move to an entity manager
-            if (HasEntity)
-            {
-                Entity.ActionTick();
-            }
-
-            base.ActionTick(xIdxOfFocus, yIdxOfFocus, range);
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             _sprite.Draw(spriteBatch, Position, DrawOrder.BACKGROUND_CONTENT);
-            base.Draw(spriteBatch);
-
-            // TODO: Move to an entity manager
-            if (HasEntity)
-            {
-                Entity.Draw(spriteBatch);
-            }
         }
 
         public void SetPlayerDestination()

@@ -7,7 +7,12 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class Entity
+    public interface IEntity : IMyDrawable, IActionTickable, IFrameTickable
+    {
+        void SetDestination(Floor destination);
+    }
+
+    public class Entity : IEntity
     {
         protected enum DestinationState
         {

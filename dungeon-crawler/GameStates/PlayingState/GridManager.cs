@@ -10,7 +10,6 @@ namespace DungeonCrawler.GameStates.PlayingState
     public class GridManager
     {
         private readonly PlayingState _playingState;
-        private readonly List<GridSquare> _drawableGridSquares;
 
         public const int STARTING_X = 0;
         public const int STARTING_Y = 0;
@@ -27,7 +26,6 @@ namespace DungeonCrawler.GameStates.PlayingState
             _playingState = playingState;
             Floors = new List<Floor>();
             Walls = new List<Wall>();
-            _drawableGridSquares = new List<GridSquare>();
 
             LevelGenerator levelGenerator = new LevelGenerator(this, clickManager);
             levelGenerator.GenerateLevel();
@@ -48,65 +46,23 @@ namespace DungeonCrawler.GameStates.PlayingState
             return Floors.Find(sq => sq.XIdx == STARTING_X && sq.YIdx == STARTING_Y);
         }
 
-        public void FrameTick(GameTime gameTime)
-        {
-            foreach (var floor in Floors)
-            {
-                floor.FrameTick(gameTime);
-            }
-            foreach (var wall in Walls)
-            {
-                wall.FrameTick(gameTime);
-            }
-        }
-
-        public void ActionTick()
-        {
-            UpdateVisibilityStates();
-        }
-
-        public void UpdateVisibilityStates()
-        {
-            // Any GridSquare within the range of the player is visible.
-            GridSquare containingPlayer = Floors.Find(sq => sq.Entity is Player);
-            foreach (var floor in Floors)
-            {
-                floor.ActionTick(containingPlayer.XIdx, containingPlayer.YIdx, VIEW_RANGE);
-            }
-            foreach (var wall in Walls)
-            {
-                wall.ActionTick(containingPlayer.XIdx, containingPlayer.YIdx, VIEW_RANGE);
-            }
-        }
-
         public void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var gridSquare in _drawableGridSquares)
+            foreach (var floor in Floors)
             {
-                gridSquare.Draw(spriteBatch);
+                floor.Draw(spriteBatch);
             }
-        }
-
-        public void AddToDrawables(GridSquare gridSquare)
-        {
-            _drawableGridSquares.Add(gridSquare);
-        }
-
-        public void RemoveFromDrawables(GridSquare gridSquare)
-        {
-            _drawableGridSquares.Remove(gridSquare);
+            foreach (var wall in Walls)
+            {
+                wall.Draw(spriteBatch);
+            }
         }
 
         public void SetPlayerDestination(Floor floor)
         {
-            if (_drawableGridSquares.Contains(floor))
-            {
-                _playingState.SetPlayerDestination(floor);
-            }
-            else
-            {
-                Game1.Log("The destination isn't visible.", LogLevel.Warning);
-            }
+            _playingState.SetPlayerDestination(floor);
+            // TODO: Add range limiting back.
+            // Game1.Log("The destination isn't visible.", LogLevel.Warning);
         }
 
         public bool Busy()
@@ -117,11 +73,6 @@ namespace DungeonCrawler.GameStates.PlayingState
                 busy |= floor.Busy();
             }
             return busy;
-        }
-
-        public float GetNumberDrawableGridSquares()
-        {
-            return _drawableGridSquares.Count;
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     public static class DrawOrder
     {
+        public const float DEBUG = 0.99f;
         public const float PARTICLES = 0.9f;
         public const float FOREGROUND_CONTENT_TOP = 0.8f;
         // Between these values are reserved.
