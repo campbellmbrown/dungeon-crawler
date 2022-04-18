@@ -6,14 +6,13 @@ namespace DungeonCrawler.GameStates.PlayingState
 {
     public class Player : Entity
     {
-        private readonly PlayingState _playingState;
-
+        private readonly IEntityManager _entityManager;
         private readonly InputManager _inputManager;
 
-        public Player(GridManager gridManager, PlayingState playingState, Floor floor) :
+        public Player(GridManager gridManager, IEntityManager entityManager, Floor floor) :
             base(gridManager, floor)
         {
-            _playingState = playingState;
+            _entityManager = entityManager;
 
             _inputManager = new InputManager();
         }
@@ -24,7 +23,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             // TODO: determine the best place for this to be. Maybe this should happen when the player clicks on a Floor.
             if (QueuedFloors.Count > 0 && _destinationState == DestinationState.AtDestination)
             {
-                _playingState.ActionTick();
+                _entityManager.ActionTick();
             }
             base.FrameTick(gameTime);
         }
@@ -36,12 +35,12 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public override void FrameTick(GameTime gameTime)
         {
-            // Do nothing. The frame tick should be done before all other entities, performed in the PriorityFrameTick.
+            throw new System.InvalidOperationException("The frame tick should be done before all other entities, performed in the PriorityFrameTick.");
         }
 
         public override void ActionTick()
         {
-            // Do nothing. The action tick should be done before all other entities, performed in the PriorityActionTick.
+            throw new System.InvalidOperationException("The action tick should be done before all other entities, performed in the PriorityActionTick.");
         }
     }
 }

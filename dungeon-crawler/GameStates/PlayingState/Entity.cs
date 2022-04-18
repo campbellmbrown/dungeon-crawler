@@ -7,7 +7,12 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class Entity
+    public interface IEntity : IMyDrawable, IActionTickable, IFrameTickable, ICouldBeBusy
+    {
+        void SetDestination(Floor destination);
+    }
+
+    public class Entity : IEntity
     {
         protected enum DestinationState
         {
@@ -101,7 +106,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        public bool Busy()
+        public bool IsBusy()
         {
             return _destinationState != DestinationState.AtDestination;
         }

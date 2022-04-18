@@ -6,9 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DungeonCrawler.GameStates
 {
-    public interface IGameState
+    public interface IGameState : IMyDrawable, IFrameTickable
     {
-        public void FrameTick(GameTime gameTime);
-        public void Draw(SpriteBatch spriteBatch);
     }
 }
