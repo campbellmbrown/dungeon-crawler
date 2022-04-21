@@ -17,7 +17,7 @@ jobs:
       run: ls
 
     - name: Temp fix for path to content pipeline
-      run: sed cat DungeonCrawler/Content/Content.mcgb
+      run: sed cat DungeonCrawler/Content/Content.mgcb
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
