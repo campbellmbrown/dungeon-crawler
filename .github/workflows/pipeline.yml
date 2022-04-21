@@ -31,7 +31,7 @@ jobs:
         ls ~/.nuget/packages/monogame.extended.content.pipeline/3.8.0/tools
 
     - name: Temp fix for path to content pipeline
-      run: sed -i s!C:/Users/campb!~!g DungeonCrawler/Content/Content.mgcb
+      run: sed -i s/campb/runneradmin/g DungeonCrawler/Content/Content.mgcb
 
     # - name: Build
       # run: dotnet build --configuration Release --no-restore
