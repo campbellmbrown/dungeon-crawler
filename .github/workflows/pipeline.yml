@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Temp fix for path to content pipeline
-    - name: sed cat DungeonCrawler/Content/Content.mcgb
+    - uses: sed cat DungeonCrawler/Content/Content.mcgb
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
