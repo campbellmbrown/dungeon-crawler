@@ -12,6 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Temp fix for path to content pipeline
+    - name: sed cat DungeonCrawler/Content/Content.mcgb
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -22,15 +26,6 @@ jobs:
 
     # - name: Build
       # run: dotnet build --configuration Release --no-restore
-
-    - name: Echo home
-      run: echo $HOME
-
-    - name: Debug
-      run: ls ~
-
-    - name: Debug 2
-      run: echo %userprofile%
 
     - name: Test
       run: dotnet test DungeonCrawlerTests/DungeonCrawlerTests.csproj --no-restore --verbosity normal
