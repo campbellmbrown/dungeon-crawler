@@ -21,20 +21,11 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
 
-    - name: Temp
-      run: |
-        ls ~
-        ls ~/.nuget
-        ls ~/.nuget/packages
-        ls ~/.nuget/packages/monogame.extended.content.pipeline
-        ls ~/.nuget/packages/monogame.extended.content.pipeline/3.8.0
-        ls ~/.nuget/packages/monogame.extended.content.pipeline/3.8.0/tools
-
     - name: Temp fix for path to content pipeline
       run: sed -i s/campb/runneradmin/g DungeonCrawler/Content/Content.mgcb
 
-    # - name: Build
-      # run: dotnet build --configuration Release --no-restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
 
     - name: Test
       run: dotnet test DungeonCrawlerTests/DungeonCrawlerTests.csproj --no-restore --verbosity normal
