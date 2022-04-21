@@ -14,7 +14,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Temp
-      run: ls ~/.nuget/packages/monogame.extended.content.pipeline/3.8.0/tools
+      run: |
+        ls ~
+        ls ~/.nuget
+        ls ~/.nuget/packages
+        ls ~/.nuget/packages/monogame.extended.content.pipeline
+        ls ~/.nuget/packages/monogame.extended.content.pipeline/3.8.0
+        ls ~/.nuget/packages/monogame.extended.content.pipeline/3.8.0/tools
 
     - name: Temp fix for path to content pipeline
       run: sed -i !C:/Users/campb!~!g DungeonCrawler/Content/Content.mgcb
