@@ -29,5 +29,8 @@ jobs:
     - name: Debug
       run: ls ~
 
+    - name: Debug 2
+      run: echo %userprofile%
+
     - name: Test
       run: dotnet test DungeonCrawlerTests/DungeonCrawlerTests.csproj --no-restore --verbosity normal
