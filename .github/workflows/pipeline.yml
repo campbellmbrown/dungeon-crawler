@@ -14,10 +14,10 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Temp
-      run: ls
+      run: ls ~/.nuget/packages/monogame.extended.content.pipeline/3.8.0/tools
 
     - name: Temp fix for path to content pipeline
-      run: sed cat DungeonCrawler/Content/Content.mgcb
+      run: sed -i !C:/Users/campb!~!g DungeonCrawler/Content/Content.mgcb
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
