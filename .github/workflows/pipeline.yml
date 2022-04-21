@@ -27,7 +27,7 @@ jobs:
       run: echo $HOME
 
     - name: Debug
-      run: dir /s /b
+      run: find / -name "MonoGame.Extended.Content.Pipeline.dll"
 
     - name: Test
       run: dotnet test DungeonCrawlerTests/DungeonCrawlerTests.csproj --no-restore --verbosity normal
