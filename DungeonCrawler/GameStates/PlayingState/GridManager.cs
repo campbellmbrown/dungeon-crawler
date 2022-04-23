@@ -9,7 +9,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 {
     public interface IGridManager
     {
-        List<Floor> Floors { get; }
+        List<IFloor> Floors { get; }
     }
 
     public class GridManager : IGridManager
@@ -20,8 +20,8 @@ namespace DungeonCrawler.GameStates.PlayingState
         public const int STARTING_Y = 0;
         public const int VIEW_RANGE = 6;
 
-        public List<Floor> Floors { get; private set; }
-        public List<Wall> Walls { get; private set; }
+        public List<IFloor> Floors { get; private set; } = new List<IFloor>();
+        public List<Wall> Walls { get; private set; } = new List<Wall>();
 
         public int MinY { get; private set; }
         public int MaxY { get; private set; }
@@ -29,8 +29,6 @@ namespace DungeonCrawler.GameStates.PlayingState
         public GridManager(PlayingState playingState, ClickManager clickManager)
         {
             _playingState = playingState;
-            Floors = new List<Floor>();
-            Walls = new List<Wall>();
 
             LevelGenerator levelGenerator = new LevelGenerator(this, clickManager);
             levelGenerator.GenerateLevel();
@@ -46,7 +44,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             return exists;
         }
 
-        public Floor GetStartingFloor()
+        public IFloor GetStartingFloor()
         {
             return Floors.Find(sq => sq.XIdx == STARTING_X && sq.YIdx == STARTING_Y);
         }
@@ -63,7 +61,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        public void SetPlayerDestination(Floor floor)
+        public void SetPlayerDestination(IFloor floor)
         {
             _playingState.SetPlayerDestination(floor);
             // TODO: Add range limiting back.

@@ -5,15 +5,16 @@ namespace DungeonCrawler.GameStates.PlayingState
 {
     public interface IDijkstra
     {
+        Stack<IFloor> FindShortestPath(IFloor orig, IFloor dest);
     }
 
     public class Dijkstra : IDijkstra
     {
-        private readonly IGridManager _gridManager;
+        private readonly IList<IFloor> _floors;
 
-        public Dijkstra(IGridManager gridManager)
+        public Dijkstra(IList<IFloor> floors)
         {
-            _gridManager = gridManager;
+            _floors = floors;
         }
 
         private class Vertex
@@ -35,13 +36,13 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        public Stack<Floor> FindShortestPath(Floor orig, Floor dest)
+        public Stack<IFloor> FindShortestPath(IFloor orig, IFloor dest)
         {
             // See https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm for implementation.
 
             // Create a list of unvisited nodes. Set the distance to 0 for the source node.
             List<Vertex> unvisited = new List<Vertex>();
-            foreach (var floor in _gridManager.Floors)
+            foreach (var floor in _floors)
             {
                 unvisited.Add(new Vertex(floor.XIdx, floor.YIdx));
             }
@@ -79,18 +80,18 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
 
             // Create a path of Floors.
-            Stack<Floor> path = new Stack<Floor>();
+            Stack<IFloor> path = new Stack<IFloor>();
             curr = target;
             if (curr.Prev != null || curr == source)
             {
                 while (curr != null)
                 {
-                    path.Push(_gridManager.Floors.Find(gs => (gs.XIdx == curr.XIdx) && (gs.YIdx == curr.YIdx)));
+                    path.Push(_floors.ToList().Find(gs => (gs.XIdx == curr.XIdx) && (gs.YIdx == curr.YIdx)));
                     curr = curr.Prev;
                 }
             }
 
-            Game1.Log("A total of " + (_gridManager.Floors.Count - unvisited.Count).ToString() + "/" + _gridManager.Floors.Count.ToString() + " were checked.", LogLevel.Debug);
+            // Game1.Log("A total of " + (_floors.Count - unvisited.Count).ToString() + "/" + _floors.Count.ToString() + " were checked.", LogLevel.Debug);
             // Remove the first one - this should be the origin.
             path.Pop();
             return path;

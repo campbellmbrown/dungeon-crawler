@@ -63,7 +63,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _entityManager.ActionTick();
         }
 
-        public void SetPlayerDestination(Floor floor)
+        public void SetPlayerDestination(IFloor floor)
         {
             if (_entityManager.IsBusy())
             {

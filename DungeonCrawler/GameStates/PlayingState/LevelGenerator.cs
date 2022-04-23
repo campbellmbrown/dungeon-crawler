@@ -97,11 +97,11 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         private void GenerateFloor()
         {
-            Floor currentFloor = TryCreateNewFloor(GridManager.STARTING_X, GridManager.STARTING_Y);
+            var currentFloor = TryCreateNewFloor(GridManager.STARTING_X, GridManager.STARTING_Y);
             CreateRoom(currentFloor);
-            Direction currentDirection = RNG.RandomEnum<Direction>();
+            var currentDirection = RNG.RandomEnum<Direction>();
             UpdateDirectionWeights(currentDirection);
-            int mainPathLength = Game1.Random.Next(MAIN_PATH_MIN_LENGTH, MAIN_PATH_MAX_LENGTH + 1);
+            var mainPathLength = Game1.Random.Next(MAIN_PATH_MIN_LENGTH, MAIN_PATH_MAX_LENGTH + 1);
             _distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
 
             for (int idx = 0; idx < mainPathLength; idx++)
@@ -121,7 +121,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
             CreateRoom(currentFloor);
 
-            BitMask floorBitMask = new BitMask();
+            var floorBitMask = new BitMask();
             foreach (var floor in _gridManager.Floors)
             {
                 floor.UpdateID(floorBitMask.FindValue(BitMask.BitMaskType.Bits8, _gridManager.Floors, floor));
@@ -140,7 +140,7 @@ namespace DungeonCrawler.GameStates.PlayingState
                     }
                 }
             }
-            BitMask wallBitMask = new BitMask();
+            var wallBitMask = new BitMask();
             foreach (var wall in _gridManager.Walls)
             {
                 wall.UpdateID(wallBitMask.FindValue(BitMask.BitMaskType.Bits4, _gridManager.Walls, wall));
@@ -154,14 +154,14 @@ namespace DungeonCrawler.GameStates.PlayingState
         /// <param name="currentFloor">The current Floor in the main path.</param>
         /// <param name="currentDirection">The current direction of the main path</param>
         /// <returns>A new direction.</returns>
-        private Direction ChangeDirection(Floor currentFloor, Direction currentDirection)
+        private Direction ChangeDirection(IFloor currentFloor, Direction currentDirection)
         {
-            Direction previousDirection = currentDirection;
-            Direction newDirection = ChooseNewDirection(currentDirection);
+            var previousDirection = currentDirection;
+            var newDirection = ChooseNewDirection(currentDirection);
             _distanceUntilDirectionChange = NewDistanceUntilDirectionChange();
             if (RNG.PercentChance(BRANCH_AT_DIRECTION_CHANGE_CHANCE))
             {
-                List<Direction> options = new List<Direction>()
+                var options = new List<Direction>()
                 {
                     previousDirection,
                     _oppositeDirection[newDirection]
@@ -183,10 +183,10 @@ namespace DungeonCrawler.GameStates.PlayingState
         /// </summary>
         /// <param name="start"></param>
         /// <param name="branchDirection"></param>
-        private void CreateBranch(Floor start, Direction branchDirection)
+        private void CreateBranch(IFloor start, Direction branchDirection)
         {
-            Floor branchCurrentFloor = start;
-            int branch_length = Game1.Random.Next(BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH + 1);
+            var branchCurrentFloor = start;
+            var branch_length = Game1.Random.Next(BRANCH_MIN_LENGTH, BRANCH_MAX_LENGTH + 1);
             for (int idx = 0; idx < branch_length; idx++)
             {
                 branchCurrentFloor = CreateFloorInDirection(branchCurrentFloor, branchDirection);
@@ -222,10 +222,10 @@ namespace DungeonCrawler.GameStates.PlayingState
         /// <param name="maxW">The maximum width of the room.</param>
         /// <param name="minH">The minimum height of the room.</param>
         /// <param name="maxH">The maximum height of the room.</param>
-        private void CreateRoom(Floor center, int minW = MIN_ROOM_WIDTH, int maxW = MAX_ROOM_WIDTH, int minH = MIN_ROOM_HEIGHT, int maxH = MAX_ROOM_HEIGHT)
+        private void CreateRoom(IFloor center, int minW = MIN_ROOM_WIDTH, int maxW = MAX_ROOM_WIDTH, int minH = MIN_ROOM_HEIGHT, int maxH = MAX_ROOM_HEIGHT)
         {
-            int roomHeight = Game1.Random.Next(minH, maxH + 1);
-            int roomWidth = Game1.Random.Next(minW, maxW + 1);
+            var roomHeight = Game1.Random.Next(minH, maxH + 1);
+            var roomWidth = Game1.Random.Next(minW, maxW + 1);
 
             // The center will always be closer to the top left, e.g.
             //    +-------+   +-------+   +-----+
@@ -235,8 +235,8 @@ namespace DungeonCrawler.GameStates.PlayingState
             //    |X X X X|   +-------+   +-----+
             //    +-------+
 
-            int originX = center.XIdx + 1 - ((roomWidth + 1) / 2);
-            int originY = center.YIdx + 1 - ((roomHeight + 1) / 2);
+            var originX = center.XIdx + 1 - ((roomWidth + 1) / 2);
+            var originY = center.YIdx + 1 - ((roomHeight + 1) / 2);
 
             for (int xIdx = 0; xIdx < roomWidth; xIdx++)
             {
@@ -258,8 +258,8 @@ namespace DungeonCrawler.GameStates.PlayingState
         /// <param name="currentDirection">The current direction.</param>
         private void UpdateDirectionWeights(Direction currentDirection)
         {
-            Direction weightedDirection1 = currentDirection;
-            Direction weightedDirection2 = RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
+            var weightedDirection1 = currentDirection;
+            var weightedDirection2 = RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]);
             _changeDirectionWeights[weightedDirection1].Value = PRIORITY_DIRECTION_WEIGHT;
             _changeDirectionWeights[weightedDirection2].Value = PRIORITY_DIRECTION_WEIGHT;
             _branchDirectionWeights[_oppositeDirection[weightedDirection1]].Value = PRIORITY_DIRECTION_WEIGHT;
@@ -272,7 +272,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         /// <param name="currentFloor">The Floor to shift to the side of.</param>
         /// <param name="currentDirection">The current direction.</param>
         /// <returns>The new Floor, or an existing Floor if there is one already at the index.</returns>
-        private Floor ShiftSidewaysOne(Floor currentFloor, Direction currentDirection)
+        private IFloor ShiftSidewaysOne(IFloor currentFloor, Direction currentDirection)
         {
             return CreateFloorInDirection(currentFloor, RNG.ChooseRandom(_turn90DegreesOptions[currentDirection]));
         }
@@ -283,7 +283,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         /// <param name="current">The Floor to move from.</param>
         /// <param name="direction">The direction to move into.</param>
         /// <returns>The new Floor, or an existing Floor if there is one already at the index.</returns>
-        private Floor CreateFloorInDirection(Floor current, Direction direction)
+        private IFloor CreateFloorInDirection(IFloor current, Direction direction)
         {
             (int, int) idxDelta = _indexDeltas[direction];
             int newXIdx = current.XIdx + idxDelta.Item1;
@@ -297,12 +297,12 @@ namespace DungeonCrawler.GameStates.PlayingState
         /// <param name="xIdx">X index of the new Floor.</param>
         /// <param name="yIdx">Y index of the new Floor</param>
         /// <returns>The new Floor, or an existing Floor if there is one already at the index.</returns>
-        private Floor TryCreateNewFloor(int xIdx, int yIdx)
+        private IFloor TryCreateNewFloor(int xIdx, int yIdx)
         {
-            Floor floorExists = _gridManager.Floors.Find(floor => floor.XIdx == xIdx && floor.YIdx == yIdx);
+            IFloor floorExists = _gridManager.Floors.Find(floor => floor.XIdx == xIdx && floor.YIdx == yIdx);
             if (floorExists == null)
             {
-                Floor newFloor = new Floor(_gridManager, _clickManager, xIdx, yIdx);
+                IFloor newFloor = new Floor(_gridManager, _clickManager, xIdx, yIdx);
                 _gridManager.Floors.Add(newFloor);
                 return newFloor;
             }

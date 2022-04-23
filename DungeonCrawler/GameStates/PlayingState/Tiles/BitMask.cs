@@ -67,7 +67,7 @@ namespace DungeonCrawler.GameStates.PlayingState.Tiles
         }
 
         public int FindValue<T>(BitMaskType bitMaskType, List<T> gridSquares, T gridSquare)
-            where T : GridSquare
+            where T : IGridSquare
         {
             switch (bitMaskType)
             {
@@ -90,8 +90,8 @@ namespace DungeonCrawler.GameStates.PlayingState.Tiles
         ///     [8]
         /// If a neighboring tile is present, it contributes to the value. Therefore, there are
         /// 16 unique textures.
-        int FindValueWith4Bits<T>(List<T> gridSquares, GridSquare gridSquare)
-            where T : GridSquare
+        int FindValueWith4Bits<T>(List<T> gridSquares, IGridSquare gridSquare)
+            where T : IGridSquare
         {
             bool above = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx && gs.YIdx == gridSquare.YIdx - 1);
             bool right = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx + 1 && gs.YIdx == gridSquare.YIdx);
@@ -120,8 +120,8 @@ namespace DungeonCrawler.GameStates.PlayingState.Tiles
         ///
         /// Therefore, there are only 47 unique textures.
         /// The _8BitRemap is used to convert the large numbers into this range.
-        private int FindValueWith8Bits<T>(List<T> gridSquares, GridSquare gridSquare)
-            where T : GridSquare
+        private int FindValueWith8Bits<T>(List<T> gridSquares, IGridSquare gridSquare)
+            where T : IGridSquare
         {
             bool above = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx && gs.YIdx == gridSquare.YIdx - 1);
             bool right = gridSquares.Any(gs => gs.XIdx == gridSquare.XIdx + 1 && gs.YIdx == gridSquare.YIdx);

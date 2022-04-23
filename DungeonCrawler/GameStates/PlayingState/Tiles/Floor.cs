@@ -7,12 +7,13 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public interface IFloor : IMyDrawable, IHasSpriteSheet
+    public interface IFloor : IGridSquare, IMyDrawable, IHasSpriteSheet
     {
         void SetPlayerDestination();
+        Entity Entity { get; set; }
     }
 
-    public class Floor : GridSquare, IHasSpriteSheet
+    public class Floor : GridSquare, IHasSpriteSheet, IFloor
     {
         readonly ClickManager _clickManager;
         readonly SpriteSheet _sprite;

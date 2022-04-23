@@ -9,7 +9,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         private readonly IEntityManager _entityManager;
         private readonly InputManager _inputManager;
 
-        public Player(GridManager gridManager, IEntityManager entityManager, Floor floor) :
+        public Player(GridManager gridManager, IEntityManager entityManager, IFloor floor) :
             base(gridManager, floor)
         {
             _entityManager = entityManager;

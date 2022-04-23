@@ -9,7 +9,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 {
     public interface IEntity : IMyDrawable, IActionTickable, IFrameTickable, ICouldBeBusy
     {
-        void SetDestination(Floor destination);
+        void SetDestination(IFloor destination);
     }
 
     public class Entity : IEntity
@@ -29,15 +29,15 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         protected DestinationState _destinationState;
         Vector2 _destination;
-        public Queue<Floor> QueuedFloors { get; }
+        public Queue<IFloor> QueuedFloors { get; }
         public Vector2 Position { get; private set; }
-        Floor _floor;
+        IFloor _floor;
 
-        public Entity(GridManager gridManager, Floor floor)
+        public Entity(GridManager gridManager, IFloor floor)
         {
             _gridManager = gridManager;
-            _pathFinding = new Dijkstra(_gridManager);
-            QueuedFloors = new Queue<Floor>();
+            _pathFinding = new Dijkstra(_gridManager.Floors);
+            QueuedFloors = new Queue<IFloor>();
             _floor = floor;
             _floor.Entity = this;
 
@@ -89,9 +89,9 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        public void SetDestination(Floor destination)
+        public void SetDestination(IFloor destination)
         {
-            Stack<Floor> sequence = _pathFinding.FindShortestPath(_floor, destination);
+            var sequence = _pathFinding.FindShortestPath(_floor, destination);
             if (sequence.Count() > MAX_FLOORS_PER_PATHFIND)
             {
                 Game1.Log("The destination is too far away from the source.", LogLevel.Warning);
@@ -100,7 +100,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             {
                 while (sequence.Count > 0)
                 {
-                    Floor step = sequence.Pop();
+                    var step = sequence.Pop();
                     QueuedFloors.Enqueue(step);
                 }
             }
