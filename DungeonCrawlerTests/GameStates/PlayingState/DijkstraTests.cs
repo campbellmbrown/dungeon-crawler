@@ -152,6 +152,7 @@ namespace DungeonCrawlerTests
             Assert.That(result.Count(), Is.EqualTo(expectedPathLength));
         }
 
+        [Test]
         public void FindShortestPath_OriginIsDestination()
         {
             // Arrange:
