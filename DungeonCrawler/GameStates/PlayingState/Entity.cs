@@ -21,7 +21,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         }
 
         readonly GridManager _gridManager;
-        readonly Dijkstra _pathFinding;
+        readonly IDijkstra _pathFinding;
 
         const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
         const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
