@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler;
 using DungeonCrawler.GameStates.PlayingState;
+using Microsoft.Xna.Framework;
 using Moq;
 using NUnit.Framework;
 
@@ -24,9 +25,8 @@ namespace DungeonCrawlerTests
             _dijkstra = new Dijkstra(_logManagerMock.Object, _floors);
         }
 
-        (IFloor orig, IFloor dest) MapStringToFloors(string mapStr)
+        (IFloor orig, IFloor dest) MapStringToFloors(List<string> rows)
         {
-            var rows = mapStr.Replace(" ", "").Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
             var orig = new Mock<IFloor>().Object;
             var dest = new Mock<IFloor>().Object;
             int rowIdx = 0;
@@ -59,35 +59,88 @@ namespace DungeonCrawlerTests
             return (orig, dest);
         }
 
-        [TestCase(
-            @"OxxxxxxxD", 8)]
-        [TestCase(
-            @"DxxxxxxxO", 8)]
-        [TestCase(
-            @"Oxxxxxxxx
-              xxxxxxxxx
-              xxxxxxxxD", 10)]
-        [TestCase(
-            @"Oxxxxxxxx
-              x.......x
-              xxxxxxxxD", 10)]
-        [TestCase(
-            @"O.xxx.xxx
-              x.x.x.x.x
-              xxx.xxx.D", 18)]
-        [TestCase(
-            @"xxxxxxxxx
-              xOxxxxxDx
-              xxxxxxxxx", 6)]
-        [TestCase(
-            @"OD", 1)]
-        [TestCase(
-            @"xxx..x..xxx
-              xOx.xxx.xDxxxx
-              xxxxx.xxxxx..x
-              .x...........x
-              .xxxxxxxxxxxxx", 12)]
-        public void FindShortestPath_PathIsRightLength(string mapStr, int expectedPathLength)
+        static object[] PathIsRightLengthTestCases =
+        {
+            new object[]
+            {
+                new List<string>
+                {
+                    "OxxxxxxxD",
+                },
+                8
+            },
+            new object[]
+            {
+                new List<string>
+                {
+                    @"DxxxxxxxO",
+                },
+                8
+            },
+            new object[]
+            {
+                new List<string>
+                {
+                    "Oxxxxxxxx",
+                    "xxxxxxxxx",
+                    "xxxxxxxxD",
+                },
+                10
+            },
+            new object[]
+            {
+                new List<string>
+                {
+                    "Oxxxxxxxx",
+                    "x.......x",
+                    "xxxxxxxxD",
+                },
+                10
+            },
+            new object[]
+            {
+                new List<string>
+                {
+                    "O.xxx.xxx",
+                    "x.x.x.x.x",
+                    "xxx.xxx.D",
+                },
+                18
+            },
+            new object[]
+            {
+                new List<string>
+                {
+                    "xxxxxxxxx",
+                    "xOxxxxxDx",
+                    "xxxxxxxxx",
+                },
+                6
+            },
+            new object[]
+            {
+                new List<string>
+                {
+                    "OD",
+                },
+                1
+            },
+            new object[]
+            {
+                new List<string>
+                {
+                    "xxx..x..xxx...",
+                    "xOx.xxx.xDxxxx",
+                    "xxxxx.xxxxx..x",
+                    ".x...........x",
+                    ".xxxxxxxxxxxxx",
+                },
+                12
+            },
+        };
+
+        [TestCaseSource(nameof(PathIsRightLengthTestCases))]
+        public void FindShortestPath_PathIsRightLength(List<string> mapStr, int expectedPathLength)
         {
             // Arrange:
             (IFloor orig, IFloor dest) = MapStringToFloors(mapStr);
@@ -95,26 +148,82 @@ namespace DungeonCrawlerTests
             // Act:
             var result = _dijkstra.FindShortestPath(orig, dest);
 
-            // Assert
+            // Assert:
             Assert.That(result.Count(), Is.EqualTo(expectedPathLength));
         }
 
         public void FindShortestPath_OriginIsDestination()
         {
-            // arrange:
+            // Arrange:
             // Start with this, but afterwards we will set dest to be the same as the orig
-            var floorStr =
-            @"Oxxxxxxxx
-              xxxxxxxxx
-              xxxxxxxxD";
+            var floorStr = new List<string>
+            {
+                "Oxxxxxxxx",
+                "xxxxxxxxx",
+                "xxxxxxxxD",
+            };
             (IFloor orig, IFloor dest) = MapStringToFloors(floorStr);
             dest = orig;
 
-            // Act
+            // Act:
             var result = _dijkstra.FindShortestPath(orig, dest);
 
-            // Assert
+            // Assert:
             Assert.That(result.Count(), Is.Zero);
+        }
+
+        List<string> largeMap = new List<string>
+        {
+            "xxxxxxxxxxxx................",
+            "xxxxxxxxxx.xx...............",
+            "xxxxxxxxx...xx..............",
+            "...xxxxxx....x..............",
+            "...xxxx.x....x..............",
+            "...xxxxxxxx.xxx.............",
+            "...xxxxxxxxxxxxx............",
+            "...xxxxxxxxxxxxxxxxxx.......",
+            "...xxxxxxxxxxxxx....x.......",
+            ".......xxxxx..xx....x.......",
+            "..........xxxx.x....x.......",
+            "..........xxxx.x....xx..xxx.",
+            "..........xxxxxxxxxxxxxxxxxx",
+            "..........xxxx.........xxxxx",
+            "..........xxxx.........xxxxx",
+        }; // x: 0-27, y: 0-14
+
+        (IFloor orig, IFloor dest) UseBigMap(int origX, int origY, int destX, int destY)
+        {
+            var largeMapCopy = largeMap.ToList();
+            Func<string, int, char, string> replaceInString = (origString, index, character) =>
+            {
+                var chars = origString.ToCharArray();
+                chars[index] = character;
+                return new string(chars);
+            };
+            largeMapCopy[origY] = replaceInString(largeMapCopy[origY], origX, 'O');
+            largeMapCopy[destY] = replaceInString(largeMapCopy[destY], destX, 'D');
+            return MapStringToFloors(largeMapCopy);
+        }
+
+        [TestCase(0, 0, 27, 14)]
+        [TestCase(27, 14, 0, 0)]
+        public void FindShortestpath_NoDiagonals(int origX, int origY, int destX, int destY)
+        {
+            // Arrange:
+            (IFloor orig, IFloor dest) = UseBigMap(origX, origY, destX, destY);
+
+            // Act:
+            var result = _dijkstra.FindShortestPath(orig, dest);
+
+            // Assert:
+            var start = result.Pop();
+            while (result.Count() > 0)
+            {
+                var next = result.Pop();
+                var difference = new Vector2(next.XIdx - start.XIdx, next.YIdx - start.YIdx);
+                Assert.That(difference.Length(), Is.EqualTo(1));
+                start = next;
+            }
         }
     }
 }
