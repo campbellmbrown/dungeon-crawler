@@ -26,7 +26,7 @@ namespace DungeonCrawlerTests
 
         (IFloor orig, IFloor dest) MapStringToFloors(string mapStr)
         {
-            var rows = mapStr.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+            var rows = mapStr.Replace(" ", "").Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
             var orig = new Mock<IFloor>().Object;
             var dest = new Mock<IFloor>().Object;
             int rowIdx = 0;
@@ -60,14 +60,33 @@ namespace DungeonCrawlerTests
         }
 
         [TestCase(
-@"
-...........
-.Oxxxxxxxx.
-.xxxxxxxxx.
-.xxxxxxxxD.
-...........
-", 10
-        )]
+            @"OxxxxxxxD", 8)]
+        [TestCase(
+            @"DxxxxxxxO", 8)]
+        [TestCase(
+            @"Oxxxxxxxx
+              xxxxxxxxx
+              xxxxxxxxD", 10)]
+        [TestCase(
+            @"Oxxxxxxxx
+              x.......x
+              xxxxxxxxD", 10)]
+        [TestCase(
+            @"O.xxx.xxx
+              x.x.x.x.x
+              xxx.xxx.D", 18)]
+        [TestCase(
+            @"xxxxxxxxx
+              xOxxxxxDx
+              xxxxxxxxx", 6)]
+        [TestCase(
+            @"OD", 1)]
+        [TestCase(
+            @"xxx..x..xxx
+              xOx.xxx.xDxxxx
+              xxxxx.xxxxx..x
+              .x...........x
+              .xxxxxxxxxxxxx", 12)]
         public void FindShortestPath_PathIsRightLength(string mapStr, int expectedPathLength)
         {
             // Arrange:
@@ -78,6 +97,24 @@ namespace DungeonCrawlerTests
 
             // Assert
             Assert.That(result.Count(), Is.EqualTo(expectedPathLength));
+        }
+
+        public void FindShortestPath_OriginIsDestination()
+        {
+            // arrange:
+            // Start with this, but afterwards we will set dest to be the same as the orig
+            var floorStr =
+            @"Oxxxxxxxx
+              xxxxxxxxx
+              xxxxxxxxD";
+            (IFloor orig, IFloor dest) = MapStringToFloors(floorStr);
+            dest = orig;
+
+            // Act
+            var result = _dijkstra.FindShortestPath(orig, dest);
+
+            // Assert
+            Assert.That(result.Count(), Is.Zero);
         }
     }
 }
