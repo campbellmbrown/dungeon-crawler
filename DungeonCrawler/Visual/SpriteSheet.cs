@@ -8,11 +8,13 @@ namespace DungeonCrawler.Visual
 {
     public class SpriteSheet : Sprite
     {
-        private readonly Dictionary<int, Rectangle> _textureRectangles;
-        private Rectangle _currentTextureRectangle;
+        readonly ILogManager _logManager;
+        readonly Dictionary<int, Rectangle> _textureRectangles;
+        Rectangle _currentTextureRectangle;
 
-        public SpriteSheet(Texture2D texture, Dictionary<int, Rectangle> textureRectangles, int initialID) : base(texture)
+        public SpriteSheet(ILogManager logManager, Texture2D texture, Dictionary<int, Rectangle> textureRectangles, int initialID) : base(texture)
         {
+            _logManager = logManager;
             _textureRectangles = textureRectangles;
             ChangeTextureRectangle(initialID);
         }
@@ -26,7 +28,7 @@ namespace DungeonCrawler.Visual
         {
             if (layer == DrawOrder.DEFAULT)
             {
-                Game1.Log("Drawing at default layer", LogLevel.Warning);
+                _logManager.Log("Drawing at default layer", LogLevel.Warning);
             }
             spriteBatch.Draw(_texture, position, _currentTextureRectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
         }

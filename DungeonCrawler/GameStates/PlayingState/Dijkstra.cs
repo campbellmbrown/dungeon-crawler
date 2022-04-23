@@ -10,10 +10,12 @@ namespace DungeonCrawler.GameStates.PlayingState
 
     public class Dijkstra : IDijkstra
     {
-        private readonly IList<IFloor> _floors;
+        readonly ILogManager _logManager;
+        readonly IList<IFloor> _floors;
 
-        public Dijkstra(IList<IFloor> floors)
+        public Dijkstra(ILogManager logManager, IList<IFloor> floors)
         {
+            _logManager = logManager;
             _floors = floors;
         }
 
@@ -91,7 +93,7 @@ namespace DungeonCrawler.GameStates.PlayingState
                 }
             }
 
-            // Game1.Log("A total of " + (_floors.Count - unvisited.Count).ToString() + "/" + _floors.Count.ToString() + " were checked.", LogLevel.Debug);
+            _logManager.Log("A total of " + (_floors.Count - unvisited.Count).ToString() + "/" + _floors.Count.ToString() + " were checked.", LogLevel.Debug);
             // Remove the first one - this should be the origin.
             path.Pop();
             return path;

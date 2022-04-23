@@ -65,7 +65,12 @@ namespace DungeonCrawler
         }
     }
 
-    public class LogManager
+    public interface ILogManager : IFrameTickable, IMyDrawable
+    {
+        void Log(string message, LogLevel logLevel);
+    }
+
+    public class LogManager : ILogManager
     {
         private const int MAX_LOGS = 200;
         private const int ACCEPTABLE_LOGS = 100;
@@ -89,7 +94,7 @@ namespace DungeonCrawler
             _inputManager.AddSingleShotInput(Keys.G, CycleLog);
         }
 
-        public void FrameTick()
+        public void FrameTick(GameTime gameTime)
         {
             _inputManager.FrameTick();
         }
@@ -123,10 +128,10 @@ namespace DungeonCrawler
             {
                 _currentLogLevel++;
             }
-            AddLogMessage("Changed log level to " + Enum.GetName(typeof(LogLevel), _currentLogLevel), LogLevel.Other);
+            Log("Changed log level to " + Enum.GetName(typeof(LogLevel), _currentLogLevel), LogLevel.Other);
         }
 
-        public void AddLogMessage(string message, LogLevel logLevel)
+        public void Log(string message, LogLevel logLevel)
         {
             if (logLevel >= _currentLogLevel)
             {
@@ -137,7 +142,7 @@ namespace DungeonCrawler
                     {
                         _logPrints.RemoveAt(0);
                     }
-                    AddLogMessage("Erasing old logs to save memory", LogLevel.Warning);
+                    Log("Erasing old logs to save memory", LogLevel.Warning);
                 }
             }
         }

@@ -26,7 +26,7 @@ namespace DungeonCrawler
 
         public static Random Random { get; private set; }
 
-        static LogManager _log;
+        ILogManager _logManager;
         static PerformanceManager _performanceManager;
         GameState _gameState;
         IGameState _playingState;
@@ -86,9 +86,9 @@ namespace DungeonCrawler
                 { "normal_font", Content.Load<BitmapFont>("fonts/normal_font") },
             };
 
-            _log = new LogManager(_spriteBatchManager.DebugLayerView);
+            _logManager = new LogManager(_spriteBatchManager.DebugLayerView);
             _performanceManager = new PerformanceManager(_spriteBatchManager.DebugLayerView);
-            _playingState = new PlayingState(_spriteBatchManager);
+            _playingState = new PlayingState(_logManager, _spriteBatchManager);
         }
 
         protected override void Update(GameTime gameTime)
@@ -107,10 +107,10 @@ namespace DungeonCrawler
                     _playingState.FrameTick(gameTime);
                     break;
                 default:
-                    Log("Invalid GameState for updating", LogLevel.Error);
+                    _logManager.Log("Invalid GameState for updating", LogLevel.Error);
                     break;
             }
-            _log.FrameTick();
+            _logManager.FrameTick(gameTime);
             base.Update(gameTime);
         }
 
@@ -123,25 +123,16 @@ namespace DungeonCrawler
                     _playingState.Draw(_spriteBatch);
                     break;
                 default:
-                    Log("Invalid GameState for drawing", LogLevel.Error);
+                    _logManager.Log("Invalid GameState for drawing", LogLevel.Error);
                     break;
             }
 
             _spriteBatchManager.Switch(DrawType.DebugContent);
-            _log.Draw(_spriteBatch);
+            _logManager.Draw(_spriteBatch);
             _performanceManager.Draw(_spriteBatch);
             // base.Draw(gameTime); // Does this need to be done?
             _spriteBatchManager.Finish();
             _performanceManager.Stop();
-        }
-
-        public static void Log(string message, LogLevel logLevel = LogLevel.Trace, bool writeToOutput = false)
-        {
-            _log.AddLogMessage(message, logLevel);
-            if (writeToOutput)
-            {
-                Debug.WriteLine(message);
-            }
         }
 
         private void HeartBeat(GameTime gameTime)
@@ -149,7 +140,7 @@ namespace DungeonCrawler
             _timeSinceLastHeartBeat += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (_timeSinceLastHeartBeat >= HEARTBEAT_TIME)
             {
-                Log("Heartbeat", LogLevel.Trace);
+                _logManager.Log("Heartbeat", LogLevel.Trace);
                 _timeSinceLastHeartBeat -= HEARTBEAT_TIME;
             }
         }

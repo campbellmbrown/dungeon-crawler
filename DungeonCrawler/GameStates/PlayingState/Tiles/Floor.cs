@@ -73,12 +73,12 @@ namespace DungeonCrawler.GameStates.PlayingState
             { 47, new Rectangle(7 * GRID_SQUARE_SIZE, 5 * GRID_SQUARE_SIZE, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE) },
         };
 
-        public Floor(GridManager gridManager, ClickManager clickManager, int xIdx, int yIdx)
+        public Floor(ILogManager logManager, GridManager gridManager, ClickManager clickManager, int xIdx, int yIdx)
             : base(gridManager, xIdx, yIdx)
         {
             _clickManager = clickManager;
             _clickManager.AddLeftClick(new RectangleF(Position.X, Position.Y, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE), SetPlayerDestination);
-            _sprite = new SpriteSheet(Game1.Textures["gray_brick_floors"], TextureRectangleLookup, 0);
+            _sprite = new SpriteSheet(logManager, Game1.Textures["gray_brick_floors"], TextureRectangleLookup, 0);
         }
 
         public void Draw(SpriteBatch spriteBatch)

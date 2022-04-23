@@ -36,10 +36,10 @@ namespace DungeonCrawler.GameStates.PlayingState
         };
 
 
-        public Wall(GridManager gridManager, int xIdx, int yIdx) :
+        public Wall(ILogManager logManager, GridManager gridManager, int xIdx, int yIdx) :
             base(gridManager, xIdx, yIdx)
         {
-            _sprite = new SpriteSheet(Game1.Textures["gray_brick_walls"], TextureRectangleLookup, 0);
+            _sprite = new SpriteSheet(logManager, Game1.Textures["gray_brick_walls"], TextureRectangleLookup, 0);
         }
 
         public void Draw(SpriteBatch spriteBatch)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DungeonCrawler;
 using DungeonCrawler.GameStates.PlayingState;
 using Moq;
 using NUnit.Framework;
@@ -9,16 +10,18 @@ namespace DungeonCrawlerTests
 {
     public class DijkstraTests
     {
-        IDijkstra _dijkstra;
+        Mock<ILogManager> _logManagerMock;
         List<Mock<IFloor>> _floorsMocks;
         List<IFloor> _floors;
+        IDijkstra _dijkstra;
 
         [SetUp]
         public void Setup()
         {
+            _logManagerMock = new Mock<ILogManager>();
             _floorsMocks = new List<Mock<IFloor>>();
             _floors = new List<IFloor>();
-            _dijkstra = new Dijkstra(_floors);
+            _dijkstra = new Dijkstra(_logManagerMock.Object, _floors);
         }
 
         (IFloor orig, IFloor dest) MapStringToFloors(string mapStr)

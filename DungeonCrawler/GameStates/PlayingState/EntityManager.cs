@@ -17,9 +17,9 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         List<IEntity> _entities;
 
-        public EntityManager(GridManager gridManager)
+        public EntityManager(ILogManager logManager, GridManager gridManager)
         {
-            Player = new Player(gridManager, this, gridManager.GetStartingFloor());
+            Player = new Player(logManager, gridManager, this, gridManager.GetStartingFloor());
             _entities = new List<IEntity>();
         }
 

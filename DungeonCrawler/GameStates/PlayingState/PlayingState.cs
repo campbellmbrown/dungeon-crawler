@@ -12,6 +12,7 @@ namespace DungeonCrawler.GameStates.PlayingState
     public class PlayingState : IPlayingState
     {
         // Dependencies
+        readonly ILogManager _logManager;
         readonly SpriteBatchManager _spriteBatchManager;
 
         // Private
@@ -22,12 +23,13 @@ namespace DungeonCrawler.GameStates.PlayingState
         // TODO: move to a MouseManager
         Sprite _mouseLight;
 
-        public PlayingState(SpriteBatchManager spriteBatchManager)
+        public PlayingState(ILogManager logManager, SpriteBatchManager spriteBatchManager)
         {
+            _logManager = logManager;
             _spriteBatchManager = spriteBatchManager;
             _clickManager = new ClickManager(spriteBatchManager.MainLayerView);
-            _gridManager = new GridManager(this, _clickManager);
-            _entityManager = new EntityManager(_gridManager);
+            _gridManager = new GridManager(logManager, this, _clickManager);
+            _entityManager = new EntityManager(logManager, _gridManager);
             _mouseLight = new Sprite(Game1.Textures["medium_light"]);
             _viewMask = new Sprite(Game1.Textures["center_view"]);
         }
@@ -67,7 +69,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
             if (_entityManager.IsBusy())
             {
-                Game1.Log("Action tick triggered but something is busy.", LogLevel.Warning);
+                _logManager.Log("Action tick triggered but something is busy.", LogLevel.Warning);
             }
             else
             {

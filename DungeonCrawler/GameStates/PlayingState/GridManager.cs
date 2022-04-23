@@ -26,11 +26,11 @@ namespace DungeonCrawler.GameStates.PlayingState
         public int MinY { get; private set; }
         public int MaxY { get; private set; }
 
-        public GridManager(PlayingState playingState, ClickManager clickManager)
+        public GridManager(ILogManager logManager, PlayingState playingState, ClickManager clickManager)
         {
             _playingState = playingState;
 
-            LevelGenerator levelGenerator = new LevelGenerator(this, clickManager);
+            LevelGenerator levelGenerator = new LevelGenerator(logManager, this, clickManager);
             levelGenerator.GenerateLevel();
             MinY = (int)Math.Min(Floors.Min(fl => fl.Position.Y), Walls.Min(wa => wa.Position.Y));
             MaxY = (int)Math.Max(Floors.Max(fl => fl.Position.Y), Walls.Max(wa => wa.Position.Y));

@@ -39,8 +39,9 @@ namespace DungeonCrawler.GameStates.PlayingState
             { Direction.Right, new List<Direction>(){ Direction.Up, Direction.Down } },
         };
 
-        private readonly GridManager _gridManager;
-        private readonly ClickManager _clickManager;
+        readonly ILogManager _logManager;
+        readonly GridManager _gridManager;
+        readonly ClickManager _clickManager;
 
         private int _distanceUntilDirectionChange;
 
@@ -83,8 +84,9 @@ namespace DungeonCrawler.GameStates.PlayingState
             { Direction.Right, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
         };
 
-        public LevelGenerator(GridManager gridManager, ClickManager clickManager)
+        public LevelGenerator(ILogManager logManager, GridManager gridManager, ClickManager clickManager)
         {
+            _logManager = logManager;
             _gridManager = gridManager;
             _clickManager = clickManager;
         }
@@ -302,7 +304,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             IFloor floorExists = _gridManager.Floors.Find(floor => floor.XIdx == xIdx && floor.YIdx == yIdx);
             if (floorExists == null)
             {
-                IFloor newFloor = new Floor(_gridManager, _clickManager, xIdx, yIdx);
+                IFloor newFloor = new Floor(_logManager, _gridManager, _clickManager, xIdx, yIdx);
                 _gridManager.Floors.Add(newFloor);
                 return newFloor;
             }
@@ -321,7 +323,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
             if (!_gridManager.DoesGridSquareExistAt(xIdx, yIdx))
             {
-                _gridManager.Walls.Add(new Wall(_gridManager, xIdx, yIdx));
+                _gridManager.Walls.Add(new Wall(_logManager, _gridManager, xIdx, yIdx));
             }
         }
     }

@@ -21,6 +21,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         }
 
         readonly GridManager _gridManager;
+        readonly ILogManager _logManager;
         readonly IDijkstra _pathFinding;
 
         const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
@@ -33,10 +34,11 @@ namespace DungeonCrawler.GameStates.PlayingState
         public Vector2 Position { get; private set; }
         IFloor _floor;
 
-        public Entity(GridManager gridManager, IFloor floor)
+        public Entity(ILogManager logManager, GridManager gridManager, IFloor floor)
         {
+            _logManager = logManager;
             _gridManager = gridManager;
-            _pathFinding = new Dijkstra(_gridManager.Floors);
+            _pathFinding = new Dijkstra(_logManager, _gridManager.Floors);
             QueuedFloors = new Queue<IFloor>();
             _floor = floor;
             _floor.Entity = this;
@@ -78,7 +80,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public virtual void ActionTick()
         {
-            Game1.Log("Entity " + GetHashCode().ToString() + " ActionTick triggered.", LogLevel.Debug);
+            _logManager.Log("Entity " + GetHashCode().ToString() + " ActionTick triggered.", LogLevel.Debug);
             if (QueuedFloors.Count > 0)
             {
                 _floor.Entity = null;
@@ -94,7 +96,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             var sequence = _pathFinding.FindShortestPath(_floor, destination);
             if (sequence.Count() > MAX_FLOORS_PER_PATHFIND)
             {
-                Game1.Log("The destination is too far away from the source.", LogLevel.Warning);
+                _logManager.Log("The destination is too far away from the source.", LogLevel.Warning);
             }
             else
             {
