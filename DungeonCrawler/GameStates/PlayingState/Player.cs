@@ -9,8 +9,13 @@ namespace DungeonCrawler.GameStates.PlayingState
         private readonly IEntityManager _entityManager;
         private readonly InputManager _inputManager;
 
-        public Player(ILogManager logManager, GridManager gridManager, IEntityManager entityManager, IFloor floor) :
-            base(logManager, gridManager, floor)
+        public Player(
+            ILogManager logManager,
+            IGridManager gridManager,
+            IEntityManager entityManager,
+            IPathFinding pathFinding,
+            IFloor floor) :
+            base(logManager, gridManager, pathFinding, floor)
         {
             _entityManager = entityManager;
 
@@ -21,7 +26,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
             _inputManager.FrameTick();
             // TODO: determine the best place for this to be. Maybe this should happen when the player clicks on a Floor.
-            if (QueuedFloors.Count > 0 && _destinationState == DestinationState.AtDestination)
+            if (QueuedFloors.Count > 0 && DestinationState == DestinationState.AtDestination)
             {
                 _entityManager.ActionTick();
             }

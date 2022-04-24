@@ -10,6 +10,8 @@ namespace DungeonCrawler.GameStates.PlayingState
     public interface IGridManager
     {
         List<IFloor> Floors { get; }
+        int MinY { get; }
+        int MaxY { get; }
     }
 
     public class GridManager : IGridManager

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
@@ -7,44 +8,50 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
+    public enum DestinationState
+    {
+        AtDestination,
+        OffDestination,
+    }
+
     public interface IEntity : IMyDrawable, IActionTickable, IFrameTickable, ICouldBeBusy
     {
+        const int MAX_FLOORS_PER_PATHFIND = 15;
+
         void SetDestination(IFloor destination);
+
+        Queue<IFloor> QueuedFloors { get; set; }
+        DestinationState DestinationState { get; }
     }
 
     public class Entity : IEntity
     {
-        protected enum DestinationState
-        {
-            AtDestination,
-            OffDestination,
-        }
-
-        readonly GridManager _gridManager;
+        readonly IGridManager _gridManager;
         readonly ILogManager _logManager;
-        readonly IDijkstra _pathFinding;
+        readonly IPathFinding _pathFinding;
+        IFloor _floor;
 
         const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
         const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
-        const int MAX_FLOORS_PER_PATHFIND = 15;
 
-        protected DestinationState _destinationState;
         Vector2 _destination;
-        public Queue<IFloor> QueuedFloors { get; }
+        public Queue<IFloor> QueuedFloors { get; set; } = new Queue<IFloor>();
         public Vector2 Position { get; private set; }
-        IFloor _floor;
+        public DestinationState DestinationState { get; set; } = DestinationState.AtDestination;
 
-        public Entity(ILogManager logManager, GridManager gridManager, IFloor floor)
+        public Entity(
+            ILogManager logManager,
+            IGridManager gridManager,
+            IPathFinding pathfinding,
+            IFloor floor)
         {
             _logManager = logManager;
             _gridManager = gridManager;
-            _pathFinding = new Dijkstra(_logManager, _gridManager.Floors);
-            QueuedFloors = new Queue<IFloor>();
+            _pathFinding = pathfinding;
             _floor = floor;
             _floor.Entity = this;
 
             Position = _floor.Position;
-            _destinationState = DestinationState.AtDestination;
         }
 
         public const int FRAME_TICKS_PER_STEP = 10;
@@ -52,7 +59,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public virtual void FrameTick(GameTime gameTime)
         {
             // If not at destination
-            if (_destinationState == DestinationState.OffDestination)
+            if (DestinationState == DestinationState.OffDestination)
             {
                 Vector2 diff = _destination - Position;
                 if (diff.Length() > 0) // Cannot normalize a vector of length 0
@@ -62,7 +69,7 @@ namespace DungeonCrawler.GameStates.PlayingState
                 if ((_destination - Position).Length() < DESTINATION_HYSTERESIS)
                 {
                     Position = _destination;
-                    _destinationState = DestinationState.AtDestination;
+                    DestinationState = DestinationState.AtDestination;
                 }
             }
         }
@@ -87,14 +94,14 @@ namespace DungeonCrawler.GameStates.PlayingState
                 _floor = QueuedFloors.Dequeue();
                 _floor.Entity = this;
                 _destination = _floor.Position;
-                _destinationState = DestinationState.OffDestination;
+                DestinationState = DestinationState.OffDestination;
             }
         }
 
         public void SetDestination(IFloor destination)
         {
             var sequence = _pathFinding.FindShortestPath(_floor, destination);
-            if (sequence.Count() > MAX_FLOORS_PER_PATHFIND)
+            if (sequence.Count() > IEntity.MAX_FLOORS_PER_PATHFIND)
             {
                 _logManager.Log("The destination is too far away from the source.", LogLevel.Warning);
             }
@@ -110,7 +117,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public bool IsBusy()
         {
-            return _destinationState != DestinationState.AtDestination;
+            return DestinationState != DestinationState.AtDestination;
         }
     }
 }

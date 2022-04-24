@@ -10,7 +10,7 @@ namespace DungeonCrawler.GameStates.PlayingState
     public interface IFloor : IGridSquare, IMyDrawable, IHasSpriteSheet
     {
         void SetPlayerDestination();
-        Entity Entity { get; set; }
+        IEntity Entity { get; set; }
     }
 
     public class Floor : GridSquare, IHasSpriteSheet, IFloor
@@ -18,7 +18,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         readonly ClickManager _clickManager;
         readonly SpriteSheet _sprite;
 
-        public Entity Entity { get; set; }
+        public IEntity Entity { get; set; }
         public bool HasEntity { get { return Entity != null; } }
 
         public static Dictionary<int, Rectangle> TextureRectangleLookup { get; } = new Dictionary<int, Rectangle>()

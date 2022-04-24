@@ -14,7 +14,7 @@ namespace DungeonCrawlerTests
         Mock<ILogManager> _logManagerMock;
         List<Mock<IFloor>> _floorsMocks;
         List<IFloor> _floors;
-        IDijkstra _dijkstra;
+        IPathFinding _dijkstra;
 
         [SetUp]
         public void Setup()

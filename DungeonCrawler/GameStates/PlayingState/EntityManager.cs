@@ -19,7 +19,8 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public EntityManager(ILogManager logManager, GridManager gridManager)
         {
-            Player = new Player(logManager, gridManager, this, gridManager.GetStartingFloor());
+            IPathFinding dijkstra = new Dijkstra(logManager, gridManager.Floors);
+            Player = new Player(logManager, gridManager, this, dijkstra, gridManager.GetStartingFloor());
             _entities = new List<IEntity>();
         }
 

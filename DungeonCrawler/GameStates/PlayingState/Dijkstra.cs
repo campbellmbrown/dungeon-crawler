@@ -3,12 +3,12 @@ using System.Linq;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public interface IDijkstra
+    public interface IPathFinding
     {
         Stack<IFloor> FindShortestPath(IFloor orig, IFloor dest);
     }
 
-    public class Dijkstra : IDijkstra
+    public class Dijkstra : IPathFinding
     {
         readonly ILogManager _logManager;
         readonly IList<IFloor> _floors;
