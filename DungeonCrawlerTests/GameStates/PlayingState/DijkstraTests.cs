@@ -59,7 +59,7 @@ namespace DungeonCrawlerTests
             return (orig, dest);
         }
 
-        static object[] PathIsRightLengthTestCases =
+        static object[] _pathIsRightLengthTestCases =
         {
             new object[]
             {
@@ -139,7 +139,7 @@ namespace DungeonCrawlerTests
             },
         };
 
-        [TestCaseSource(nameof(PathIsRightLengthTestCases))]
+        [TestCaseSource(nameof(_pathIsRightLengthTestCases))]
         public void FindShortestPath_PathIsRightLength(List<string> mapStr, int expectedPathLength)
         {
             // Arrange:
@@ -173,7 +173,7 @@ namespace DungeonCrawlerTests
             Assert.That(result.Count(), Is.Zero);
         }
 
-        List<string> largeMap = new List<string>
+        List<string> _largeMap = new List<string>
         {
             "xxxxxxxxxxxx................",
             "xxxxxxxxxx.xx...............",
@@ -194,7 +194,7 @@ namespace DungeonCrawlerTests
 
         (IFloor orig, IFloor dest) UseBigMap(int origX, int origY, int destX, int destY)
         {
-            var largeMapCopy = largeMap.ToList();
+            var largeMapCopy = _largeMap.ToList();
             Func<string, int, char, string> replaceInString = (origString, index, character) =>
             {
                 var chars = origString.ToCharArray();
