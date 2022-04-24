@@ -24,11 +24,6 @@ jobs:
     - name: Temp fix for path to content pipeline
       run: sed -i s/campb/runneradmin/g DungeonCrawler/Content/Content.mgcb
 
-    - name: Format
-      run: |
-        dotnet format DungeonCrawler --verbosity diagnostic --verify-no-changes
-        dotnet format DungeonCrawlerTests --verbosity diagnostic --verify-no-changes
-
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
