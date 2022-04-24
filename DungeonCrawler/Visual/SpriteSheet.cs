@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,13 +22,13 @@ namespace DungeonCrawler.Visual
             _currentTextureRectangle = _textureRectangles[id];
         }
 
-        public override void Draw(SpriteBatch spriteBatch, Vector2 position, float layer = DrawOrder.DEFAULT)
+        public override void Draw(ISpriteBatchWrapper spriteBatch, Vector2 position, float layer = DrawOrder.DEFAULT)
         {
             if (layer == DrawOrder.DEFAULT)
             {
                 _logManager.Log("Drawing at default layer", LogLevel.Warning);
             }
-            spriteBatch.Draw(_texture, position, _currentTextureRectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
+            spriteBatch.SpriteBatch.Draw(_texture, position, _currentTextureRectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, layer);
         }
     }
 }

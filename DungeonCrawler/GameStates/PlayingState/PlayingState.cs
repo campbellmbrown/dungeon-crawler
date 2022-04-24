@@ -1,7 +1,5 @@
 using DungeonCrawler.Management;
 using DungeonCrawler.Visual;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
@@ -34,7 +32,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _viewMask = new Sprite(Game1.Textures["center_view"]);
         }
 
-        public void FrameTick(GameTime gameTime)
+        public void FrameTick(IGameTimeWrapper gameTime)
         {
             _clickManager.FrameTick();
             _entityManager.FrameTick(gameTime);
@@ -42,7 +40,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _spriteBatchManager.MainLayerView.Focus(_entityManager.Player.Position);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(ISpriteBatchWrapper spriteBatch)
         {
             // We don't need to switch to DrawType.MainContent
             _gridManager.Draw(spriteBatch);

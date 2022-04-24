@@ -20,6 +20,8 @@ namespace DungeonCrawler
 
         readonly GraphicsDeviceManager _graphics;
         SpriteBatch _spriteBatch;
+        IGameTimeWrapper _gameTimeWrapper = new GameTimeWrapper();
+        ISpriteBatchWrapper _spriteBatchWrapper;
 
         public static Dictionary<string, Texture2D> Textures { get; set; }
         public static Dictionary<string, BitmapFont> Fonts { get; set; }
@@ -70,6 +72,7 @@ namespace DungeonCrawler
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _spriteBatchManager = new SpriteBatchManager(GraphicsDevice, _spriteBatch, Content);
+            _spriteBatchWrapper = new SpriteBatchWrapper(_spriteBatch);
 
             Textures = new Dictionary<string, Texture2D>()
             {
@@ -93,6 +96,8 @@ namespace DungeonCrawler
 
         protected override void Update(GameTime gameTime)
         {
+            _gameTimeWrapper.GameTime = gameTime;
+
             _performanceManager.Start();
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
@@ -104,13 +109,13 @@ namespace DungeonCrawler
             switch (_gameState)
             {
                 case GameState.Playing:
-                    _playingState.FrameTick(gameTime);
+                    _playingState.FrameTick(_gameTimeWrapper);
                     break;
                 default:
                     _logManager.Log("Invalid GameState for updating", LogLevel.Error);
                     break;
             }
-            _logManager.FrameTick(gameTime);
+            _logManager.FrameTick(_gameTimeWrapper);
             base.Update(gameTime);
         }
 
@@ -120,7 +125,7 @@ namespace DungeonCrawler
             switch (_gameState)
             {
                 case GameState.Playing:
-                    _playingState.Draw(_spriteBatch);
+                    _playingState.Draw(_spriteBatchWrapper);
                     break;
                 default:
                     _logManager.Log("Invalid GameState for drawing", LogLevel.Error);
@@ -128,7 +133,7 @@ namespace DungeonCrawler
             }
 
             _spriteBatchManager.Switch(DrawType.DebugContent);
-            _logManager.Draw(_spriteBatch);
+            _logManager.Draw(_spriteBatchWrapper);
             _performanceManager.Draw(_spriteBatch);
             // base.Draw(gameTime); // Does this need to be done?
             _spriteBatchManager.Finish();

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler;
 using DungeonCrawler.GameStates.PlayingState;
+using Microsoft.Xna.Framework;
 using Moq;
 using NUnit.Framework;
 
@@ -181,16 +182,69 @@ namespace DungeonCrawlerTests
         [Test]
         public void FrameTick_AtDestination_DoesNothing()
         {
+            // Arrange:
+            var originalPosition = _entity.Position;
+            Assert.That(_entity.DestinationState, Is.EqualTo(DestinationState.AtDestination));
+            Mock<IGameTimeWrapper> gameTimeWrapperMock = new Mock<IGameTimeWrapper>();
+
+            // Act:
+            _entity.FrameTick(gameTimeWrapperMock.Object);
+
+            // Assert:
+            Assert.That(_entity.DestinationState, Is.EqualTo(DestinationState.AtDestination));
+            Assert.That(_entity.Position, Is.EqualTo(originalPosition));
         }
 
         [Test]
         public void FrameTick_OffDestination_ChangesPosition()
         {
+            // Arrange:
+            var originalPosition = _entity.Position;
+            var queuedFloorMock = FakeQueuedFloors(1).First();
+            queuedFloorMock
+                .Setup(queuedFloor => queuedFloor.Position)
+                .Returns(new Vector2(100, 0));
+            // This should set up the DestinationState to OffDestination
+            // and the _destination set to the queuedFloor:
+            _entity.ActionTick();
+            Mock<IGameTimeWrapper> gameTimeWrapperMock = new Mock<IGameTimeWrapper>();
+            gameTimeWrapperMock
+                .Setup(gameTimeWrapper => gameTimeWrapper.TimeDiffSec)
+                .Returns(0.1f); // 100 ms have passed
+
+            // Act:
+            _entity.FrameTick(gameTimeWrapperMock.Object);
+
+            // Assert:
+            var expectedDisplacement = new Vector2(IEntity.MOVEMENT_SPEED * 0.1f, 0);
+            Assert.That(_entity.Position, Is.EqualTo(expectedDisplacement));
         }
 
         [Test]
         public void FrameTick_OffDestination_CloseEnoughToDestination_SnapsPosition()
         {
+            // Arrange:
+            var originalPosition = _entity.Position;
+            var queuedFloorMock = FakeQueuedFloors(1).First();
+            queuedFloorMock
+                .Setup(queuedFloor => queuedFloor.Position)
+                .Returns(new Vector2(0.5f, 0)); // Really close to the entities position
+            // This should set up the DestinationState to OffDestination
+            // and the _destination set to the queuedFloor:
+            _entity.ActionTick();
+            Mock<IGameTimeWrapper> gameTimeWrapperMock = new Mock<IGameTimeWrapper>();
+            gameTimeWrapperMock
+                .Setup(gameTimeWrapper => gameTimeWrapper.TimeDiffSec)
+                .Returns(0.01f); // 10 ms have passed
+
+            // Act:
+            _entity.FrameTick(gameTimeWrapperMock.Object);
+
+            // Assert:
+            // IEntity.MOVEMENT_SPEED (80f) * 0.01f = 0.8 pixels of movement
+            // This will move the entitiy 0.8 - 0.5 = 0.3 pixels
+            // This is close enough to the destination so it should snap to the desination.
+            Assert.That(_entity.Position, Is.EqualTo(new Vector2(0.5f, 0)));
         }
     }
 }

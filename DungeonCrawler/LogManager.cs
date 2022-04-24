@@ -47,17 +47,17 @@ namespace DungeonCrawler
             _logTime = DateTime.Now;
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, float opacity)
+        public void Draw(ISpriteBatchWrapper spriteBatch, Vector2 position, float opacity)
         {
-            spriteBatch.DrawString(
+            spriteBatch.SpriteBatch.DrawString(
                 Game1.Fonts["normal_font"], _logTime.ToString("HH:mm:ss.fff"),
                 position,
                 _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
-            spriteBatch.DrawString(
+            spriteBatch.SpriteBatch.DrawString(
                 Game1.Fonts["normal_font"], Enum.GetName(typeof(LogLevel), _logLevel).ToUpper(),
                 position + _levelOffset,
                 _logColors[_logLevel] * opacity, 0f, Vector2.Zero, 1f, SpriteEffects.None, DrawOrder.DEFAULT);
-            spriteBatch.DrawString(
+            spriteBatch.SpriteBatch.DrawString(
                 Game1.Fonts["normal_font"],
                 _logText,
                 position + _textOffset,
@@ -94,12 +94,12 @@ namespace DungeonCrawler
             _inputManager.AddSingleShotInput(Keys.G, CycleLog);
         }
 
-        public void FrameTick(GameTime gameTime)
+        public void FrameTick(IGameTimeWrapper gameTime)
         {
             _inputManager.FrameTick();
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(ISpriteBatchWrapper spriteBatch)
         {
             if (_logActive)
             {

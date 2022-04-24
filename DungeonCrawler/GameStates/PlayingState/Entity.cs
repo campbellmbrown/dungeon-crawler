@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
@@ -17,9 +15,11 @@ namespace DungeonCrawler.GameStates.PlayingState
     public interface IEntity : IMyDrawable, IActionTickable, IFrameTickable, ICouldBeBusy
     {
         const int MAX_FLOORS_PER_PATHFIND = 15;
+        const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
 
         void SetDestination(IFloor destination);
 
+        Vector2 Position { get; }
         Queue<IFloor> QueuedFloors { get; set; }
         DestinationState DestinationState { get; }
     }
@@ -31,7 +31,6 @@ namespace DungeonCrawler.GameStates.PlayingState
         readonly IPathFinding _pathFinding;
         IFloor _floor;
 
-        const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
         const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
 
         Vector2 _destination;
@@ -56,7 +55,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public const int FRAME_TICKS_PER_STEP = 10;
 
-        public virtual void FrameTick(GameTime gameTime)
+        public virtual void FrameTick(IGameTimeWrapper gameTime)
         {
             // If not at destination
             if (DestinationState == DestinationState.OffDestination)
@@ -64,7 +63,7 @@ namespace DungeonCrawler.GameStates.PlayingState
                 Vector2 diff = _destination - Position;
                 if (diff.Length() > 0) // Cannot normalize a vector of length 0
                 {
-                    Position += Vector2.Normalize(diff) * MOVEMENT_SPEED * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    Position += Vector2.Normalize(diff) * IEntity.MOVEMENT_SPEED * gameTime.TimeDiffSec;
                 }
                 if ((_destination - Position).Length() < DESTINATION_HYSTERESIS)
                 {
@@ -74,9 +73,9 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(ISpriteBatchWrapper spriteBatch)
         {
-            spriteBatch.DrawRectangle(new RectangleF(Position.X, Position.Y, 16, 16), Color.Yellow, 1f, FindLayerDepth());
+            spriteBatch.SpriteBatch.DrawRectangle(new RectangleF(Position.X, Position.Y, 16, 16), Color.Yellow, 1f, FindLayerDepth());
         }
 
         // Temporary - create proper function (with an interface?) when drawing an actual sprite.

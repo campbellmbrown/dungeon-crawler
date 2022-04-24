@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler.Management;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public interface IGridManager
+    public interface IGridManager : IMyDrawable
     {
         List<IFloor> Floors { get; }
         int MinY { get; }
@@ -51,7 +49,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             return Floors.Find(sq => sq.XIdx == STARTING_X && sq.YIdx == STARTING_Y);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(ISpriteBatchWrapper spriteBatch)
         {
             foreach (var floor in Floors)
             {

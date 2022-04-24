@@ -1,8 +1,4 @@
 using System.Collections.Generic;
-using DungeonCrawler;
-using DungeonCrawler.GameStates.PlayingState;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
@@ -24,7 +20,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _entities = new List<IEntity>();
         }
 
-        public void FrameTick(GameTime gameTime)
+        public void FrameTick(IGameTimeWrapper gameTime)
         {
             Player.PriorityFrameTick(gameTime);
             foreach (var entity in _entities)
@@ -42,7 +38,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(ISpriteBatchWrapper spriteBatch)
         {
             Player.Draw(spriteBatch);
             foreach (var entity in _entities)

@@ -2,7 +2,6 @@
 using DungeonCrawler.Management;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
@@ -81,7 +80,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _sprite = new SpriteSheet(logManager, Game1.Textures["gray_brick_floors"], TextureRectangleLookup, 0);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(ISpriteBatchWrapper spriteBatch)
         {
             _sprite.Draw(spriteBatch, Position, DrawOrder.BACKGROUND_CONTENT);
         }
