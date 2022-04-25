@@ -214,6 +214,25 @@ class MapGenerator:
             self.distance_until_direction_change -= 1
         self._create_room(current_grid_square)
 
+    def print_as_string(self):
+        # TODO: this prints sideways. This should be fixed.
+        max_x = self._get_max_x()
+        min_x = self._get_min_x()
+        max_y = self._get_max_y()
+        min_y = self._get_min_y()
+        map_as_string = ""
+        for x in range(max_x - min_x + 1):
+            for y in range(max_y - min_y + 1):
+                x_idx = min_x + x
+                y_idx = min_y + y
+                if any(gridsquare.x == x_idx and gridsquare.y == y_idx for gridsquare in self.grid_squares):
+                    map_as_string += "x"
+                else:
+                    map_as_string += "."
+            map_as_string += "\n"
+        print(map_as_string)
+
+
     def statistics(self, num_generations: int = 1000):
         logger.disabled = True
         floor_areas = []
@@ -349,6 +368,7 @@ def main():
     map_generator = MapGenerator()
     # map_generator.statistics(num_generations=10000)
     map_generator.generate()
+    map_generator.print_as_string()
     map_generator.plot()
 
 
