@@ -58,11 +58,6 @@ namespace DungeonCrawler.GameStates.PlayingState
             _viewMask.DrawCenter(spriteBatch, _spriteBatchManager.MainLayerView.Middle);
         }
 
-        public void ActionTick()
-        {
-            _entityManager.ActionTick();
-        }
-
         public void SetPlayerDestination(IFloor floor)
         {
             if (_entityManager.IsBusy())

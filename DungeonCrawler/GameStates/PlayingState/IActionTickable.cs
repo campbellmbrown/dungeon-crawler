@@ -1,4 +1,4 @@
-namespace DungeonCrawler
+namespace DungeonCrawler.GameStates.PlayingState
 {
     public interface IActionTickable
     {

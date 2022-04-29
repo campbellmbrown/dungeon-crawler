@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
@@ -63,6 +64,12 @@ namespace DungeonCrawler.GameStates.PlayingState
                 Vector2 diff = _destination - Position;
                 if (diff.Length() > 0) // Cannot normalize a vector of length 0
                 {
+                    var offAngle = Math.Abs(Vector2.Normalize(diff).ToAngle() % (Math.PI / 2f));
+                    if (offAngle > 0.001)
+                    {
+                        throw new InvalidOperationException("Entities should not move diagonally.");
+                    }
+
                     Position += Vector2.Normalize(diff) * IEntity.MOVEMENT_SPEED * gameTime.TimeDiffSec;
                 }
                 if ((_destination - Position).Length() < DESTINATION_HYSTERESIS)
