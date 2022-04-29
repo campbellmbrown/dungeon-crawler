@@ -17,6 +17,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         readonly GridManager _gridManager;
         readonly IEntityManager _entityManager;
         readonly ClickManager _clickManager;
+        readonly IActionManager _actionManager;
         Sprite _viewMask;
         // TODO: move to a MouseManager
         Sprite _mouseLight;
@@ -30,6 +31,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _entityManager = new EntityManager(logManager, _gridManager);
             _mouseLight = new Sprite(Game1.Textures["medium_light"]);
             _viewMask = new Sprite(Game1.Textures["center_view"]);
+            _actionManager = new ActionManager();
         }
 
         public void FrameTick(IGameTimeWrapper gameTime)
