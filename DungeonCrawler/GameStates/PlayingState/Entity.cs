@@ -108,14 +108,12 @@ namespace DungeonCrawler.GameStates.PlayingState
             if (sequence.Count() > IEntity.MAX_FLOORS_PER_PATHFIND)
             {
                 _logManager.Log("The destination is too far away from the source.", LogLevel.Warning);
-                return 0;
             }
             while (sequence.Count > 0)
             {
                 var step = sequence.Pop();
                 QueuedFloors.Enqueue(step);
             }
-            return QueuedFloors.Count;
         }
     }
 }
