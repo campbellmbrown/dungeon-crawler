@@ -1,0 +1,38 @@
+@startuml Action State Diagram
+
+title Action State Diagram
+
+state Stopped
+state Starting #Orange
+state InProgress
+state Restarting #Orange
+state Stopping
+
+[*] --> Stopped
+Stopped -> Starting : Click\n/ reset time
+Starting --> InProgress
+InProgress --> Restarting : timeout
+InProgress <-- Restarting : / reset time
+Stopping <-- Restarting : player no longer\npartaking\nin actions
+Stopped <-- Stopping
+
+Stopping : This state exists so objects
+Stopping : can observe the action when
+Stopping : it's at 100% before stopping
+Stopping : observation of the action
+Stopping : manager
+
+Starting : Acts as a single frame
+Starting : that objects can observe
+Starting : and trigger their ActionTick
+
+Restarting : Acts as a single frame
+Restarting : that objects can observe
+Restarting : and trigger their ActionTick
+
+legend top
+    | Color | State type |
+    | <#Orange> | Objects can trigger on \n observation of this state |
+endlegend
+
+@enduml

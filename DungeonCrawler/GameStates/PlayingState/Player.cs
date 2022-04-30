@@ -14,13 +14,13 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
         }
 
-        public override void ActionTick()
+        public override void FrameTick(IGameTimeWrapper gameTime)
         {
-            if (QueuedFloors.Count == 0)
+            base.FrameTick(gameTime);
+            if (_actionManager.ActionState != ActionState.Stopped && !PartakingInActionTick)
             {
                 _actionManager.Stop();
             }
-            base.ActionTick();
         }
     }
 }

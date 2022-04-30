@@ -63,17 +63,14 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public void SetPlayerDestination(IFloor floor)
         {
-            if (_actionManager.ActionState != ActionState.Stopped)
+            if (_actionManager.ActionState == ActionState.Stopped)
             {
-                _logManager.Log("Action tick triggered but actions are in progress.", LogLevel.Warning);
+                var floorsQueued = _entityManager.Player.SetDestination(floor);
+                _actionManager.Start();
             }
             else
             {
-                var floorsQueued = _entityManager.Player.SetDestination(floor);
-                if (floorsQueued > 0)
-                {
-                    _actionManager.Start();
-                }
+                _logManager.Log("Action tick triggered but actions are in progress.", LogLevel.Warning);
             }
         }
     }

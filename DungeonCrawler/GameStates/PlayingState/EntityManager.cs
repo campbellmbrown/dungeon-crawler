@@ -25,7 +25,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             Player.FrameTick(gameTime);
             foreach (var entity in _entities)
             {
-                entity.ActionTick();
+                entity.FrameTick(gameTime);
             }
         }
 

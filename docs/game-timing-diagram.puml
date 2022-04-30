@@ -1,76 +1,81 @@
 @startuml Game Sequence Diagram
 title Game Sequence Diagram
 
-participant Game1
 participant PlayingState
 participant GridManager
 participant GridSquare
 participant ClickManager
 participant EntityManager
+participant ActionManager
 participant Player
 participant Entity
 
--> Game1 : Update
-activate Game1 #Green
-    Game1 -> PlayingState : FrameTick
-    activate PlayingState #Green
-        PlayingState -> ClickManager : FrameTick
-        activate ClickManager #Green
-            alt Left click GridSquare
-                ClickManager -> GridSquare : SetPlayerDestination
-                GridSquare -> GridManager : SetPlayerDestination
-                GridManager -> PlayingState : SetPlayerDestination
-                alt GridManager not busy
-                    PlayingState -> Player : SetDestination
-                    Player -> Player : Add to QueuedFloors
+activate PlayingState #Green
+    PlayingState -> ClickManager : FrameTick()
+    activate ClickManager #Green
+        alt Left click GridSquare
+            ClickManager -> GridSquare : SetPlayerDestination()
+            GridSquare -> GridManager : SetPlayerDestination()
+            GridManager -> PlayingState : SetPlayerDestination()
+            ActionManager --> PlayingState : ActionState
+            alt ActionState == Stopped
+                PlayingState -> Player : SetDestination()
+                Player -> Player : Add to QueuedFloors
+                Player --> PlayingState : floorsQueued
+                alt floorsQueued > 0
+                    PlayingState -> ActionManager : Start()
                 end
             end
-        deactivate ClickManager
+        end
+    deactivate ClickManager
 
-        PlayingState -> EntityManager : FrameTick
-        activate EntityManager #Green
-            EntityManager -> Player : PrioirityFrameTick
-            activate Player #Green
-                alt There are queuedGridSquares and AtDestination
-                    Player -> PlayingState : ActionTick
-                    activate PlayingState #Orange
-                        PlayingState -> EntityManager : ActionTick
-                        activate EntityManager #Orange
-                            EntityManager -> Player : PriorityActionTick
-                            activate Player #Orange
-                                alt there are queuedGridSquares
-                                    Player -> GridSquare : Set entity to this
-                                    Player -> Player : New destination
-                                end
-                            deactivate Player
-                            loop for each Entity
-                                EntityManager -> Entity : ActionTick
-                                activate Entity #Orange
-                                    alt there are queuedGridSquares
-                                        Entity -> GridSquare : Set entity to this
-                                        Entity -> Entity : New destination
-                                    end
-                                deactivate Entity
-                            end
-                        deactivate EntityManager
-                    deactivate PlayingState
-                    alt Off destination
-                        Player -> Player : Move towards destination
-                    end
-                end
-            deactivate Player
-
-            loop for each Entity
-                EntityManager -> Entity : FrameTick
-                activate Entity #Green
-                    alt Off destination
-                        Entity -> Entity : Move towards destination
-                    end
-                deactivate Entity
+    PlayingState -> EntityManager : FrameTick()
+    activate EntityManager #Green
+        EntityManager -> Player : FrameTick()
+        activate Player #Green
+            Player -> Entity : FrameTick()
+            note over Player
+                This does everything the
+                Entity does below, just
+                before all the other
+                Entities.
+            end note
+            ActionManager -> Player : ActionState
+            alt ActionState != Stopped and !PartakingInActionTick
+                Player -> ActionManager : Stop()
             end
-        deactivate EntityManager
-    deactivate PlayingState
-deactivate Game1
+        deactivate Player
+        EntityManager -> Entity : FrameTick()
+        loop for each entity
+            activate Entity #Green
+                ActionManager --> Entity : ActionState
+                alt ActionState == Stopped
+                else ActionState == Starting
+                    Entity -> Entity : ActionTick()
+                    activate Entity #Orange
+                        alt there are queuedGridSquares
+                            Entity -> GridSquare : Set entity to this
+                            Entity -> Entity : New destination
+                        end
+                    deactivate Entity
+                end
+                alt PartakingInActionTick
+                    ActionManager -> Entity : DecimalComplete
+                    Entity -> Entity : Change position
+                end
+                alt ActionState == Restarting
+                    Entity -> Entity : ActionTick()
+                    activate Entity #Orange
+                        alt there are queuedGridSquares
+                            Entity -> GridSquare : Set entity to this
+                            Entity -> Entity : New destination
+                        end
+                    deactivate Entity
+                end
+            deactivate Entity
+        end
+    deactivate EntityManager
+deactivate PlayingState
 
 legend top
     | Color     | Tick type   |
