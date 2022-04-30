@@ -26,18 +26,19 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
             _logManager = logManager;
             _spriteBatchManager = spriteBatchManager;
-            _clickManager = new ClickManager(spriteBatchManager.MainLayerView);
-            _gridManager = new GridManager(logManager, this, _clickManager);
-            _entityManager = new EntityManager(logManager, _gridManager);
+            _actionManager = new ActionManager(_logManager);
+            _clickManager = new ClickManager(_spriteBatchManager.MainLayerView);
+            _gridManager = new GridManager(_logManager, this, _clickManager);
+            _entityManager = new EntityManager(_logManager, _gridManager, _actionManager);
             _mouseLight = new Sprite(Game1.Textures["medium_light"]);
             _viewMask = new Sprite(Game1.Textures["center_view"]);
-            _actionManager = new ActionManager();
         }
 
         public void FrameTick(IGameTimeWrapper gameTime)
         {
             _clickManager.FrameTick();
             _entityManager.FrameTick(gameTime);
+            _actionManager.FrameTick(gameTime);
 
             _spriteBatchManager.MainLayerView.Focus(_entityManager.Player.Position);
         }
@@ -62,13 +63,17 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public void SetPlayerDestination(IFloor floor)
         {
-            if (_entityManager.IsBusy())
+            if (_actionManager.ActionState != ActionState.Stopped)
             {
-                _logManager.Log("Action tick triggered but something is busy.", LogLevel.Warning);
+                _logManager.Log("Action tick triggered but actions are in progress.", LogLevel.Warning);
             }
             else
             {
-                _entityManager.Player.SetDestination(floor);
+                var floorsQueued = _entityManager.Player.SetDestination(floor);
+                if (floorsQueued > 0)
+                {
+                    _actionManager.Start();
+                }
             }
         }
     }

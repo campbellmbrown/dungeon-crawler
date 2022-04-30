@@ -7,46 +7,41 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public enum DestinationState
-    {
-        AtDestination,
-        OffDestination,
-    }
-
-    public interface IEntity : IMyDrawable, IActionTickable, IFrameTickable, ICouldBeBusy
+    public interface IEntity : IMyDrawable, IActionTickable, IFrameTickable
     {
         const int MAX_FLOORS_PER_PATHFIND = 15;
-        const float MOVEMENT_SPEED = 80f; // 80 pixels/second.
 
-        void SetDestination(IFloor destination);
+        int SetDestination(IFloor destination);
 
-        Vector2 Position { get; }
         Queue<IFloor> QueuedFloors { get; set; }
-        DestinationState DestinationState { get; }
+        bool PartakingInActionTick { get; }
+        Vector2 Position { get; }
     }
 
     public class Entity : IEntity
     {
-        readonly IGridManager _gridManager;
         readonly ILogManager _logManager;
+        readonly IGridManager _gridManager;
+        protected readonly IActionManager _actionManager;
         readonly IPathFinding _pathFinding;
-        IFloor _floor;
 
-        const float DESTINATION_HYSTERESIS = 0.5f; // How many pixels away for the destination to be considered reached.
-
-        Vector2 _destination;
         public Queue<IFloor> QueuedFloors { get; set; } = new Queue<IFloor>();
+        public bool PartakingInActionTick { get; private set; } = false;
         public Vector2 Position { get; private set; }
-        public DestinationState DestinationState { get; set; } = DestinationState.AtDestination;
+
+        IFloor _floor;
+        Vector2 _origPosition;
 
         public Entity(
             ILogManager logManager,
             IGridManager gridManager,
+            IActionManager actionManager,
             IPathFinding pathfinding,
             IFloor floor)
         {
             _logManager = logManager;
             _gridManager = gridManager;
+            _actionManager = actionManager;
             _pathFinding = pathfinding;
             _floor = floor;
             _floor.Entity = this;
@@ -54,29 +49,23 @@ namespace DungeonCrawler.GameStates.PlayingState
             Position = _floor.Position;
         }
 
-        public const int FRAME_TICKS_PER_STEP = 10;
-
         public virtual void FrameTick(IGameTimeWrapper gameTime)
         {
-            // If not at destination
-            if (DestinationState == DestinationState.OffDestination)
+            if (_actionManager.ActionState == ActionState.Stopped)
             {
-                Vector2 diff = _destination - Position;
-                if (diff.Length() > 0) // Cannot normalize a vector of length 0
-                {
-                    var offAngle = Math.Abs(Vector2.Normalize(diff).ToAngle() % (Math.PI / 2f));
-                    if (offAngle > 0.001)
-                    {
-                        throw new InvalidOperationException("Entities should not move diagonally.");
-                    }
-
-                    Position += Vector2.Normalize(diff) * IEntity.MOVEMENT_SPEED * gameTime.TimeDiffSec;
-                }
-                if ((_destination - Position).Length() < DESTINATION_HYSTERESIS)
-                {
-                    Position = _destination;
-                    DestinationState = DestinationState.AtDestination;
-                }
+                return;
+            }
+            if (_actionManager.ActionState == ActionState.Starting)
+            {
+                ActionTick();
+            }
+            if (PartakingInActionTick)
+            {
+                Position = _origPosition + _actionManager.DecimalComplete * (_floor.Position - _origPosition);
+            }
+            if (_actionManager.ActionState == ActionState.Restarting)
+            {
+                ActionTick();
             }
         }
 
@@ -96,34 +85,41 @@ namespace DungeonCrawler.GameStates.PlayingState
             _logManager.Log("Entity " + GetHashCode().ToString() + " ActionTick triggered.", LogLevel.Debug);
             if (QueuedFloors.Count > 0)
             {
+                PartakingInActionTick = true;
+                _origPosition = _floor.Position;
                 _floor.Entity = null;
                 _floor = QueuedFloors.Dequeue();
                 _floor.Entity = this;
-                _destination = _floor.Position;
-                DestinationState = DestinationState.OffDestination;
+            }
+            else
+            {
+                PartakingInActionTick = false;
             }
         }
 
-        public void SetDestination(IFloor destination)
+        /// <summary>
+        /// Sets the destination tile for the entity.
+        /// </summary>
+        /// <returns>The amount of tiles added to the queue.</returns>
+        public int SetDestination(IFloor destination)
         {
+            if (QueuedFloors.Count > 0)
+            {
+                throw new InvalidOperationException("Cannot add floors to the queue that's already filled.");
+            }
+
             var sequence = _pathFinding.FindShortestPath(_floor, destination);
             if (sequence.Count() > IEntity.MAX_FLOORS_PER_PATHFIND)
             {
                 _logManager.Log("The destination is too far away from the source.", LogLevel.Warning);
+                return 0;
             }
-            else
+            while (sequence.Count > 0)
             {
-                while (sequence.Count > 0)
-                {
-                    var step = sequence.Pop();
-                    QueuedFloors.Enqueue(step);
-                }
+                var step = sequence.Pop();
+                QueuedFloors.Enqueue(step);
             }
-        }
-
-        public bool IsBusy()
-        {
-            return DestinationState != DestinationState.AtDestination;
+            return QueuedFloors.Count;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
     public interface IActionManager : IFrameTickable
     {
-        const float SecondsPerAction = 0.2f;
+        const float SecondsPerAction = 0.25f;
         float DecimalComplete { get; }
         ActionState ActionState { get; }
         void Start();
@@ -29,46 +29,63 @@ namespace DungeonCrawler.GameStates.PlayingState
 
     public enum ActionState
     {
-        NotActive,
+        Stopped,
+        Stopping,
+        Starting,
         InProgress,
-        Finished,
+        Restarting,
     }
 
     public class ActionManager : IActionManager
     {
+        readonly ILogManager _logManager;
+
         public float DecimalComplete => _timePassed / IActionManager.SecondsPerAction;
-        public ActionState ActionState { get; private set; } = ActionState.NotActive;
+        public ActionState ActionState { get; private set; } = ActionState.Stopped;
 
         float _timePassed = 0f;
 
-        public ActionManager()
+        public ActionManager(ILogManager logManager)
         {
+            _logManager = logManager;
         }
 
         public void Start()
         {
             _timePassed = 0;
-            ActionState = ActionState.InProgress;
+            _logManager.Log($"Transition from {ActionState} to {ActionState.Starting}");
+            ActionState = ActionState.Starting;
         }
 
         public void Stop()
         {
-            ActionState = ActionState.NotActive;
+            _logManager.Log($"Transition from {ActionState} to {ActionState.Stopping}");
+            ActionState = ActionState.Stopping;
         }
 
         public void FrameTick(IGameTimeWrapper gameTime)
         {
             switch (ActionState)
             {
-                case ActionState.NotActive:
+                case ActionState.Stopped:
                     // Do nothing
+                    break;
+                case ActionState.Stopping:
+                    _logManager.Log($"Transition from {ActionState} to {ActionState.Stopped}");
+                    ActionState = ActionState.Stopped;
+                    break;
+                case ActionState.Starting:
+                    _logManager.Log($"Transition from {ActionState} to {ActionState.InProgress}");
+                    ActionState = ActionState.InProgress;
                     break;
                 case ActionState.InProgress:
                     Progress(gameTime);
                     break;
-                case ActionState.Finished:
+                case ActionState.Restarting:
                     // We haven't got a stop signal so start the next action
-                    Start();
+                    _timePassed = 0;
+                    _logManager.Log($"Transition from {ActionState} to {ActionState.InProgress}");
+                    ActionState = ActionState.InProgress;
                     break;
             }
         }
@@ -79,7 +96,8 @@ namespace DungeonCrawler.GameStates.PlayingState
             if (_timePassed >= IActionManager.SecondsPerAction)
             {
                 _timePassed = IActionManager.SecondsPerAction;
-                ActionState = ActionState.Finished;
+                _logManager.Log($"Transition from {ActionState} to {ActionState.Restarting}");
+                ActionState = ActionState.Restarting;
             }
         }
     }
