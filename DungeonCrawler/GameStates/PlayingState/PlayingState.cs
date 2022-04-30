@@ -14,18 +14,20 @@ namespace DungeonCrawler.GameStates.PlayingState
         readonly SpriteBatchManager _spriteBatchManager;
 
         // Private
+        readonly IFocusManager _focusManager;
+        readonly IActionManager _actionManager;
+        readonly ClickManager _clickManager;
         readonly GridManager _gridManager;
         readonly IEntityManager _entityManager;
-        readonly ClickManager _clickManager;
-        readonly IActionManager _actionManager;
-        Sprite _viewMask;
         // TODO: move to a MouseManager
         Sprite _mouseLight;
+        Sprite _viewMask;
 
         public PlayingState(ILogManager logManager, SpriteBatchManager spriteBatchManager)
         {
             _logManager = logManager;
             _spriteBatchManager = spriteBatchManager;
+            _focusManager = new FocusManager(_spriteBatchManager);
             _actionManager = new ActionManager(_logManager);
             _clickManager = new ClickManager(_spriteBatchManager.MainLayerView);
             _gridManager = new GridManager(_logManager, this, _clickManager);
@@ -39,8 +41,8 @@ namespace DungeonCrawler.GameStates.PlayingState
             _clickManager.FrameTick();
             _entityManager.FrameTick(gameTime);
             _actionManager.FrameTick(gameTime);
-
-            _spriteBatchManager.MainLayerView.Focus(_entityManager.Player.Position);
+            _focusManager.Focus(_entityManager.Player.Position);
+            _focusManager.FrameTick(gameTime);
         }
 
         public void Draw(ISpriteBatchWrapper spriteBatch)

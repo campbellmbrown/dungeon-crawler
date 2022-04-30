@@ -13,7 +13,12 @@ namespace DungeonCrawler.Visual
         ViewLightContent,
     }
 
-    public class SpriteBatchManager
+    public interface ISpriteBatchManager
+    {
+        ILayerView MainLayerView { get; }
+    }
+
+    public class SpriteBatchManager : ISpriteBatchManager
     {
         // Dependencies
         private readonly GraphicsDevice _graphicsDevice;
