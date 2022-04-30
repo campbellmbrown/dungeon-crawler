@@ -1,23 +1,5 @@
-using System.Timers;
-
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    // Click happens
-    // Player generates queue
-    // Entities generate queue
-    // Action manager starts
-    // Entity tick progresses
-    // Player moves towards destination
-    // Entity moves towards destination
-    // Entity tick progresses
-    // Player moves towards destination
-    // Entity moves towards destination
-    // Entity tick is at 100%
-    // Player locks to tile
-    // If player has no more tiles, clear entity tiles
-    // and stop the action manager
-    // Entity locks to tile
-
     public interface IActionManager : IFrameTickable
     {
         const float SecondsPerAction = 0.25f;

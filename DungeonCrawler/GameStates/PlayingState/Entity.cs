@@ -11,7 +11,7 @@ namespace DungeonCrawler.GameStates.PlayingState
     {
         const int MAX_FLOORS_PER_PATHFIND = 15;
 
-        int SetDestination(IFloor destination);
+        void SetDestination(IFloor destination);
 
         Queue<IFloor> QueuedFloors { get; set; }
         bool PartakingInActionTick { get; }
@@ -97,11 +97,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        /// <summary>
-        /// Sets the destination tile for the entity.
-        /// </summary>
-        /// <returns>The amount of tiles added to the queue.</returns>
-        public int SetDestination(IFloor destination)
+        public void SetDestination(IFloor destination)
         {
             if (QueuedFloors.Count > 0)
             {

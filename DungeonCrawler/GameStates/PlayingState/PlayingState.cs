@@ -65,7 +65,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
             if (_actionManager.ActionState == ActionState.Stopped)
             {
-                var floorsQueued = _entityManager.Player.SetDestination(floor);
+                _entityManager.Player.SetDestination(floor);
                 _actionManager.Start();
             }
             else
