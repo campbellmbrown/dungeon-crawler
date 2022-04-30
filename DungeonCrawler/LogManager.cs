@@ -68,6 +68,7 @@ namespace DungeonCrawler
     public interface ILogManager : IFrameTickable, IMyDrawable
     {
         void Log(string message, LogLevel logLevel);
+        void Log(string message);
     }
 
     public class LogManager : ILogManager
@@ -129,6 +130,11 @@ namespace DungeonCrawler
                 _currentLogLevel++;
             }
             Log("Changed log level to " + Enum.GetName(typeof(LogLevel), _currentLogLevel), LogLevel.Other);
+        }
+
+        public void Log(string message)
+        {
+            Log(message, LogLevel.Trace);
         }
 
         public void Log(string message, LogLevel logLevel)

@@ -17,6 +17,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         readonly GridManager _gridManager;
         readonly IEntityManager _entityManager;
         readonly ClickManager _clickManager;
+        readonly IActionManager _actionManager;
         Sprite _viewMask;
         // TODO: move to a MouseManager
         Sprite _mouseLight;
@@ -25,9 +26,10 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
             _logManager = logManager;
             _spriteBatchManager = spriteBatchManager;
-            _clickManager = new ClickManager(spriteBatchManager.MainLayerView);
-            _gridManager = new GridManager(logManager, this, _clickManager);
-            _entityManager = new EntityManager(logManager, _gridManager);
+            _actionManager = new ActionManager(_logManager);
+            _clickManager = new ClickManager(_spriteBatchManager.MainLayerView);
+            _gridManager = new GridManager(_logManager, this, _clickManager);
+            _entityManager = new EntityManager(_logManager, _gridManager, _actionManager);
             _mouseLight = new Sprite(Game1.Textures["medium_light"]);
             _viewMask = new Sprite(Game1.Textures["center_view"]);
         }
@@ -36,6 +38,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         {
             _clickManager.FrameTick();
             _entityManager.FrameTick(gameTime);
+            _actionManager.FrameTick(gameTime);
 
             _spriteBatchManager.MainLayerView.Focus(_entityManager.Player.Position);
         }
@@ -58,20 +61,16 @@ namespace DungeonCrawler.GameStates.PlayingState
             _viewMask.DrawCenter(spriteBatch, _spriteBatchManager.MainLayerView.Middle);
         }
 
-        public void ActionTick()
-        {
-            _entityManager.ActionTick();
-        }
-
         public void SetPlayerDestination(IFloor floor)
         {
-            if (_entityManager.IsBusy())
+            if (_actionManager.ActionState == ActionState.Stopped)
             {
-                _logManager.Log("Action tick triggered but something is busy.", LogLevel.Warning);
+                _entityManager.Player.SetDestination(floor);
+                _actionManager.Start();
             }
             else
             {
-                _entityManager.Player.SetDestination(floor);
+                _logManager.Log("Action tick triggered but actions are in progress.", LogLevel.Warning);
             }
         }
     }

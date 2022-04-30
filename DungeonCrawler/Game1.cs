@@ -33,9 +33,6 @@ namespace DungeonCrawler
         GameState _gameState;
         IGameState _playingState;
 
-        const float HEARTBEAT_TIME = 1f; // sec
-        float _timeSinceLastHeartBeat = HEARTBEAT_TIME;
-
         public const string VERSION_STR = "v0.3.4";
 
         SpriteBatchManager _spriteBatchManager;
@@ -104,8 +101,6 @@ namespace DungeonCrawler
                 Exit();
             }
 
-            HeartBeat(gameTime);
-
             switch (_gameState)
             {
                 case GameState.Playing:
@@ -138,16 +133,6 @@ namespace DungeonCrawler
             // base.Draw(gameTime); // Does this need to be done?
             _spriteBatchManager.Finish();
             _performanceManager.Stop();
-        }
-
-        private void HeartBeat(GameTime gameTime)
-        {
-            _timeSinceLastHeartBeat += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (_timeSinceLastHeartBeat >= HEARTBEAT_TIME)
-            {
-                _logManager.Log("Heartbeat", LogLevel.Trace);
-                _timeSinceLastHeartBeat -= HEARTBEAT_TIME;
-            }
         }
     }
 }
