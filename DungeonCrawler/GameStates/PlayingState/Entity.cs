@@ -108,6 +108,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             if (sequence.Count() > IEntity.MAX_FLOORS_PER_PATHFIND)
             {
                 _logManager.Log("The destination is too far away from the source.", LogLevel.Warning);
+                return;
             }
             while (sequence.Count > 0)
             {
