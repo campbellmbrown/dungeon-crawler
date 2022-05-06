@@ -41,6 +41,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public void Stop()
         {
+            _timePassed = IActionManager.SecondsPerAction;
             _logManager.Log($"Transition from {ActionState} to {ActionState.Stopping}");
             ActionState = ActionState.Stopping;
         }
