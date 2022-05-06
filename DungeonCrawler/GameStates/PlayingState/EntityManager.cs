@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DungeonCrawler.GameStates.PlayingState.PathFinding;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
@@ -16,6 +17,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public EntityManager(ILogManager logManager, GridManager gridManager, IActionManager actionManager)
         {
             IPathFinding dijkstra = new Dijkstra(logManager, gridManager.Floors);
+            IPathFinding simpleMove = new SimpleMove(gridManager.Floors);
             Player = new Player(logManager, gridManager, actionManager, dijkstra, gridManager.GetStartingFloor());
             _entities = new List<IEntity>();
         }

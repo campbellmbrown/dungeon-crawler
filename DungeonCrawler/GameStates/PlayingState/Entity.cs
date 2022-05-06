@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using DungeonCrawler.GameStates.PlayingState.PathFinding;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;

@@ -1,4 +1,4 @@
-﻿using DungeonCrawler.Management;
+using DungeonCrawler.GameStates.PlayingState.PathFinding;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
