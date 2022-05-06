@@ -31,6 +31,7 @@ namespace DungeonCrawler.GameStates.PlayingState.PathFinding
             var xDiff = dest.XIdx - orig.XIdx;
             var yDiff = dest.YIdx - orig.YIdx;
 
+            // Try move in the direction with the greatest difference
             if (Math.Abs(xDiff) >= Math.Abs(yDiff))
             {
                 var xDisplacement = Math.Sign(xDiff);
@@ -41,12 +42,16 @@ namespace DungeonCrawler.GameStates.PlayingState.PathFinding
                     return stack;
                 }
             }
-            var yDisplacement = Math.Sign(yDiff);
-            var floorInY = FloorAt(orig.XIdx, orig.YIdx + yDisplacement);
-            if (floorInY != null)
+            // If we can't move in that direction, try in the other direction
+            if (Math.Abs(yDiff) > 0)
             {
-                stack.Push(floorInY);
-                return stack;
+                var yDisplacement = Math.Sign(yDiff);
+                var floorInY = FloorAt(orig.XIdx, orig.YIdx + yDisplacement);
+                if (floorInY != null)
+                {
+                    stack.Push(floorInY);
+                    return stack;
+                }
             }
             return stack;
         }

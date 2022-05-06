@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using DungeonCrawler.GameStates.PlayingState;
 using DungeonCrawler.GameStates.PlayingState.PathFinding;
 using Moq;
@@ -74,71 +73,6 @@ namespace DungeonCrawlerTests
                 },
                 2, 3
             },
-            new object[]
-            {
-                new List<string>
-                {
-                    "xxxxx",
-                    "xxOxx",
-                    "xx.xx",
-                    "xxxxx",
-                    "xxDxx",
-                    "xxxxx",
-                },
-                1, 1
-            },
-            new object[]
-            {
-                new List<string>
-                {
-                    "xxxxx",
-                    "xxOxx",
-                    "xx..x",
-                    "xxxxx",
-                    "xxDxx",
-                    "xxxxx",
-                },
-                1, 1
-            },
-            new object[]
-            {
-                new List<string>
-                {
-                    "xxxxx",
-                    "xxOxx",
-                    "x..xx",
-                    "xxxxx",
-                    "xxDxx",
-                    "xxxxx",
-                },
-                3, 1
-            },
-            new object[]
-            {
-                new List<string>
-                {
-                    "xxxx",
-                    "xxOx",
-                    "x..x",
-                    "xxxx",
-                    "xDxx",
-                    "xxxx",
-                },
-                1, 1
-            },
-            new object[]
-            {
-                new List<string>
-                {
-                    "xxxx",
-                    "xOxx",
-                    "x..x",
-                    "xxxx",
-                    "xxDx",
-                    "xxxx",
-                },
-                2, 1
-            },
         };
 
         [TestCaseSource(nameof(_moveInCorrectDirectionTestCases))]
@@ -204,7 +138,5 @@ namespace DungeonCrawlerTests
             // Assert:
             Assert.That(result.Count, Is.EqualTo(0));
         }
-
-        // Test destination == origin
     }
 }
