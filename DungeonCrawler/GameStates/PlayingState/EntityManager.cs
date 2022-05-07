@@ -23,7 +23,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _entities = new List<IEntity>();
 
             // Temporary
-            for (int idx = 0; idx < 2; idx++)
+            for (int idx = 0; idx < 10; idx++)
             {
                 _entities.Add(
                     new Botlin(logManager, gridManager, actionManager, simpleMove, RNG.ChooseRandom(gridManager.Floors))

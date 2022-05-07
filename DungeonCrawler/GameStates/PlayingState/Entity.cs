@@ -30,7 +30,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public bool PartakingInActionTick { get; private set; } = false;
         public Vector2 Position { get; private set; }
 
-        IFloor _floor;
+        protected IFloor _floor;
         Vector2 _origPosition;
 
         public Entity(
