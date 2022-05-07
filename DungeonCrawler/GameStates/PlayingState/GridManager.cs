@@ -10,6 +10,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         List<IFloor> Floors { get; }
         int MinY { get; }
         int MaxY { get; }
+        IFloor PlayerFloor { get; }
     }
 
     public class GridManager : IGridManager
@@ -25,6 +26,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public int MinY { get; private set; }
         public int MaxY { get; private set; }
+        public IFloor PlayerFloor { get => Floors.Find(floor => floor.Entity is Player ); }
 
         public GridManager(ILogManager logManager, PlayingState playingState, ClickManager clickManager)
         {

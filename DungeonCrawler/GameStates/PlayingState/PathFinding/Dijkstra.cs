@@ -1,19 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace DungeonCrawler.GameStates.PlayingState
+namespace DungeonCrawler.GameStates.PlayingState.PathFinding
 {
-    public interface IPathFinding
-    {
-        Stack<IFloor> FindShortestPath(IFloor orig, IFloor dest);
-    }
-
     public class Dijkstra : IPathFinding
     {
         readonly ILogManager _logManager;
-        readonly IList<IFloor> _floors;
+        readonly List<IFloor> _floors;
 
-        public Dijkstra(ILogManager logManager, IList<IFloor> floors)
+        public Dijkstra(ILogManager logManager, List<IFloor> floors)
         {
             _logManager = logManager;
             _floors = floors;
@@ -88,7 +83,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             {
                 while (curr != null)
                 {
-                    path.Push(_floors.ToList().Find(gs => (gs.XIdx == curr.XIdx) && (gs.YIdx == curr.YIdx)));
+                    path.Push(_floors.Find(gs => (gs.XIdx == curr.XIdx) && (gs.YIdx == curr.YIdx)));
                     curr = curr.Prev;
                 }
             }

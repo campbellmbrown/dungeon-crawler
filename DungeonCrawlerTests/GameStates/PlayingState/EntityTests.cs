@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler;
 using DungeonCrawler.GameStates.PlayingState;
+using DungeonCrawler.GameStates.PlayingState.PathFinding;
 using Microsoft.Xna.Framework;
 using Moq;
 using NUnit.Framework;
@@ -167,6 +168,24 @@ namespace DungeonCrawlerTests
             // Assert:
             _floorMock.VerifySet(floor => floor.Entity = null, Times.Once);
             nextFloorMock.VerifySet(floor => floor.Entity = (IEntity)_entity, Times.Once);
+        }
+
+        [Test]
+        public void ActionTick_NextFloorHasAnEntity_StopsPartaking()
+        {
+            // Arrange:
+            var floorMocks = FakeQueuedFloors(10);
+            var nextFloorMock = floorMocks.First();
+            nextFloorMock
+                .Setup(floor => floor.Entity)
+                .Returns(new Mock<IEntity>().Object);
+
+            // Act:
+            _entity.ActionTick();
+
+            // Assert:
+            Assert.That(_entity.QueuedFloors.Count, Is.Zero);
+            Assert.That(_entity.PartakingInActionTick, Is.False);
         }
 
         [Test]

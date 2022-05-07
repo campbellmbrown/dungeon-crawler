@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DungeonCrawler.GameStates.PlayingState.PathFinding;
 using DungeonCrawler.Visual;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -21,7 +22,7 @@ namespace DungeonCrawler.GameStates.PlayingState
     public class Entity : IEntity
     {
         readonly ILogManager _logManager;
-        readonly IGridManager _gridManager;
+        protected readonly IGridManager _gridManager;
         protected readonly IActionManager _actionManager;
         readonly IPathFinding _pathFinding;
 
@@ -29,7 +30,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public bool PartakingInActionTick { get; private set; } = false;
         public Vector2 Position { get; private set; }
 
-        IFloor _floor;
+        protected IFloor _floor;
         Vector2 _origPosition;
 
         public Entity(
@@ -82,14 +83,23 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public virtual void ActionTick()
         {
-            _logManager.Log("Entity " + GetHashCode().ToString() + " ActionTick triggered.", LogLevel.Debug);
+            _logManager.Log($"{GetType()} ({GetHashCode()}) ActionTick triggered from state {_actionManager.ActionState}", LogLevel.Debug);
             if (QueuedFloors.Count > 0)
             {
-                PartakingInActionTick = true;
-                _origPosition = _floor.Position;
-                _floor.Entity = null;
-                _floor = QueuedFloors.Dequeue();
-                _floor.Entity = this;
+                // Encountered another entity, don't move any more
+                if (QueuedFloors.Peek().Entity != null)
+                {
+                    QueuedFloors.Clear();
+                    PartakingInActionTick = false;
+                }
+                else // The entity is going to be doing something this action tick
+                {
+                    PartakingInActionTick = true;
+                    _origPosition = _floor.Position;
+                    _floor.Entity = null;
+                    _floor = QueuedFloors.Dequeue();
+                    _floor.Entity = this;
+                }
             }
             else
             {

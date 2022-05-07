@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DungeonCrawler;
 using DungeonCrawler.GameStates.PlayingState;
+using DungeonCrawler.GameStates.PlayingState.PathFinding;
 using Microsoft.Xna.Framework;
 using Moq;
 using NUnit.Framework;
@@ -15,6 +16,7 @@ namespace DungeonCrawlerTests
         List<Mock<IFloor>> _floorsMocks;
         List<IFloor> _floors;
         IPathFinding _dijkstra;
+        PathFindingHelper _pathFindingHelper;
 
         [SetUp]
         public void Setup()
@@ -23,40 +25,7 @@ namespace DungeonCrawlerTests
             _floorsMocks = new List<Mock<IFloor>>();
             _floors = new List<IFloor>();
             _dijkstra = new Dijkstra(_logManagerMock.Object, _floors);
-        }
-
-        (IFloor orig, IFloor dest) MapStringToFloors(List<string> rows)
-        {
-            var orig = new Mock<IFloor>().Object;
-            var dest = new Mock<IFloor>().Object;
-            int rowIdx = 0;
-            foreach (var row in rows)
-            {
-                int columnIdx = 0;
-                foreach (var column in row)
-                {
-                    if (column != '.')
-                    {
-                        var floorMock = new Mock<IFloor>();
-                        floorMock.Setup(floor => floor.XIdx).Returns(columnIdx);
-                        floorMock.Setup(floor => floor.YIdx).Returns(rowIdx);
-                        _floorsMocks.Add(floorMock);
-                        _floors.Add(floorMock.Object);
-
-                        if (column == 'O')
-                        {
-                            orig = floorMock.Object;
-                        }
-                        if (column == 'D')
-                        {
-                            dest = floorMock.Object;
-                        }
-                    }
-                    columnIdx++;
-                }
-                rowIdx++;
-            }
-            return (orig, dest);
+            _pathFindingHelper = new PathFindingHelper(_floorsMocks, _floors);
         }
 
         static object[] _pathIsRightLengthTestCases =
@@ -143,13 +112,13 @@ namespace DungeonCrawlerTests
         public void FindShortestPath_PathIsRightLength(List<string> mapStr, int expectedPathLength)
         {
             // Arrange:
-            (IFloor orig, IFloor dest) = MapStringToFloors(mapStr);
+            (IFloor orig, IFloor dest) = _pathFindingHelper.MapStringToFloors(mapStr);
 
             // Act:
             var result = _dijkstra.FindShortestPath(orig, dest);
 
             // Assert:
-            Assert.That(result.Count(), Is.EqualTo(expectedPathLength));
+            Assert.That(result.Count, Is.EqualTo(expectedPathLength));
         }
 
         [Test]
@@ -163,14 +132,14 @@ namespace DungeonCrawlerTests
                 "xxxxxxxxx",
                 "xxxxxxxxD",
             };
-            (IFloor orig, IFloor dest) = MapStringToFloors(floorStr);
+            (IFloor orig, IFloor dest) = _pathFindingHelper.MapStringToFloors(floorStr);
             dest = orig;
 
             // Act:
             var result = _dijkstra.FindShortestPath(orig, dest);
 
             // Assert:
-            Assert.That(result.Count(), Is.Zero);
+            Assert.That(result.Count, Is.Zero);
         }
 
         List<string> _largeMap = new List<string>
@@ -203,7 +172,7 @@ namespace DungeonCrawlerTests
             };
             largeMapCopy[origY] = replaceInString(largeMapCopy[origY], origX, 'O');
             largeMapCopy[destY] = replaceInString(largeMapCopy[destY], destX, 'D');
-            return MapStringToFloors(largeMapCopy);
+            return _pathFindingHelper.MapStringToFloors(largeMapCopy);
         }
 
         [TestCase(0, 0, 27, 14)]
@@ -218,7 +187,7 @@ namespace DungeonCrawlerTests
 
             // Assert:
             var start = result.Pop();
-            while (result.Count() > 0)
+            while (result.Count > 0)
             {
                 var next = result.Pop();
                 var difference = new Vector2(next.XIdx - start.XIdx, next.YIdx - start.YIdx);

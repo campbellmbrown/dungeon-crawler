@@ -48,6 +48,19 @@ namespace DungeonCrawlerTests
         }
 
         [Test]
+        public void Stop_SetsTimeToFull()
+        {
+            // Arrange:
+            _actionManager.Start();
+
+            // Act:
+            _actionManager.Stop();
+
+            // Assert:
+            Assert.That(_actionManager.DecimalComplete, Is.EqualTo(1));
+        }
+
+        [Test]
         public void FrameTick_Stopping_ChangesStateToStopped()
         {
             // Arrange:
