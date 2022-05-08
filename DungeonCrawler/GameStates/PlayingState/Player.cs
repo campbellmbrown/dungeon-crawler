@@ -2,7 +2,11 @@ using DungeonCrawler.GameStates.PlayingState.PathFinding;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class Player : Entity
+    public interface IPlayer : IEntity
+    {
+    }
+
+    public class Player : Entity, IPlayer
     {
         public Player(
             ILogManager logManager,
