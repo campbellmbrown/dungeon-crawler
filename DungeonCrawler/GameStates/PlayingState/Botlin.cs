@@ -3,7 +3,11 @@ using DungeonCrawler.GameStates.PlayingState.PathFinding;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class Botlin : Entity, IEntity
+    public interface IBotlin : IEntity
+    {
+    }
+
+    public class Botlin : Entity, IBotlin
     {
         int _range = 4;
 

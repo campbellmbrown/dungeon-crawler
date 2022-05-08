@@ -11,6 +11,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         int MinY { get; }
         int MaxY { get; }
         IFloor PlayerFloor { get; }
+        IFloor StartingFloor { get; }
     }
 
     public class GridManager : IGridManager
@@ -27,6 +28,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public int MinY { get; private set; }
         public int MaxY { get; private set; }
         public IFloor PlayerFloor { get => Floors.Find(floor => floor.Entity is Player ); }
+        public IFloor StartingFloor { get => Floors.Find(floor => floor.XIdx == STARTING_X && floor.YIdx == STARTING_Y); }
 
         public GridManager(ILogManager logManager, PlayingState playingState, ClickManager clickManager)
         {
@@ -44,11 +46,6 @@ namespace DungeonCrawler.GameStates.PlayingState
             exists |= Floors.Any(floor => floor.XIdx == xIdx && floor.YIdx == yIdx);
             exists |= Walls.Any(wall => wall.XIdx == xIdx && wall.YIdx == yIdx);
             return exists;
-        }
-
-        public IFloor GetStartingFloor()
-        {
-            return Floors.Find(sq => sq.XIdx == STARTING_X && sq.YIdx == STARTING_Y);
         }
 
         public void Draw(ISpriteBatchWrapper spriteBatch)
