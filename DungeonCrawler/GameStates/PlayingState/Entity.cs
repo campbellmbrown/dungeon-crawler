@@ -13,25 +13,28 @@ namespace DungeonCrawler.GameStates.PlayingState
         const int MAX_FLOORS_PER_PATHFIND = 15;
 
         void SetDestination(IFloor destination);
+        void SwapWith(IEntity entity);
 
         Queue<IFloor> QueuedFloors { get; set; }
         bool PartakingInActionTick { get; }
         Vector2 Position { get; }
+        IFloor Floor { get; }
     }
 
     public class Entity : IEntity
     {
-        readonly ILogManager _logManager;
+        protected readonly ILogManager _logManager;
         protected readonly IGridManager _gridManager;
         protected readonly IActionManager _actionManager;
         readonly IPathFinding _pathFinding;
 
         public Queue<IFloor> QueuedFloors { get; set; } = new Queue<IFloor>();
-        public bool PartakingInActionTick { get; private set; } = false;
+        public bool PartakingInActionTick { get; protected set; } = false;
         public Vector2 Position { get; private set; }
+        public IFloor Floor { get; protected set; }
 
-        protected IFloor _floor;
-        Vector2 _origPosition;
+        protected Vector2 _origPosition;
+        protected bool _beenSwapped = false;
 
         public Entity(
             ILogManager logManager,
@@ -44,10 +47,10 @@ namespace DungeonCrawler.GameStates.PlayingState
             _gridManager = gridManager;
             _actionManager = actionManager;
             _pathFinding = pathfinding;
-            _floor = floor;
-            _floor.Entity = this;
+            Floor = floor;
+            Floor.Entity = this;
 
-            Position = _floor.Position;
+            Position = Floor.Position;
         }
 
         public virtual void FrameTick(IGameTimeWrapper gameTime)
@@ -62,7 +65,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
             if (PartakingInActionTick)
             {
-                Position = _origPosition + _actionManager.DecimalComplete * (_floor.Position - _origPosition);
+                Position = _origPosition + _actionManager.DecimalComplete * (Floor.Position - _origPosition);
             }
             if (_actionManager.ActionState == ActionState.Restarting)
             {
@@ -83,7 +86,14 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public virtual void ActionTick()
         {
-            _logManager.Log($"{GetType()} ({GetHashCode()}) ActionTick triggered from state {_actionManager.ActionState}", LogLevel.Debug);
+            _logManager.Log($"{GetType()} ({GetHashCode()}) ActionTick triggered from state {_actionManager.ActionState} beenSwapped = {_beenSwapped}", LogLevel.Debug);
+            if (_beenSwapped)
+            {
+                PartakingInActionTick = true;
+                QueuedFloors.Clear();
+                _beenSwapped = false;
+                return;
+            }
             if (QueuedFloors.Count > 0)
             {
                 // Encountered another entity, don't move any more
@@ -95,10 +105,10 @@ namespace DungeonCrawler.GameStates.PlayingState
                 else // The entity is going to be doing something this action tick
                 {
                     PartakingInActionTick = true;
-                    _origPosition = _floor.Position;
-                    _floor.Entity = null;
-                    _floor = QueuedFloors.Dequeue();
-                    _floor.Entity = this;
+                    _origPosition = Floor.Position;
+                    Floor.Entity = null;
+                    Floor = QueuedFloors.Dequeue();
+                    Floor.Entity = this;
                 }
             }
             else
@@ -107,14 +117,32 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
-        public void SetDestination(IFloor destination)
+        /// <summary>
+        /// Swaps this entity with another entity.
+        /// </summary>
+        /// <remarks>
+        /// Steps that this should be called:
+        /// - Entity A should set it's original position
+        /// - Entity A should store the floor of this entity (entity B)
+        /// - Entity A should call SwapWith(entityA) to allow entity B to update it's floor
+        /// - Entity A should then update it's flored based on the stored floors
+        /// <param name="entity">The entity to swap with.</param>
+        public void SwapWith(IEntity entity)
+        {
+            _origPosition = Floor.Position;
+            Floor = entity.Floor;
+            Floor.Entity = this;
+            _beenSwapped = true;
+        }
+
+        public virtual void SetDestination(IFloor destination)
         {
             if (QueuedFloors.Count > 0)
             {
                 throw new InvalidOperationException("Cannot add floors to the queue that's already filled.");
             }
 
-            var sequence = _pathFinding.FindShortestPath(_floor, destination);
+            var sequence = _pathFinding.FindShortestPath(Floor, destination);
             if (sequence.Count() > IEntity.MAX_FLOORS_PER_PATHFIND)
             {
                 _logManager.Log("The destination is too far away from the source.", LogLevel.Warning);
