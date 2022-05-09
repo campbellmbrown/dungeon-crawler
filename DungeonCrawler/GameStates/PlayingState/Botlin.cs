@@ -24,7 +24,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public override void ActionTick()
         {
             var destination = _gridManager.PlayerFloor;
-            if (Math.Max(Math.Abs(destination.XIdx - _floor.XIdx), Math.Abs(destination.YIdx - _floor.YIdx)) <= _range)
+            if (Math.Max(Math.Abs(destination.XIdx - Floor.XIdx), Math.Abs(destination.YIdx - Floor.YIdx)) <= _range)
             {
                 SetDestination(destination);
             }

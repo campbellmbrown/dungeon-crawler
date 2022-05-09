@@ -26,5 +26,24 @@ namespace DungeonCrawler.GameStates.PlayingState
                 _actionManager.Stop();
             }
         }
+
+        public override void SetDestination(IFloor destination)
+        {
+            base.SetDestination(destination);
+            if (QueuedFloors.Count == 1 && QueuedFloors.Peek().Entity != null)
+            {
+                PartakingInActionTick = true;
+                _origPosition = Floor.Position;
+                _beenSwapped = true;
+
+                var swapTarget = QueuedFloors.Dequeue().Entity;
+                var swapTargetFloor = swapTarget.Floor;
+                QueuedFloors.Clear();
+
+                swapTarget.SwapWith(this);
+                Floor = swapTargetFloor;
+                Floor.Entity = this;
+            }
+        }
     }
 }
