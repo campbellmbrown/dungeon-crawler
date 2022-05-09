@@ -38,7 +38,6 @@ namespace DungeonCrawler.GameStates.PlayingState
 
                 var swapTarget = QueuedFloors.Dequeue().Entity;
                 var swapTargetFloor = swapTarget.Floor;
-                QueuedFloors.Clear();
 
                 swapTarget.SwapWith(this);
                 Floor = swapTargetFloor;
