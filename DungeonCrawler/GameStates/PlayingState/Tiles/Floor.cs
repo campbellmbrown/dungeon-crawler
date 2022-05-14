@@ -14,7 +14,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
     public class Floor : GridSquare, IHasSpriteSheet, IFloor
     {
-        readonly ClickManager _clickManager;
+        readonly IClickManager _clickManager;
         readonly SpriteSheet _sprite;
 
         public IEntity Entity { get; set; }
@@ -72,7 +72,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             { 47, new Rectangle(7 * GRID_SQUARE_SIZE, 5 * GRID_SQUARE_SIZE, GRID_SQUARE_SIZE, GRID_SQUARE_SIZE) },
         };
 
-        public Floor(ILogManager logManager, GridManager gridManager, ClickManager clickManager, int xIdx, int yIdx)
+        public Floor(ILogManager logManager, IGridManager gridManager, IClickManager clickManager, int xIdx, int yIdx)
             : base(gridManager, xIdx, yIdx)
         {
             _clickManager = clickManager;

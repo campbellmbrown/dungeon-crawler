@@ -5,6 +5,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 {
     public interface IPlayingState : IGameState
     {
+        void SetPlayerDestination(IFloor floor);
     }
 
     public class PlayingState : IPlayingState
@@ -30,7 +31,8 @@ namespace DungeonCrawler.GameStates.PlayingState
             _focusManager = new FocusManager(_spriteBatchManager);
             _actionManager = new ActionManager(_logManager);
             _clickManager = new ClickManager(_spriteBatchManager.MainLayerView);
-            _gridManager = new GridManager(_logManager, this, _clickManager);
+            ILevelGenerator levelGenerator = new LevelGenerator(_logManager, _clickManager);
+            _gridManager = new GridManager(this, levelGenerator);
             IEntityFactory entityFactory = new EntityFactory();
             _entityManager = new EntityManager(_logManager, _gridManager, _actionManager, entityFactory);
             _entityManager.CreateTempEnemies();

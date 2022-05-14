@@ -14,7 +14,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
     public class GridSquare : IGridSquare
     {
-        protected readonly GridManager _gridManager;
+        protected readonly IGridManager _gridManager;
 
         public const int GRID_SQUARE_SIZE = 16;
 
@@ -22,7 +22,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public int XIdx { get; set; }
         public int YIdx { get; set; }
 
-        public GridSquare(GridManager gridManager, int xIdx, int yIdx)
+        public GridSquare(IGridManager gridManager, int xIdx, int yIdx)
         {
             this._gridManager = gridManager;
             this.XIdx = xIdx;

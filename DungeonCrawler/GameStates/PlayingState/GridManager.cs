@@ -8,34 +8,39 @@ namespace DungeonCrawler.GameStates.PlayingState
     public interface IGridManager : IMyDrawable
     {
         List<IFloor> Floors { get; }
+        List<IWall> Walls { get; }
         int MinY { get; }
         int MaxY { get; }
         IFloor PlayerFloor { get; }
         IFloor StartingFloor { get; }
+
+        void SetPlayerDestination(IFloor floor);
+        bool DoesGridSquareExistAt(int xIdx, int yIdx);
+        IFloor FindFloor(int xIdx, int yIdx);
     }
 
     public class GridManager : IGridManager
     {
-        private readonly PlayingState _playingState;
+        private readonly IPlayingState _playingState;
+        private readonly ILevelGenerator _levelGenerator;
 
         public const int STARTING_X = 0;
         public const int STARTING_Y = 0;
         public const int VIEW_RANGE = 6;
 
         public List<IFloor> Floors { get; private set; } = new List<IFloor>();
-        public List<Wall> Walls { get; private set; } = new List<Wall>();
+        public List<IWall> Walls { get; private set; } = new List<IWall>();
 
         public int MinY { get; private set; }
         public int MaxY { get; private set; }
-        public IFloor PlayerFloor { get => Floors.Find(floor => floor.Entity is Player ); }
-        public IFloor StartingFloor { get => Floors.Find(floor => floor.XIdx == STARTING_X && floor.YIdx == STARTING_Y); }
+        public IFloor PlayerFloor { get => Floors.Find(floor => floor.Entity is IPlayer ); }
+        public IFloor StartingFloor { get => FindFloor(STARTING_X, STARTING_Y); }
 
-        public GridManager(ILogManager logManager, PlayingState playingState, ClickManager clickManager)
+        public GridManager(IPlayingState playingState, ILevelGenerator levelGenerator)
         {
             _playingState = playingState;
-
-            LevelGenerator levelGenerator = new LevelGenerator(logManager, this, clickManager);
-            levelGenerator.GenerateLevel();
+            _levelGenerator = levelGenerator;
+            levelGenerator.GenerateLevel(this);
             MinY = (int)Math.Min(Floors.Min(fl => fl.Position.Y), Walls.Min(wa => wa.Position.Y));
             MaxY = (int)Math.Max(Floors.Max(fl => fl.Position.Y), Walls.Max(wa => wa.Position.Y));
         }
@@ -65,6 +70,11 @@ namespace DungeonCrawler.GameStates.PlayingState
             _playingState.SetPlayerDestination(floor);
             // TODO: Add range limiting back.
             // Game1.Log("The destination isn't visible.", LogLevel.Warning);
+        }
+
+        public IFloor FindFloor(int xIdx, int yIdx)
+        {
+            return Floors.Find(floor => floor.XIdx == xIdx && floor.YIdx == yIdx);
         }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public interface IWall : IMyDrawable, IHasSpriteSheet
+    public interface IWall : IGridSquare, IMyDrawable, IHasSpriteSheet
     {
     }
 
@@ -34,7 +34,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         };
 
 
-        public Wall(ILogManager logManager, GridManager gridManager, int xIdx, int yIdx) :
+        public Wall(ILogManager logManager, IGridManager gridManager, int xIdx, int yIdx) :
             base(gridManager, xIdx, yIdx)
         {
             _sprite = new SpriteSheet(logManager, Game1.Textures["gray_brick_walls"], TextureRectangleLookup, 0);
