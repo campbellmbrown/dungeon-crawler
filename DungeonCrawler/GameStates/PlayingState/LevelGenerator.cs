@@ -6,7 +6,12 @@ using DungeonCrawler.Utility;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
-    public class LevelGenerator
+    public interface ILevelGenerator
+    {
+        void GenerateLevel(IGridManager gridManager);
+    }
+
+    public class LevelGenerator : ILevelGenerator
     {
         private enum Direction
         {
@@ -40,8 +45,8 @@ namespace DungeonCrawler.GameStates.PlayingState
         };
 
         readonly ILogManager _logManager;
-        readonly GridManager _gridManager;
-        readonly ClickManager _clickManager;
+        readonly IClickManager _clickManager;
+        IGridManager _gridManager;
 
         private int _distanceUntilDirectionChange;
 
@@ -84,15 +89,15 @@ namespace DungeonCrawler.GameStates.PlayingState
             { Direction.Right, new RNG.Weight() { Value = DEFAULT_DIRECTION_WEIGHT } },
         };
 
-        public LevelGenerator(ILogManager logManager, GridManager gridManager, ClickManager clickManager)
+        public LevelGenerator(ILogManager logManager, IClickManager clickManager)
         {
             _logManager = logManager;
-            _gridManager = gridManager;
             _clickManager = clickManager;
         }
 
-        public void GenerateLevel()
+        public void GenerateLevel(IGridManager gridManager)
         {
+            _gridManager = gridManager;
             GenerateFloor();
             GenerateWalls();
         }

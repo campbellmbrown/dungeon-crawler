@@ -6,16 +6,20 @@ using MonoGame.Extended;
 
 namespace DungeonCrawler.Management
 {
-    public class ClickManager
+    public interface IClickManager
     {
-        public delegate void MethodDelegate();
+        delegate void MethodDelegate();
+        void AddLeftClick(RectangleF clickArea, MethodDelegate func);
+    }
 
+    public class ClickManager : IClickManager
+    {
         public class Click
         {
             public RectangleF ClickArea { get; set; }
-            public MethodDelegate OutputFunc { get; }
+            public IClickManager.MethodDelegate OutputFunc { get; }
 
-            public Click(RectangleF clickArea, MethodDelegate outputFunc)
+            public Click(RectangleF clickArea, IClickManager.MethodDelegate outputFunc)
             {
                 ClickArea = clickArea;
                 OutputFunc = outputFunc;
@@ -59,7 +63,7 @@ namespace DungeonCrawler.Management
             }
         }
 
-        public void AddLeftClick(RectangleF clickArea, MethodDelegate func)
+        public void AddLeftClick(RectangleF clickArea, IClickManager.MethodDelegate func)
         {
             _leftClicks.Add(new Click(clickArea, func));
         }
