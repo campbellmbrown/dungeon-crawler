@@ -270,10 +270,10 @@ namespace DungeonCrawlerTests
             Assert.That(_entity.Position, Is.EqualTo(originalPosition));
         }
 
-        [TestCase(0, -1, 0, -GridSquare.GRID_SQUARE_SIZE / 2f)]
-        [TestCase(0, 1, 0, GridSquare.GRID_SQUARE_SIZE / 2f)]
-        [TestCase(-1, 0, -GridSquare.GRID_SQUARE_SIZE / 2f, 0)]
-        [TestCase(1, 0, GridSquare.GRID_SQUARE_SIZE / 2f, 0)]
+        [TestCase(0, -1, 0, -8)]
+        [TestCase(0, 1, 0, 8)]
+        [TestCase(-1, 0, -8, 0)]
+        [TestCase(1, 0, 8, 0)]
         public void Attack_Upwards(
             int victimFloorX,
             int victimFloorY,
