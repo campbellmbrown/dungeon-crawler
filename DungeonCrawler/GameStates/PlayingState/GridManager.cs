@@ -33,7 +33,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public int MinY { get; private set; }
         public int MaxY { get; private set; }
-        public IFloor PlayerFloor { get => Floors.Find(floor => floor.Entity is IPlayer ); }
+        public IFloor PlayerFloor { get => Floors.Find(floor => floor.Entity is IPlayer); }
         public IFloor StartingFloor { get => FindFloor(STARTING_X, STARTING_Y); }
 
         public GridManager(IPlayingState playingState, ILevelGenerator levelGenerator)

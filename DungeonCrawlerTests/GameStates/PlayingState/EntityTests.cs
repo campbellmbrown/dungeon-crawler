@@ -269,5 +269,39 @@ namespace DungeonCrawlerTests
             // Assert:
             Assert.That(_entity.Position, Is.EqualTo(originalPosition));
         }
+
+        [TestCase(0, -1, 0, -8)]
+        [TestCase(0, 1, 0, 8)]
+        [TestCase(-1, 0, -8, 0)]
+        [TestCase(1, 0, 8, 0)]
+        public void Attack_Upwards(
+            int victimFloorX,
+            int victimFloorY,
+            int expectedPeakX,
+            int expectedPeakY)
+        {
+            // Arrange:
+            Assert.That(_entity.Position, Is.EqualTo(new Vector2()));
+            var victimFloorMock = new Mock<IFloor>();
+            victimFloorMock.Setup(floor => floor.XIdx).Returns(victimFloorX);
+            victimFloorMock.Setup(floor => floor.YIdx).Returns(victimFloorY);
+            _entity.Attack(victimFloorMock.Object);
+            _entity.ActionTick();
+            Assert.That(_entity.PartakingInActionTick, Is.True);
+
+            // Setup the action manager:
+            _actionManagerMock
+                .Setup(actionManager => actionManager.ActionState)
+                .Returns(ActionState.InProgress);
+            _actionManagerMock
+                .Setup(actionManager => actionManager.DecimalComplete)
+                .Returns(0.5f);
+
+            // Act:
+            _entity.FrameTick(new Mock<IGameTimeWrapper>().Object);
+
+            // Assert:
+            Assert.That(_entity.Position, Is.EqualTo(new Vector2(expectedPeakX, expectedPeakY)));
+        }
     }
 }
