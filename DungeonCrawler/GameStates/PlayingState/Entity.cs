@@ -14,6 +14,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         void SetDestination(IFloor destination);
         void SwapWith(IEntity entity);
+        void Attack(IFloor floor);
 
         Queue<IFloor> QueuedFloors { get; set; }
         bool PartakingInActionTick { get; }
@@ -34,7 +35,12 @@ namespace DungeonCrawler.GameStates.PlayingState
         public IFloor Floor { get; protected set; }
 
         protected Vector2 _origPosition;
+        protected Vector2 _attackDirection;
+
+        // Flags
         protected bool _beenSwapped = false;
+        bool _attacking = false;
+        bool _goingToAttack = false;
 
         public Entity(
             ILogManager logManager,
@@ -65,12 +71,26 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
             if (PartakingInActionTick)
             {
-                Position = _origPosition + _actionManager.DecimalComplete * (Floor.Position - _origPosition);
+                if (_attacking)
+                {
+                    // Move in a quadratic pattern
+                    var displacement = CalculateAttackDisplacement(_actionManager.DecimalComplete);
+                    Position = _origPosition + _attackDirection * displacement;
+                }
+                else
+                {
+                    Position = _origPosition + _actionManager.DecimalComplete * (Floor.Position - _origPosition);
+                }
             }
             if (_actionManager.ActionState == ActionState.Restarting)
             {
                 ActionTick();
             }
+        }
+
+        float CalculateAttackDisplacement(float decimalComplete)
+        {
+            return (float)(GridSquare.GRID_SQUARE_SIZE * 2 * (-Math.Pow(decimalComplete, 2) + decimalComplete));
         }
 
         public virtual void Draw(ISpriteBatchWrapper spriteBatch)
@@ -84,37 +104,57 @@ namespace DungeonCrawler.GameStates.PlayingState
             return DrawOrder.FOREGROUND_CONTENT_BOTTOM + ((Position.Y - _gridManager.MinY) / (_gridManager.MaxY - _gridManager.MinY) * (DrawOrder.FOREGROUND_CONTENT_TOP - DrawOrder.FOREGROUND_CONTENT_BOTTOM));
         }
 
-        public virtual void ActionTick()
+        void ActionTickSwapping()
         {
-            _logManager.Log($"{GetType()} ({GetHashCode()}) ActionTick triggered from state {_actionManager.ActionState} beenSwapped = {_beenSwapped}", LogLevel.Debug);
-            if (_beenSwapped)
+            PartakingInActionTick = true;
+            QueuedFloors.Clear();
+        }
+
+        void ActionTickAttacking()
+        {
+            PartakingInActionTick = true;
+            _origPosition = Floor.Position;
+            _attacking = true;
+        }
+
+        void ActionTickMoving()
+        {
+            // Encountered another entity, don't move any more
+            if (QueuedFloors.Peek().Entity != null)
             {
-                PartakingInActionTick = true;
                 QueuedFloors.Clear();
-                _beenSwapped = false;
-                return;
-            }
-            if (QueuedFloors.Count > 0)
-            {
-                // Encountered another entity, don't move any more
-                if (QueuedFloors.Peek().Entity != null)
-                {
-                    QueuedFloors.Clear();
-                    PartakingInActionTick = false;
-                }
-                else // The entity is going to be doing something this action tick
-                {
-                    PartakingInActionTick = true;
-                    _origPosition = Floor.Position;
-                    Floor.Entity = null;
-                    Floor = QueuedFloors.Dequeue();
-                    Floor.Entity = this;
-                }
             }
             else
             {
-                PartakingInActionTick = false;
+                PartakingInActionTick = true;
+                _origPosition = Floor.Position;
+                Floor.Entity = null;
+                Floor = QueuedFloors.Dequeue();
+                Floor.Entity = this;
             }
+        }
+
+        public virtual void ActionTick()
+        {
+            _attacking = false;
+            PartakingInActionTick = false;
+
+            if (_beenSwapped)
+            {
+                ActionTickSwapping();
+            }
+            else if (_goingToAttack)
+            {
+                ActionTickAttacking();
+            }
+            else if (QueuedFloors.Count > 0)
+            {
+                ActionTickMoving();
+            }
+
+            // Reset flags
+            _beenSwapped = false;
+            _goingToAttack = false;
         }
 
         /// <summary>
@@ -133,6 +173,16 @@ namespace DungeonCrawler.GameStates.PlayingState
             Floor = entity.Floor;
             Floor.Entity = this;
             _beenSwapped = true;
+        }
+
+        public void Attack(IFloor floor)
+        {
+            _goingToAttack = true;
+            _attackDirection = new Vector2(floor.XIdx - Floor.XIdx, floor.YIdx - Floor.YIdx);
+            if (_attackDirection.Length() != 1)
+            {
+                throw new InvalidOperationException("The attacking entity wasn't next to the victim.");
+            }
         }
 
         public virtual void SetDestination(IFloor destination)
