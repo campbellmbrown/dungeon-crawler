@@ -10,6 +10,7 @@ namespace DungeonCrawler.Visual
         IAnimation Animation { get; }
 
         void Play(IAnimation animation);
+        void Draw(ISpriteBatchWrapper spriteBatch, Vector2 position, float layer);
     }
 
     public class AnimationManager : IAnimationManager

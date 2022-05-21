@@ -27,9 +27,6 @@ namespace DungeonCrawlerTests
             _playerMock = new Mock<IPlayer>();
             _entityFactoryMock
                 .Setup(entityFactory => entityFactory.CreatePlayer(
-                    It.IsAny<ILogManager>(),
-                    It.IsAny<IGridManager>(),
-                    It.IsAny<IActionManager>(),
                     It.IsAny<IPathFinding>(),
                     It.IsAny<IFloor>()
                 ))

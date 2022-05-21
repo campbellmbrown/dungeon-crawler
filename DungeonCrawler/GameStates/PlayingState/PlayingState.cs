@@ -24,7 +24,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         Sprite _mouseLight;
         Sprite _viewMask;
 
-        public PlayingState(ILogManager logManager, SpriteBatchManager spriteBatchManager)
+        public PlayingState(ILogManager logManager, SpriteBatchManager spriteBatchManager, IAnimationList animationList)
         {
             _logManager = logManager;
             _spriteBatchManager = spriteBatchManager;
@@ -33,7 +33,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _clickManager = new ClickManager(_spriteBatchManager.MainLayerView);
             ILevelGenerator levelGenerator = new LevelGenerator(_logManager, _clickManager);
             _gridManager = new GridManager(this, levelGenerator);
-            IEntityFactory entityFactory = new EntityFactory();
+            IEntityFactory entityFactory = new EntityFactory(_logManager, _gridManager, _actionManager, animationList);
             _entityManager = new EntityManager(_logManager, _gridManager, _actionManager, entityFactory);
             _entityManager.CreateTempEnemies();
             _mouseLight = new Sprite(Game1.Textures["medium_light"]);

@@ -36,7 +36,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             _entityFactory = entityFactory;
 
             IPathFinding dijkstra = new Dijkstra(_logManager, _gridManager.Floors);
-            Player = entityFactory.CreatePlayer(_logManager, _gridManager, _actionManager, dijkstra, gridManager.StartingFloor);
+            Player = entityFactory.CreatePlayer(dijkstra, gridManager.StartingFloor);
             _entities = new List<IEntity>();
         }
 
@@ -52,7 +52,7 @@ namespace DungeonCrawler.GameStates.PlayingState
             for (int idx = 0; idx < 10; idx++)
             {
                 _entities.Add(
-                    _entityFactory.CreateBotlin(_logManager, _gridManager, _actionManager, simpleMove, RNG.ChooseRandom(_gridManager.Floors))
+                    _entityFactory.CreateBotlin(simpleMove, RNG.ChooseRandom(_gridManager.Floors))
                 );
             }
         }

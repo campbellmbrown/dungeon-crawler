@@ -24,6 +24,7 @@ namespace DungeonCrawler
         ISpriteBatchWrapper _spriteBatchWrapper;
 
         public static Dictionary<string, Texture2D> Textures { get; set; }
+        IAnimationList _animationList;
         public static Dictionary<string, BitmapFont> Fonts { get; set; }
 
         public static Random Random { get; private set; }
@@ -85,10 +86,11 @@ namespace DungeonCrawler
             {
                 { "normal_font", Content.Load<BitmapFont>("fonts/normal_font") },
             };
+            _animationList = new AnimationList(Content);
 
             _logManager = new LogManager(_spriteBatchManager.DebugLayerView);
             _performanceManager = new PerformanceManager(_spriteBatchManager.DebugLayerView);
-            _playingState = new PlayingState(_logManager, _spriteBatchManager);
+            _playingState = new PlayingState(_logManager, _spriteBatchManager, _animationList);
         }
 
         protected override void Update(GameTime gameTime)

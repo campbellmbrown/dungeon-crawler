@@ -1,23 +1,49 @@
 using DungeonCrawler.GameStates.PlayingState.PathFinding;
+using DungeonCrawler.Visual;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
     public interface IEntityFactory
     {
-        IPlayer CreatePlayer(ILogManager logManager, IGridManager gridManager, IActionManager actionManager, IPathFinding pathFinding, IFloor floor);
-        IBotlin CreateBotlin(ILogManager logManager, IGridManager gridManager, IActionManager actionManager, IPathFinding pathFinding, IFloor floor);
+        IPlayer CreatePlayer(IPathFinding pathFinding, IFloor floor);
+        IBotlin CreateBotlin(IPathFinding pathFinding, IFloor floor);
     }
 
     public class EntityFactory : IEntityFactory
     {
-        public IPlayer CreatePlayer(ILogManager logManager, IGridManager gridManager, IActionManager actionManager, IPathFinding pathFinding, IFloor floor)
+        readonly ILogManager _logManager;
+        readonly IGridManager _gridManager;
+        readonly IActionManager _actionManager;
+        readonly IAnimationList _animationList;
+
+        public EntityFactory(
+            ILogManager logManager,
+            IGridManager gridManager,
+            IActionManager actionManager,
+            IAnimationList animationList)
         {
-            return new Player(logManager, gridManager, actionManager, pathFinding, floor);
+            _logManager = logManager;
+            _gridManager = gridManager;
+            _actionManager = actionManager;
+            _animationList = animationList;
         }
 
-        public IBotlin CreateBotlin(ILogManager logManager, IGridManager gridManager, IActionManager actionManager, IPathFinding pathFinding, IFloor floor)
+        public IPlayer CreatePlayer(IPathFinding pathFinding, IFloor floor)
         {
-            return new Botlin(logManager, gridManager, actionManager, pathFinding, floor);
+            var animationManager = new AnimationManager(_animationList.Get(AnimationId.PlayerIdleLeft));
+            return new Player(
+                _logManager,
+                _gridManager,
+                _actionManager,
+                pathFinding,
+                floor,
+                _animationList,
+                animationManager);
+        }
+
+        public IBotlin CreateBotlin(IPathFinding pathFinding, IFloor floor)
+        {
+            return new Botlin(_logManager, _gridManager, _actionManager, pathFinding, floor);
         }
     }
 }
