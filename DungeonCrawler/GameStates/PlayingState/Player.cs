@@ -55,6 +55,24 @@ namespace DungeonCrawler.GameStates.PlayingState
             }
         }
 
+        public override void ActionTick()
+        {
+            base.ActionTick();
+            if (!PartakingInActionTick)
+            {
+                return;
+            }
+            float hysteresis = 0.1f;
+            if (_distanceToTravel.X > hysteresis)
+            {
+                _animationManager.Play(AnimationId.PlayerIdleRight);
+            }
+            else if (_distanceToTravel.X < -hysteresis)
+            {
+                _animationManager.Play(AnimationId.PlayerIdleLeft);
+            }
+        }
+
         public override void SetDestination(IFloor destination)
         {
             base.SetDestination(destination);

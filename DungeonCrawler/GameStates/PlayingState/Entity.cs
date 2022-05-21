@@ -59,6 +59,8 @@ namespace DungeonCrawler.GameStates.PlayingState
             Position = Floor.Position;
         }
 
+        protected Vector2 _distanceToTravel => Floor.Position - _origPosition;
+
         public virtual void FrameTick(IGameTimeWrapper gameTime)
         {
             if (_actionManager.ActionState == ActionState.Stopped)
@@ -79,7 +81,7 @@ namespace DungeonCrawler.GameStates.PlayingState
                 }
                 else
                 {
-                    Position = _origPosition + _actionManager.DecimalComplete * (Floor.Position - _origPosition);
+                    Position = _origPosition + _actionManager.DecimalComplete * _distanceToTravel;
                 }
             }
             if (_actionManager.ActionState == ActionState.Restarting)
@@ -95,13 +97,7 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public virtual void Draw(ISpriteBatchWrapper spriteBatch)
         {
-            spriteBatch.SpriteBatch.DrawRectangle(new RectangleF(Position.X, Position.Y, 16, 16), Color.Yellow, 1f, FindLayerDepth());
-        }
-
-        // Temporary - create proper function (with an interface?) when drawing an actual sprite.
-        public float FindLayerDepth()
-        {
-            return DrawOrder.FOREGROUND_CONTENT_BOTTOM + ((Position.Y - _gridManager.MinY) / (_gridManager.MaxY - _gridManager.MinY) * (DrawOrder.FOREGROUND_CONTENT_TOP - DrawOrder.FOREGROUND_CONTENT_BOTTOM));
+            spriteBatch.SpriteBatch.DrawRectangle(new RectangleF(Position.X, Position.Y, 16, 16), Color.Yellow, 1f, _gridManager.FindLayerDepth(Position.Y));
         }
 
         void ActionTickSwapping()
