@@ -11,6 +11,7 @@ namespace DungeonCrawler.Visual
         PlayerIdleLeft,
         PlayerIdleRight,
         PlayerIdleUp,
+        PlayerIdleDown,
     }
 
     public interface IAnimationList
@@ -37,6 +38,10 @@ namespace DungeonCrawler.Visual
                 { AnimationId.PlayerIdleUp, new Animation(
                     content.Load<Texture2D>("textures/animations/player_idle_up"), 6,
                     new List<float> { 1.1f, 0.1f, 0.1f, 0.1f, 1f, 0.2f } )
+                },
+                { AnimationId.PlayerIdleDown, new Animation(
+                    content.Load<Texture2D>("textures/animations/player_idle_down"), 7,
+                    new List<float> { 1f, 0.1f, 0.1f, 0.1f, 1f, 0.1f, 0.2f } )
                 },
             };
             CheckAllAnimationsLoaded();

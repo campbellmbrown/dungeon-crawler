@@ -75,6 +75,10 @@ namespace DungeonCrawler.GameStates.PlayingState
             {
                 _animationManager.Play(AnimationId.PlayerIdleUp);
             }
+            else if (_distanceToTravel.Y > hysteresis)
+            {
+                _animationManager.Play(AnimationId.PlayerIdleDown);
+            }
         }
 
         public override void SetDestination(IFloor destination)
