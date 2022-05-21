@@ -28,7 +28,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public override void Draw(ISpriteBatchWrapper spriteBatch)
         {
             // TODO update draw order.
-            _animationManager.Draw(spriteBatch, Position, DrawOrder.DEBUG);
+            _animationManager.Draw(spriteBatch, Position, _gridManager.FindLayerDepth(Position.Y));
             base.Draw(spriteBatch);
         }
 

@@ -49,7 +49,7 @@ namespace DungeonCrawler.Visual
         }
 
         float _timer;
-        Rectangle _drawRectangle => new Rectangle(CurrentFrame * _animation.FrameWidth, 0, _animation.FrameWidth, _animation.FrameWidth);
+        Rectangle _drawRectangle => new Rectangle(CurrentFrame * _animation.FrameWidth, 0, _animation.FrameWidth, _animation.FrameHeight);
 
         public AnimationManager(IAnimation animation)
         {

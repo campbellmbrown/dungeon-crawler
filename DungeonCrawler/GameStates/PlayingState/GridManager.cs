@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DungeonCrawler.Management;
+using DungeonCrawler.Visual;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
@@ -17,6 +17,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         void SetPlayerDestination(IFloor floor);
         bool DoesGridSquareExistAt(int xIdx, int yIdx);
         IFloor FindFloor(int xIdx, int yIdx);
+        float FindLayerDepth(float yPos);
     }
 
     public class GridManager : IGridManager
@@ -75,6 +76,18 @@ namespace DungeonCrawler.GameStates.PlayingState
         public IFloor FindFloor(int xIdx, int yIdx)
         {
             return Floors.Find(floor => floor.XIdx == xIdx && floor.YIdx == yIdx);
+        }
+
+        /// <summary>
+        /// Finds the layer depth value for drawing.
+        /// </summary>
+        /// Calculates the layer depth by using the min and max position of the GridSquares, finding where
+        /// the position of interest lies between these two values, and converts it to a value between
+        /// FOREGROUND_CONTENT_TOP and FOREGROUND_CONTENT_BOTTOM.
+        public float FindLayerDepth(float yPos)
+        {
+            float positionRatio = (yPos - MinY) / (MaxY - MinY);
+            return DrawOrder.FOREGROUND_CONTENT_BOTTOM + (positionRatio * (DrawOrder.FOREGROUND_CONTENT_TOP - DrawOrder.FOREGROUND_CONTENT_BOTTOM));
         }
     }
 }

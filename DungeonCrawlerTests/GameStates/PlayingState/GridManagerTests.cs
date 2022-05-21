@@ -1,4 +1,6 @@
 using DungeonCrawler.GameStates.PlayingState;
+using DungeonCrawler.Visual;
+using Microsoft.Xna.Framework;
 using Moq;
 using NUnit.Framework;
 
@@ -21,6 +23,11 @@ namespace DungeonCrawlerTests
                     gridManager.Floors.Add(CreateMockFloor(0, 0).Object);
                     gridManager.Walls.Add(CreateMockWall(1, 0).Object);
                 });
+            CreateGridManager();
+        }
+
+        void CreateGridManager()
+        {
             _gridManager = new GridManager(
                 _playingStateMock.Object,
                 _levelGeneratorMock.Object);
@@ -31,6 +38,8 @@ namespace DungeonCrawlerTests
             var floorMock = new Mock<IFloor>();
             floorMock.Setup(floor => floor.XIdx).Returns(xIdx);
             floorMock.Setup(floor => floor.YIdx).Returns(yIdx);
+            floorMock.Setup(floor => floor.Position)
+                .Returns(new Vector2(xIdx * GridSquare.GRID_SQUARE_SIZE, yIdx * GridSquare.GRID_SQUARE_SIZE));
             return floorMock;
         }
 
@@ -39,6 +48,8 @@ namespace DungeonCrawlerTests
             var wallMock = new Mock<IWall>();
             wallMock.Setup(wall => wall.XIdx).Returns(xIdx);
             wallMock.Setup(wall => wall.YIdx).Returns(yIdx);
+            wallMock.Setup(wall => wall.Position)
+                .Returns(new Vector2(xIdx * GridSquare.GRID_SQUARE_SIZE, yIdx * GridSquare.GRID_SQUARE_SIZE));
             return wallMock;
         }
 
@@ -101,6 +112,31 @@ namespace DungeonCrawlerTests
             // Assert:
             _playingStateMock
                 .Verify(playingState => playingState.SetPlayerDestination(floorMock.Object));
+        }
+
+        [TestCase(80, 0.8f)] // 5 * 16 = 80, this is the bottom-most GridSquare position
+        [TestCase(40, 0.65f)]
+        [TestCase(20, 0.575f)]
+        [TestCase(0, 0.5f)] // This is the middle GridSquare position
+        [TestCase(-20, 0.425f)]
+        [TestCase(-40, 0.35f)]
+        [TestCase(-80, 0.2f)] // -5 * 16 = -80, this is the top-most GridSquare position
+        public void FindLayerDepth(float yPos, float expecedLayerDepth)
+        {
+            // Arrange:
+            _levelGeneratorMock
+                .Setup(levelGenerator => levelGenerator.GenerateLevel(It.IsAny<IGridManager>()))
+                .Callback<IGridManager>(gridManager => {
+                    gridManager.Floors.Add(CreateMockFloor(0, -5).Object);
+                    gridManager.Walls.Add(CreateMockWall(0, 5).Object);
+                });
+            CreateGridManager();
+
+            // Act:
+            var layerDepth = _gridManager.FindLayerDepth(yPos);
+
+            // Assert:
+            Assert.That(layerDepth, Is.EqualTo(expecedLayerDepth).Within(0.001f));
         }
     }
 }

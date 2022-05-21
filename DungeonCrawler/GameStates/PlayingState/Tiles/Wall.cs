@@ -43,7 +43,7 @@ namespace DungeonCrawler.GameStates.PlayingState
         public void Draw(ISpriteBatchWrapper spriteBatch)
         {
             Vector2 offset = new Vector2(0, GRID_SQUARE_SIZE - WALL_HEIGHT);
-            _sprite.Draw(spriteBatch, Position + offset, FindLayerDepth());
+            _sprite.Draw(spriteBatch, Position + offset, _gridManager.FindLayerDepth(Position.Y));
         }
 
         public void UpdateID(int id)
