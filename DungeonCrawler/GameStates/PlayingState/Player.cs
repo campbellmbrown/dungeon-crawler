@@ -1,5 +1,6 @@
 using DungeonCrawler.GameStates.PlayingState.PathFinding;
 using DungeonCrawler.Visual;
+using Microsoft.Xna.Framework;
 
 namespace DungeonCrawler.GameStates.PlayingState
 {
@@ -27,9 +28,22 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public override void Draw(ISpriteBatchWrapper spriteBatch)
         {
-            // TODO update draw order.
-            _animationManager.Draw(spriteBatch, Position, _gridManager.FindLayerDepth(Position.Y));
-            base.Draw(spriteBatch);
+            var alignment = new Vector2(0.5f, 0.9f);
+            var adjustment = CalculatePositionAdjustment(alignment);
+            _animationManager.Draw(spriteBatch, Position + adjustment, _gridManager.FindLayerDepth(Position.Y));
+        }
+
+        /// <summary>
+        /// Calculates the position adjustment to align the bottom-center of the entity to the position specified.
+        /// </summary>
+        /// <param name="alignment">A Vector2 specifying the position to align to. This should be match the coordinates
+        /// (i.e. X +ve towards the right of the screen, Y +ve towards the bottom of the screen) and should be from
+        /// [0, 0] to [1, 1].</param>
+        /// <returns>The position adjustment.</returns>
+        Vector2 CalculatePositionAdjustment(Vector2 alignment)
+        {
+            var alignmentPos = alignment * GridSquare.GRID_SQUARE_SIZE;
+            return alignmentPos - _animationManager.CurrentFrameRelativeBottomMiddle;
         }
 
         public override void FrameTick(IGameTimeWrapper gameTime)

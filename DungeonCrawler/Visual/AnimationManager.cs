@@ -8,6 +8,7 @@ namespace DungeonCrawler.Visual
     {
         int CurrentFrame { get; }
         IAnimation Animation { get; }
+        Vector2 CurrentFrameRelativeBottomMiddle { get; }
 
         void Play(IAnimation animation);
         void Draw(ISpriteBatchWrapper spriteBatch, Vector2 position, float layer);
@@ -47,6 +48,8 @@ namespace DungeonCrawler.Visual
                 }
             }
         }
+
+        public Vector2 CurrentFrameRelativeBottomMiddle => new Vector2(Animation.FrameWidth / 2f, Animation.FrameHeight);
 
         float _timer;
         Rectangle _drawRectangle => new Rectangle(CurrentFrame * _animation.FrameWidth, 0, _animation.FrameWidth, _animation.FrameHeight);
