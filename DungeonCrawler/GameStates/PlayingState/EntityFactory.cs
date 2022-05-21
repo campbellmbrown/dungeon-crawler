@@ -30,14 +30,13 @@ namespace DungeonCrawler.GameStates.PlayingState
 
         public IPlayer CreatePlayer(IPathFinding pathFinding, IFloor floor)
         {
-            var animationManager = new AnimationManager(_animationList.Get(AnimationId.PlayerIdleLeft));
+            var animationManager = new AnimationManager(_animationList, AnimationId.PlayerIdleLeft);
             return new Player(
                 _logManager,
                 _gridManager,
                 _actionManager,
                 pathFinding,
                 floor,
-                _animationList,
                 animationManager);
         }
 

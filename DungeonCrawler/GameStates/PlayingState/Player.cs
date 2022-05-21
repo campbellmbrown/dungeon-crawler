@@ -18,12 +18,11 @@ namespace DungeonCrawler.GameStates.PlayingState
             IActionManager actionManager,
             IPathFinding pathFinding,
             IFloor floor,
-            IAnimationList animationList,
             IAnimationManager animationManager) :
             base(logManager, gridManager, actionManager, pathFinding, floor)
         {
             _animationManager = animationManager;
-            _animationManager.Play(animationList.Get(AnimationId.PlayerIdleLeft));
+            _animationManager.Play(AnimationId.PlayerIdleLeft);
         }
 
         public override void Draw(ISpriteBatchWrapper spriteBatch)

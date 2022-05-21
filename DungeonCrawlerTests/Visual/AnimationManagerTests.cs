@@ -8,6 +8,7 @@ namespace DungeonCrawlerTests
 {
     public class AnimationManagerTests
     {
+        Mock<IAnimationList> _animationListMock;
         Mock<IAnimation> _animationMock;
         Mock<IGameTimeWrapper> _gameTimeWrapperMock;
         IAnimationManager _animationManager;
@@ -15,9 +16,13 @@ namespace DungeonCrawlerTests
         [SetUp]
         public void Setup()
         {
-            _animationMock = new Mock<IAnimation>();
+            _animationListMock = new Mock<IAnimationList>();
             _gameTimeWrapperMock = new Mock<IGameTimeWrapper>();
-            _animationManager = new AnimationManager(_animationMock.Object);
+            _animationMock = new Mock<IAnimation>();
+            _animationListMock
+                .Setup(animationList => animationList.Get(AnimationId.PlayerIdleLeft))
+                .Returns(_animationMock.Object);
+            _animationManager = new AnimationManager(_animationListMock.Object, AnimationId.PlayerIdleLeft);
         }
 
         [Test]
@@ -93,13 +98,16 @@ namespace DungeonCrawlerTests
         public void FrameTick_Play()
         {
             // Arrange:
-            var _newAnimation = new Mock<IAnimation>();
+            var _newAnimationMock = new Mock<IAnimation>();
+            _animationListMock
+                .Setup(animationList => animationList.Get(AnimationId.PlayerIdleRight))
+                .Returns(_newAnimationMock.Object);
 
             // Act:
-            _animationManager.Play(_newAnimation.Object);
+            _animationManager.Play(AnimationId.PlayerIdleRight);
 
             // Arrange:
-            Assert.That(_animationManager.Animation, Is.EqualTo(_newAnimation.Object));
+            Assert.That(_animationManager.Animation, Is.EqualTo(_newAnimationMock.Object));
             Assert.That(_animationManager.CurrentFrame, Is.Zero);
         }
     }

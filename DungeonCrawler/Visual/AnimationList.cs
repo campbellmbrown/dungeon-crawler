@@ -7,6 +7,7 @@ namespace DungeonCrawler.Visual
     public enum AnimationId
     {
         PlayerIdleLeft,
+        PlayerIdleRight,
     }
 
     public interface IAnimationList
@@ -24,6 +25,10 @@ namespace DungeonCrawler.Visual
             {
                 { AnimationId.PlayerIdleLeft, new Animation(
                     content.Load<Texture2D>("textures/animations/player_idle_left"), 8,
+                    new List<float> { 1f, 0.1f, 0.1f, 0.1f, 1f, 0.1f, 0.10f, 0.1f } )
+                },
+                { AnimationId.PlayerIdleRight, new Animation(
+                    content.Load<Texture2D>("textures/animations/player_idle_right"), 8,
                     new List<float> { 1f, 0.1f, 0.1f, 0.1f, 1f, 0.1f, 0.10f, 0.1f } )
                 },
             };

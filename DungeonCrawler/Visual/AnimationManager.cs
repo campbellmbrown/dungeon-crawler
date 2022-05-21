@@ -10,12 +10,14 @@ namespace DungeonCrawler.Visual
         IAnimation Animation { get; }
         Vector2 CurrentFrameRelativeBottomMiddle { get; }
 
-        void Play(IAnimation animation);
+        void Play(AnimationId animation);
         void Draw(ISpriteBatchWrapper spriteBatch, Vector2 position, float layer);
     }
 
     public class AnimationManager : IAnimationManager
     {
+        readonly IAnimationList _animationList;
+
         public int CurrentFrame { get; private set; } = 0;
 
         IAnimation _animation;
@@ -54,9 +56,10 @@ namespace DungeonCrawler.Visual
         float _timer;
         Rectangle _drawRectangle => new Rectangle(CurrentFrame * _animation.FrameWidth, 0, _animation.FrameWidth, _animation.FrameHeight);
 
-        public AnimationManager(IAnimation animation)
+        public AnimationManager(IAnimationList animationList, AnimationId startingAnimation)
         {
-            Animation = animation;
+            _animationList = animationList;
+            Play(startingAnimation);
         }
 
         public void FrameTick(IGameTimeWrapper gameTime)
@@ -73,9 +76,9 @@ namespace DungeonCrawler.Visual
             }
         }
 
-        public void Play(IAnimation animation)
+        public void Play(AnimationId animation)
         {
-            Animation = animation;
+            Animation = _animationList.Get(animation);
         }
 
         public void Draw(ISpriteBatchWrapper spriteBatch, Vector2 position, float layer)
